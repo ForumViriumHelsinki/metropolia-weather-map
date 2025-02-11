@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "start-db": "docker-compose up",
     "lint": "next lint"
   },
   "dependencies": {
