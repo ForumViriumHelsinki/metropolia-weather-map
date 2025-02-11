@@ -1,15 +1,70 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const avenir = localFont({
+  src: [
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Light.otf",
+      weight: "300",
+      style: "light",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Book.otf",
+      weight: "400",
+      style: "book",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Roman.otf",
+      weight: "500",
+      style: "roman",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Medium.otf",
+      weight: "600",
+      style: "medium",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Heavy.otf",
+      weight: "800",
+      style: "heavy",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Black.otf",
+      weight: "900",
+      style: "black",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-LightOblique.otf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-BookOblique.otf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-Oblique.otf",
+      weight: "500",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-MediumOblique.otf",
+      weight: "600",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-HeavyOblique.otf",
+      weight: "800",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Avenir/AvenirLTStd-BlackOblique.otf",
+      weight: "900",
+      style: "italic",
+    },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -24,11 +79,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${avenir.className} antialiased`}>{children}</body>
     </html>
   );
 }

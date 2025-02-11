@@ -2,27 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  @apply m-0 p-0;
 }
 
+/* Light mode */
+:root {
+  --background: white;
+  --foreground: black;
+}
+
+/* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: theme(colors.dark.gray);
+    --foreground: white;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: theme(fontFamily.avenir), Arial, Helvetica, sans-serif;
   @apply w-screen;
 }
 
 /* Leaflet */
 
 .leaflet-container {
-  @apply w-full h-full;
+  @apply h-full w-full;
 }
