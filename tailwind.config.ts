@@ -19,7 +19,7 @@ export default {
         // Dark mode
         dark: {
           gray: "#181a1b",
-          test: "#990000",
+          banner: "#3e1500",
         },
         // Variables
         background: "var(--background)",

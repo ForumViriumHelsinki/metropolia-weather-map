@@ -1,0 +1,50 @@
+[
+  {
+    "type": "auringossa",
+    "temperature": 15,
+    "humidity": 65,
+    "attached": "tolppa"
+  },
+  {
+    "type": "varjossa",
+    "temperature": 14,
+    "humidity": 68,
+    "attached": "puu"
+  },
+  {
+    "type": "auringossa",
+    "temperature": 13,
+    "humidity": 72,
+    "attached": "julkisivulla"
+  },
+  {
+    "type": "varjossa",
+    "temperature": 16,
+    "humidity": 60,
+    "attached": "julkisivulla"
+  },
+  {
+    "type": "auringossa",
+    "temperature": 12,
+    "humidity": 70,
+    "attached": "tolppa"
+  },
+  {
+    "type": "varjossa",
+    "temperature": 17,
+    "humidity": 63,
+    "attached": "puu"
+  },
+  {
+    "type": "auringossa",
+    "temperature": 11,
+    "humidity": 75,
+    "attached": "tolppa"
+  },
+  {
+    "type": "varjossa",
+    "temperature": 18,
+    "humidity": 58,
+    "attached": "julkisivulla"
+  }
+]
