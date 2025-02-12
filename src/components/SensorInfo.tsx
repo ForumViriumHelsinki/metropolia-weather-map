@@ -30,8 +30,8 @@ const SensorInfo = ({ data }: { data: TempData }) => {
 
       {/* Details */}
       <div
-        //
-        className={`absolute top-[calc(100%-6px)] h-fit overflow-hidden transition-all ${visible ? "sensor-info-shadow max-h-[150px]" : "max-h-0"} w-full text-black [&_span]:text-lg`}
+        // Distance from top reduced by height of padding to keep distance between text consistent
+        className={`absolute top-[calc(100%-8px)] h-fit overflow-hidden transition-all ${visible ? "sensor-info-shadow max-h-[150px]" : "max-h-0"} w-full text-black [&_span]:text-lg`}
       >
         <div
           className={`${bgColor} px-6 pb-2 transition-colors duration-300 ease-linear`}

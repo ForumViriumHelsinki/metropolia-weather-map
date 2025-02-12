@@ -1,4 +1,5 @@
 import SensorInfo from "@/components/SensorInfo";
+import TestMap from "@/components/TestMap";
 import tempData from "./temp-data.json";
 
 export type TempData = {
@@ -16,7 +17,9 @@ export default async function Home() {
       {/* Hero */}
       <div className="flex w-full justify-between bg-yellow-pale px-[16.666%] dark:bg-dark-banner">
         <h1 className="w-1/4 pt-9 text-5xl">Mäkelänkatu</h1>
-        <div className="aspect-[2/1] w-1/2 border-2">{/* <TestMap /> */}</div>
+        <div className="aspect-[2/1] w-1/2 border-2">
+          <TestMap />
+        </div>
       </div>
 
       {/* Sensor data */}
