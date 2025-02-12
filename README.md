@@ -30,7 +30,7 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 # Tietokanta
 Postgres tietokanta käynnistetään docker säiliössä komennolla:
-`docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydatabase -p 5432:5432 -d postgres`
+`docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydatabase -p 5432:5432 -d postgis/postgis`
 Korvaa my- alkuiset syötteet omillasi.
 
 Luodun ympäristön voi tuhota näin:
@@ -39,3 +39,7 @@ Luodun ympäristön voi tuhota näin:
 Jos tallensit dataa volumeen, saat sen poistettua komennolla:
 `docker volume prune`
 Tämä poistaa kaikki volumet, joilla ei ole assosiaatiota käynnissä olevaan tai pysäytettyyn docker säiliöön.
+
+Tietokannan terminaaliin pääsee käsiksi näin:
+`docker exec -it my-postgres psql -U myuser -d mydatabase`
+my- alkuiset syötteet korvaat omillasi.
