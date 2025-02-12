@@ -31,6 +31,10 @@ body {
     @apply after:absolute after:left-[14px] after:top-[10px] after:block;
     @apply after:border-4 after:border-orange after:border-l-transparent after:border-t-transparent;
   }
+
+  .sensor-info-shadow {
+    @apply shadow-[5px_15px_10px_var(--background)];
+  }
 }
 
 /* Leaflet */
