@@ -1,7 +1,7 @@
 services:
   db:
     container_name: weather-map-db
-    image: postgres:latest
+    image: postgis/postgis
     restart: always
     shm_size: 128mb
     volumes:
