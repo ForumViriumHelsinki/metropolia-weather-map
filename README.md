@@ -27,19 +27,3 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 - Analysointi selviää tavoitteiden määrittämisen jälkeen.
 - Knime tai joku muu soveltuva teknologia
-
-# Tietokanta
-Postgres tietokanta käynnistetään docker säiliössä komennolla:<br>
-`docker run --name my-postgres -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypassword -e POSTGRES_DB=mydatabase -p 5432:5432 -d postgis/postgis`<br>
-Korvaa my- alkuiset syötteet omillasi.
-
-Luodun ympäristön voi tuhota näin:<br>
-1. `docker stop my-postgres`
-2. `docker rm my-postgres`<br>
-3. Jos tallensit dataa volumeen, saat sen poistettua komennolla:<br>
-`docker volume prune`<br>
-Tämä poistaa kaikki volumet, joilla ei ole assosiaatiota käynnissä olevaan tai pysäytettyyn docker säiliöön.
-
-Tietokannan terminaaliin pääsee käsiksi näin:<br>
-`docker exec -it my-postgres psql -U myuser -d mydatabase`<br>
-my- alkuiset syötteet korvaat omillasi.
