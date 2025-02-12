@@ -33,7 +33,7 @@ body {
   }
 
   .sensor-info-shadow {
-    @apply shadow-[5px_12px_10px_var(--background)];
+    @apply shadow-[5px_15px_10px_var(--background)];
   }
 }
 
