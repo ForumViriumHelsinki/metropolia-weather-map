@@ -6,6 +6,7 @@ services:
     shm_size: 128mb
     volumes:
       - ./db_data:/var/lib/postgresql/data
+      - ./init_db/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: pass
     ports:
