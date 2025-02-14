@@ -27,3 +27,15 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 - Analysointi selviää tavoitteiden määrittämisen jälkeen.
 - Knime tai joku muu soveltuva teknologia
+
+# Projekti
+
+## Client
+
+- `pnpm install`
+- `pnpm run dev`
+
+## Server
+
+- `pip install -r requirements.txt`
+- `py .\main.py`
