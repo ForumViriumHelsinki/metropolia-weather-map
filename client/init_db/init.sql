@@ -21,5 +21,6 @@ CREATE TABLE IF NOT EXISTS weather.sensordata (
     humidity FLOAT,
     temperature FLOAT,
     sensor TEXT,
-    FOREIGN KEY (sensor) REFERENCES weather.sensors(id) ON DELETE CASCADE
+    FOREIGN KEY (sensor) REFERENCES weather.sensors(id) ON DELETE CASCADE,
+    CONSTRAINT sensor_time_id UNIQUE (time,sensor)
 );

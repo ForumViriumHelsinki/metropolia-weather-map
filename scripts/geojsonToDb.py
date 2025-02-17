@@ -11,11 +11,10 @@ load_dotenv()
 DB_NAME = os.getenv("POSTGRES_DB")
 DB_USER = os.getenv("POSTGRES_USER")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_HOST = os.getenv("POSTGRES_HOST")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 TABLE_NAME = "weather.sensors"  # Change this to your table name
 GEOJSON_FOLDER = "./scripts/sensors"  # Change this to your GeoJSON folder path
-
 # Establish connection to the database
 conn = psycopg2.connect(
     dbname=DB_NAME,
@@ -64,4 +63,4 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print("CSV and GeoJSON data inserted successfully!")
+print("GeoJSON data inserted successfully!")
