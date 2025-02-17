@@ -15,7 +15,8 @@
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-leaflet": "5.0.0-rc.2"
+    "react-leaflet": "5.0.0-rc.2",
+    "weather-map": "file:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
