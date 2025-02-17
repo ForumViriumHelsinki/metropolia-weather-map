@@ -14,8 +14,7 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DB_HOST = os.getenv("POSTGRES_HOST")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 TABLE_NAME = "weather.sensordata"  # Change this to your table name
-##CSV_FILE = "./scripts/makelankatu-2024.csv"  # Change this to your CSV file path
-CSV_FILE = "./scripts/makelankatu-2024_test.csv"  # Change this to your CSV file path
+CSV_FILE = "./scripts/makelankatu-2024.csv"  # Change this to your CSV file path
 
 # Establish connection to the database
 conn = psycopg2.connect(
