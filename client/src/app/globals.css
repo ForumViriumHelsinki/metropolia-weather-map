@@ -8,17 +8,17 @@
 
 /* Light mode */
 :root {
-  --background: white;
+  --background: #9dcdc0;
   --foreground: black;
 }
 
 /* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: theme(colors.dark.gray);
     --foreground: white;
   }
-}
+} */
 
 body {
   color: var(--foreground);
