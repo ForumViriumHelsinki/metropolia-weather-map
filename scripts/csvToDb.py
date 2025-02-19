@@ -5,7 +5,8 @@ from io import StringIO
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
+load_dotenv(ENV_PATH)
 
 # Database connection parameters
 DB_NAME = os.getenv("DB_NAME")
@@ -13,8 +14,11 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASS")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT", "5432")
-TABLE_NAME = "weather_alt.sensordata"  # Change this to your table name
-CSV_FILE = "./makelankatu-2024.csv"  # Change this to your CSV file path
+TABLE_NAME = "weather.sensordata"  # Change this to your table name
+
+CSV_FILE = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "data", "makelankatu-2024.csv")
+)  # Change this to your CSV file path
 
 # Establish connection to the database
 conn = psycopg2.connect(

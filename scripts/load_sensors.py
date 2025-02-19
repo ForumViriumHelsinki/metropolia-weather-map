@@ -3,11 +3,15 @@ import os
 import json
 from dotenv import load_dotenv
 
-load_dotenv("../.env.local")
+ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
+
+load_dotenv(ENV_PATH)
+
 
 FOLDER_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data/sensors")
+    os.path.join(os.path.dirname(__file__), "..", "data", "sensors")
 )
+
 
 TABLE = "weather.sensors"
 
@@ -16,6 +20,8 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
+
+print(DB_HOST)
 
 
 def insert_sensor(cursor, id, lon, lat, type, note, attached, install_date):
