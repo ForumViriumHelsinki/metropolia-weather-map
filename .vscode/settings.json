@@ -1,0 +1,14 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "weather_alt",
+      "database": "weather_alt",
+      "username": "postgres",
+      "password": "pass"
+    }
+  ]
+}
