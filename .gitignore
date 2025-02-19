@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 .venv
+!.env.local
 
 # vercel
 .vercel
@@ -42,7 +43,13 @@ yarn-error.log*
 next-env.d.ts
 
 # Postgres data
-/db_data
+**/db_data
 
 # Webstorm
 .idea
+
+vscode
+**/.vscode
+
+# pycache
+**/__pycache__
