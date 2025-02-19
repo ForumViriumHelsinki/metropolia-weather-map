@@ -6,17 +6,11 @@ CREATE SCHEMA IF NOT EXISTS weather_alt;
 
 SET search_path TO weather_alt;
 
-CREATE TYPE coords AS (
-	lat FLOAT,
-	lon FLOAT
-);
-
-CREATE TYPE sensor_type AS ENUM ('sun', 'shade');
 
 CREATE TABLE IF NOT EXISTS weather_alt.sensors (
     id TEXT PRIMARY KEY,
-    coords coords,
-    type sensor_type,
+    coords POINT,
+    type TEXT,
     note TEXT,
     attached TEXT,
     install_date DATE
