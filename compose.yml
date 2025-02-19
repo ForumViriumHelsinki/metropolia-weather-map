@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: weather-map-db-alt
+    container_name: weatherdb
     image: postgres
     environment:
       POSTGRES_USER: postgres

@@ -3,12 +3,13 @@ import os
 import json
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env.local"))
+load_dotenv("../.env.local")
 
 FOLDER_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../data/sensors")
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data/sensors")
 )
-TABLE = "weather_alt.sensors"
+
+TABLE = "weather.sensors"
 
 DB_NAME = os.getenv("DB_NAME")
 DB_HOST = os.getenv("DB_HOST")
