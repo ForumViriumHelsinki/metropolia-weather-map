@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node_modules/.bin/next dev --turbopack",
+    "build": "node_modules/.bin/next build",
+    "start": "node_modules/.bin/next start",
     "start-db": "docker-compose up",
     "enter-db": "docker exec -it weather-map-db psql -U postgres",
-    "lint": "next lint"
+    "start-api": "uvicorn api.main:app --reload",
+    "lint": "node_modules/.bin/next lint"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
