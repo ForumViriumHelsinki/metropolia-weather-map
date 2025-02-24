@@ -1,6 +1,6 @@
 export enum SensorType {
-  "auringossa",
-  "varjossa",
+  "Auringossa",
+  "Varjossa",
 }
 
 export type Sensor = {

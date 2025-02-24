@@ -1,13 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import TIMESTAMP, Column, Integer, String, Date, select
-from geoalchemy2 import Geometry
-from sqlalchemy import text
-from sqlalchemy import Table, Column, MetaData, TEXT, DATETIME
+from sqlalchemy import TIMESTAMP, Column, Table, MetaData, TEXT, select
 from sqlalchemy.dialects.postgresql import DATE
 from datetime import datetime
-from dateutil import parser
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -130,21 +126,23 @@ async def post_sensordata(
 
 @app.get("/api/sensors")
 async def get_sensors(db: AsyncSession = Depends(get_db)):
+    print("Sensors")
     query = sensor_table.select()
     result = await db.execute(query)
     sensors = result.fetchall()
     return {"sensors": [dict(row._mapping) for row in sensors]}
 
 
-@app.get("/api/sensors/{sensor_id}")
+@app.get("/api/sensors/id/{sensor_id}")
 async def get_sensor(sensor_id: str, db: AsyncSession = Depends(get_db)):
+    print("Sensors id")
     query = sensor_table.select().where(sensor_table.c.id == sensor_id)
     result = await db.execute(query)
     sensor = result.fetchone()
     return {"sensor": dict(sensor._mapping)}
 
 
-@app.get("/api/sensordata/{sensor_id}")
+@app.get("/api/sensordata/id/{sensor_id}")
 async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
     query = sensordata_table.select().where(sensordata_table.c.sensor == sensor_id)
     result = await db.execute(query)
@@ -152,14 +150,19 @@ async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
     return {"data": [dict(row._mapping) for row in data]}
 
 
-@app.get("/api/sensordata/{start_date}/{end_date}")
+@app.get("/api/sensordata/dates")
 async def get_sensor_data_range(
     start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
 ):
 
     try:
-        start_dt = parser.isoparse(start_date).replace(tzinfo=None)
-        end_dt = parser.isoparse(end_date)
+        # Fix date format
+        start_date = start_date.replace(" ", "+")
+        end_date = end_date.replace(" ", "+")
+
+        start_dt = datetime.fromisoformat(start_date).replace(tzinfo=None)
+        end_dt = datetime.fromisoformat(end_date).replace(tzinfo=None)
+
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format")
 
@@ -168,7 +171,7 @@ async def get_sensor_data_range(
             status_code=400, detail="start_date must be before end_date"
         )
 
-    query = sensor_table.select().where(
+    query = sensordata_table.select().where(
         sensordata_table.c.time.between(start_dt, end_dt)
     )
     result = await db.execute(query, {"start_date": start_dt, "end_date": end_dt})
