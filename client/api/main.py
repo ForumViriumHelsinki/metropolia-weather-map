@@ -8,7 +8,8 @@ from sqlalchemy import Table, Column, MetaData, TEXT, DATETIME
 from sqlalchemy.dialects.postgresql import DATE
 from datetime import datetime
 from dateutil import parser
-
+from pydantic import BaseModel, Field
+from typing import List
 DATABASE_URL = "postgresql+asyncpg://postgres:pass@localhost:5432/weather"
 
 #Set up of async engine
@@ -42,6 +43,12 @@ sensordata_table = Table(
 
 app = FastAPI()
 
+class SensorDataInput(BaseModel):
+    time: datetime
+    humidity: float = Field(..., ge=0, le=100)  # Humidity must be between 0-100%
+    temperature: float
+    sensor: str  # Sensor ID must match an existing sensor
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
@@ -56,8 +63,6 @@ async def get_sensors(db: AsyncSession = Depends(get_db)):
 
     return {"sensors": [dict(row._mapping) for row in sens]}
 
-#Creating fastapi instance
-app = FastAPI()
 
 #Dependency for getting the session
 async def get_db():
@@ -67,6 +72,49 @@ async def get_db():
 @app.get("/")
 def home():
     return {"message": "Hello World"}
+
+@app.post("/api/sensordata/batch")
+async def post_sensordata(data: List[SensorDataInput], db: AsyncSession = Depends(get_db)):
+    
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty data list")
+    
+    sensor_ids = {entry.sensor for entry in data}
+    
+    result = await db.execute(select(sensor_table.c.id).where(sensor_table.c.id.in_(sensor_ids)))
+    existing_sensors = {row[0] for row in result.fetchall()}
+
+    valid_entries = []
+    errors = []
+
+    for entry in data:
+        if entry.sensor in existing_sensors:
+            valid_entries.append(
+                {
+                    "time": entry.time,
+                    "humidity": entry.humidity,
+                    "temperature": entry.temperature,
+                    "sensor": entry.sensor
+                }
+            )
+        else:
+            errors.append({"sensor": entry.sensor, "error": "Sensor ID not found"})
+        
+        if valid_entries:
+            insert_stmt = sensordata_table.insert().values(valid_entries)
+            try:
+                await db.execute(insert_stmt)
+                await db.commit()
+            except Exception as e:
+                await db.rollback()
+                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+        return {
+            "message": "Data inserted",
+            "inserted": len(valid_entries),
+            "Failed": errors
+        }
+    
 
 @app.get("/api/sensors")
 async def get_sensors(db: AsyncSession = Depends(get_db)):
