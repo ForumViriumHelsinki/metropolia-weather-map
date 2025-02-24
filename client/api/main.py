@@ -70,37 +70,37 @@ def home():
 
 @app.get("/api/sensors")
 async def get_sensors(db: AsyncSession = Depends(get_db)):
-    query = text("SELECT id, coords, type, note, attached, install_date FROM weather.sensors")
+    query = sensor_table.select()
     result = await db.execute(query)
     sensors = result.fetchall()
     return {"sensors": [dict(row._mapping) for row in sensors]}
 
 @app.get("/api/sensors/{sensor_id}")
 async def get_sensor(sensor_id: str, db: AsyncSession = Depends(get_db)):
-    query = text("SELECT id, coords, type, note, attached, install_date FROM weather.sensors WHERE id = :sensor_id")
-    result = await db.execute(query, {"sensor_id": sensor_id})
+    query = sensor_table.select().where(sensor_table.c.id == sensor_id)
+    result = await db.execute(query)
     sensor = result.fetchone()
     return {"sensor": dict(sensor._mapping)}
 
 @app.get("/api/sensordata/{sensor_id}")
 async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
-    query = text("SELECT * FROM weather.sensordata WHERE sensor = :sensor_id")
-    result = await db.execute(query, {"sensor_id": sensor_id})
+    query = sensordata_table.select().where(sensordata_table.c.sensor == sensor_id)
+    result = await db.execute(query)
     data = result.fetchall()
     return {"data": [dict(row._mapping) for row in data]}
 
 @app.get("/api/sensordata/{start_date}/{end_date}")
 async def get_sensor_data_range(start_date: str, end_date: str, db: AsyncSession = Depends(get_db)):
-    
+
     try:
         start_dt = parser.isoparse(start_date).replace(tzinfo=None)
         end_dt = parser.isoparse(end_date)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format")
-    
+
     if start_dt > end_dt:
         raise HTTPException(status_code=400, detail="start_date must be before end_date")
-    
+
     query = sensor_table.select().where(sensordata_table.c.time.between(start_dt, end_dt))
     result = await db.execute(query, {"start_date": start_dt, "end_date": end_dt})
     data = result.fetchall()
