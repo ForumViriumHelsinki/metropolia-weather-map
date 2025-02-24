@@ -107,8 +107,36 @@ async def get_sensor_data_range(start_date: str, end_date: str, db: AsyncSession
     return {"data": [dict(row._mapping) for row in data]}
 
 @app.get("/api/sensors/type/{type}")
-async def add_sensor(type: str, db: AsyncSession = Depends(get_db)):
+async def get_sensor(type: str, db: AsyncSession = Depends(get_db)):
     query = sensor_table.select().where(sensor_table.c.type == type)
     result = await db.execute(query)
     sensors = result.fetchall()
     return {"sensors": [dict(row._mapping) for row in sensors]}
+
+@app.get("/api/sensordata/temperature/greater/{temp}")
+async def get_sensordata(temp: float, db: AsyncSession = Depends(get_db)):
+    query = sensordata_table.select().where(sensordata_table.c.temperature > temp)
+    result = await db.execute(query)
+    data = result.fetchall()
+    return {"data": [dict(row._mapping) for row in data]}
+
+@app.get("/api/sensordata/temperature/less/{temp}")
+async def get_sensordata(temp: float, db: AsyncSession = Depends(get_db)):
+    query = sensordata_table.select().where(sensordata_table.c.temperature < temp)
+    result = await db.execute(query)
+    data = result.fetchall()
+    return {"data": [dict(row._mapping) for row in data]}
+
+@app.get("/api/sensordata/humidity/greater/{hum}")
+async def get_sensordata(hum: float, db: AsyncSession = Depends(get_db)):
+    query = sensordata_table.select().where(sensordata_table.c.humidity > hum)
+    result = await db.execute(query)
+    data = result.fetchall()
+    return {"data": [dict(row._mapping) for row in data]}
+
+@app.get("/api/sensordata/humidity/less/{hum}")
+async def get_sensordata(hum: float, db: AsyncSession = Depends(get_db)):
+    query = sensordata_table.select().where(sensordata_table.c.humidity < hum)
+    result = await db.execute(query)
+    data = result.fetchall()
+    return {"data": [dict(row._mapping) for row in data]}
