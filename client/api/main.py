@@ -82,7 +82,7 @@ async def get_sensors(db: AsyncSession = Depends(get_db)):
     return {"sensors": [dict(row._mapping) for row in sensors]}
 
 
-@app.get("/api/sensors/{sensor_id}")
+@app.get("/api/sensors/id/{sensor_id}")
 async def get_sensor(sensor_id: str, db: AsyncSession = Depends(get_db)):
     query = text(
         "SELECT id, coords, type, note, attached, install_date FROM weather.sensors WHERE id = :sensor_id"
@@ -92,7 +92,7 @@ async def get_sensor(sensor_id: str, db: AsyncSession = Depends(get_db)):
     return {"sensor": dict(sensor._mapping)}
 
 
-@app.get("/api/sensordata/{sensor_id}")
+@app.get("/api/sensordata/id/{sensor_id}")
 async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
     query = text("SELECT * FROM weather.sensordata WHERE sensor = :sensor_id")
     result = await db.execute(query, {"sensor_id": sensor_id})
@@ -100,7 +100,7 @@ async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
     return {"data": [dict(row._mapping) for row in data]}
 
 
-@app.get("/api/sensordata/{start_date}/{end_date}")
+@app.get("/api/sensordata/dates/{start_date}/{end_date}")
 async def get_sensor_data_range(
     start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
 ):
@@ -126,6 +126,8 @@ async def get_sensor_data_range(
 
 @app.get("/api/sensors/type/{type}")
 async def add_sensor(type: str, db: AsyncSession = Depends(get_db)):
+    print({"type": type})
+
     query = sensor_table.select().where(sensor_table.c.type == type)
     result = await db.execute(query)
     sensors = result.fetchall()
