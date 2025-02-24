@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetch } from "../api/lib/apiFetch";
+import { apiFetch } from "../../utils/apiFetch";
 
 export const testPostAction = async (startDate: Date, endDate: Date) => {
   console.log(startDate, endDate);
