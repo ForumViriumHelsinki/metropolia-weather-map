@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import TIMESTAMP, Column, Integer, String, Date, select
@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import DATE
 from datetime import datetime
 from dateutil import parser
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 DATABASE_URL = "postgresql+asyncpg://postgres:pass@localhost:5432/weather"
 
@@ -80,7 +80,7 @@ async def get_db():
 def home():
     return {"message": "Hello World"}
 
-
+# Posts sensor data in batch to the database
 @app.post("/api/sensordata/batch")
 async def post_sensordata(
     data: List[SensorDataInput], db: AsyncSession = Depends(get_db)
@@ -126,91 +126,116 @@ async def post_sensordata(
             "inserted": len(valid_entries),
             "Failed": errors,
         }
-
-
-@app.get("/api/sensors")
-async def get_sensors(db: AsyncSession = Depends(get_db)):
-    query = sensor_table.select()
-    result = await db.execute(query)
-    sensors = result.fetchall()
-    return {"sensors": [dict(row._mapping) for row in sensors]}
-
-
-@app.get("/api/sensors/{sensor_id}")
-async def get_sensor(sensor_id: str, db: AsyncSession = Depends(get_db)):
-    query = sensor_table.select().where(sensor_table.c.id == sensor_id)
-    result = await db.execute(query)
-    sensor = result.fetchone()
-    return {"sensor": dict(sensor._mapping)}
-
-
-@app.get("/api/sensordata/{sensor_id}")
-async def get_sensor_data(sensor_id: str, db: AsyncSession = Depends(get_db)):
-    query = sensordata_table.select().where(sensordata_table.c.sensor == sensor_id)
-    result = await db.execute(query)
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
-
-
-@app.get("/api/sensordata/{start_date}/{end_date}")
-async def get_sensor_data_range(
-    start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
+    
+# Get sensors using any combination of filters
+@app.get("/api/sensors/")
+async def get_sensors(
+    id : Optional[str] = Query(None),
+    coods : Optional[str] = Query(None),
+    type : Optional[str] = Query(None),
+    note : Optional[str] = Query(None),
+    attached : Optional[str] = Query(None),
+    install_date_from : Optional[datetime] = Query(None),
+    install_date_to : Optional[datetime] = Query(None),
+    db: AsyncSession = Depends(get_db)
 ):
+    query = select(sensor_table)
+    filters = []
+    if id:
+        filters.append(sensor_table.c.id == id)
 
-    try:
-        start_dt = parser.isoparse(start_date).replace(tzinfo=None)
-        end_dt = parser.isoparse(end_date)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format")
+    if coods:
+        filters.append(sensor_table.c.coords == coods)
 
-    if start_dt > end_dt:
+    if type:
+        filters.append(sensor_table.c.type == type)
+
+    if note:
+        filters.append(sensor_table.c.note == note)
+
+    if attached:
+        filters.append(sensor_table.c.attached == attached)
+
+    if install_date_from:
+        filters.append(sensor_table.c.install_date == install_date_from)
+    
+    if install_date_to:
+        filters.append(sensor_table.c.install_date == install_date_to)
+    
+    if install_date_from and install_date_to and install_date_from > install_date_to:
+        raise HTTPException(
+            status_code=400, detail="install_date_from must be before install_date_to"
+        )
+
+    if filters:
+        query = query.where(*filters)
+    result = await db.execute(query)
+    sensors = result.mappings().all()
+    return {"sensors": [dict(row) for row in sensors]}
+
+# Get sensor data using any combination of filters
+@app.get("/api/sensordata/")
+async def get_sensordata(
+    sensor_id: Optional[str] = Query(None),
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
+    humidity_from: Optional[float] = Query(None),
+    humidity_to: Optional[float] = Query(None),
+    temperature_from: Optional[float] = Query(None),
+    temperature_to: Optional[float] = Query(None),
+    db: AsyncSession = Depends(get_db)
+):
+    query = select(sensordata_table)
+    filters = []
+    if sensor_id:
+        filters.append(sensordata_table.c.sensor == sensor_id)
+
+    if start_date:
+        filters.append(sensordata_table.c.time >= start_date)
+
+    if end_date:
+        filters.append(sensordata_table.c.time <= end_date)
+
+    if start_date and end_date and start_date > end_date:
         raise HTTPException(
             status_code=400, detail="start_date must be before end_date"
         )
 
-    query = sensor_table.select().where(
-        sensordata_table.c.time.between(start_dt, end_dt)
-    )
-    result = await db.execute(query, {"start_date": start_dt, "end_date": end_dt})
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
+    if humidity_from:
+        if humidity_from < 0 or humidity_from > 100:
+            raise HTTPException(
+                status_code=400, detail="humidity value must be between 0 and 100"
+            )
+        else:
+            filters.append(sensordata_table.c.humidity >= humidity_from)
+    
+    if humidity_to:
+        if humidity_to < 0 or humidity_to > 100:
+            raise HTTPException(
+                status_code=400, detail="humidity value must be between 0 and 100"
+            )
+        else:
+            filters.append(sensordata_table.c.humidity <= humidity_to)
 
+    if humidity_from and humidity_to and humidity_from > humidity_to:
+        raise HTTPException(
+            status_code=400, detail="humidity_from must be less than humidity_to"
+        )
+    
+    if temperature_from:
+        filters.append(sensordata_table.c.temperature == temperature_from)
+    
+    if temperature_to:
+        filters.append(sensordata_table.c.temperature == temperature_to)
 
-@app.get("/api/sensors/type/{type}")
-async def get_sensor(type: str, db: AsyncSession = Depends(get_db)):
-    query = sensor_table.select().where(sensor_table.c.type == type)
+    if temperature_from and temperature_to and temperature_from > temperature_to:
+        raise HTTPException(
+            status_code=400, detail="temperature_from must be less than temperature_to"
+        )
+    
+    if filters:
+        query = query.where(*filters)
+
     result = await db.execute(query)
-    sensors = result.fetchall()
-    return {"sensors": [dict(row._mapping) for row in sensors]}
-
-
-@app.get("/api/sensordata/temperature/greater/{temp}")
-async def get_sensordata(temp: float, db: AsyncSession = Depends(get_db)):
-    query = sensordata_table.select().where(sensordata_table.c.temperature > temp)
-    result = await db.execute(query)
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
-
-
-@app.get("/api/sensordata/temperature/less/{temp}")
-async def get_sensordata(temp: float, db: AsyncSession = Depends(get_db)):
-    query = sensordata_table.select().where(sensordata_table.c.temperature < temp)
-    result = await db.execute(query)
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
-
-
-@app.get("/api/sensordata/humidity/greater/{hum}")
-async def get_sensordata(hum: float, db: AsyncSession = Depends(get_db)):
-    query = sensordata_table.select().where(sensordata_table.c.humidity > hum)
-    result = await db.execute(query)
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
-
-
-@app.get("/api/sensordata/humidity/less/{hum}")
-async def get_sensordata(hum: float, db: AsyncSession = Depends(get_db)):
-    query = sensordata_table.select().where(sensordata_table.c.humidity < hum)
-    result = await db.execute(query)
-    data = result.fetchall()
-    return {"data": [dict(row._mapping) for row in data]}
+    data = result.mappings().all()
+    return {"data": [dict(row) for row in data]}
