@@ -53,3 +53,55 @@ def separate_sensors(sensor_df):
 def apply_date_range(df, start_date, end_date):
     mask = (df["time"] >= start_date) & (df["time"] <= end_date)
     return df.loc[mask]
+
+
+def get_day_data():
+    # Read csv containing daylight hour data
+    day_df = pd.read_csv("../data/daylight.csv")
+    day_df["sunrise"] = pd.to_datetime(day_df["sunrise"])
+    day_df["sunset"] = pd.to_datetime(day_df["sunset"])
+
+    # Get dataframe containing data from makelankatu csv
+    df = get_csv()
+
+    # Create date fields and merge dataframes on them
+    df["date"] = df["time"].dt.date
+    day_df["date"] = day_df["sunrise"].dt.date
+    merged_df = pd.merge(df, day_df, on="date")
+
+    # Create mask to get hours between sunrise and sunset
+    mask = (merged_df["time"] >= merged_df["sunrise"]) & (
+        merged_df["time"] <= merged_df["sunset"]
+    )
+
+    # Apply the mask
+    filtered_df = merged_df[mask]
+    filtered_df = filtered_df.drop(columns=["sunrise", "sunset"])
+
+    return filtered_df
+
+
+def get_night_data():
+    # Read csv containing daylight hour data
+    day_df = pd.read_csv("../data/daylight.csv")
+    day_df["sunrise"] = pd.to_datetime(day_df["sunrise"])
+    day_df["sunset"] = pd.to_datetime(day_df["sunset"])
+
+    # Get dataframe containing data from makelankatu csv
+    df = get_csv()
+
+    # Create date fields and merge dataframes on them
+    df["date"] = df["time"].dt.date
+    day_df["date"] = day_df["sunrise"].dt.date
+    merged_df = pd.merge(df, day_df, on="date")
+
+    # Create mask to get hours outside sunrise and sunset
+    mask = (merged_df["time"] < merged_df["sunrise"]) | (
+        merged_df["time"] > merged_df["sunset"]
+    )
+
+    # Apply the mask
+    filtered_df = merged_df[mask]
+    filtered_df = filtered_df.drop(columns=["sunrise", "sunset"])
+
+    return filtered_df
