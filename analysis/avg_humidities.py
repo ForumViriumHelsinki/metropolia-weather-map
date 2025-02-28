@@ -1,6 +1,6 @@
 import pandas as pd
-import utils_new
-from utils_new import SENSORS, SENSOR_SUN, SENSOR_SHADE
+import utils
+from utils import SENSORS, SENSOR_SUN, SENSOR_SHADE
 import matplotlib.pyplot as plt
 
 
@@ -11,9 +11,9 @@ end_date = "2024-9-30"
 # Calculate the average humidity for each day in the date range and calculate
 # the mean humidity during the whole date range
 
-df = utils_new.get_csv()
-df = utils_new.apply_date_range(df, start_date, end_date)
-sensors = utils_new.separate_sensors(df)
+df = utils.get_csv()
+df = utils.apply_date_range(df, start_date, end_date)
+sensors = utils.separate_sensors(df)
 
 
 def avg_hum_per_day(sensor_df):
