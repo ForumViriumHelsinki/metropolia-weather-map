@@ -1,28 +1,34 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import os, sys
 
-app = Flask(__name__)
-CORS(app)
+sys.path.append("./database")
+sys.path.append("./routers")
 
-@app.route("/api/debug", methods=["GET"])
-def test_get():
-	return jsonify({"message": "test"})
+from datetime import datetime
 
-@app.route("/api/debug", methods=["POST"])
-def test_post():
-	data = request.json
-	print(data)
-	try:
-		startDate = data.get("startDate")
-		endDate = data.get("endDate")
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-	except Exception as e:
-		print("error")
-		print(e)
+from routers import sensors
 
-	res = jsonify({"message": "hello"})
-	return res
+app = FastAPI()
+
+app.include_router(sensors.router)
 
 
-if __name__ == "__main__":
-	app.run(debug=True, port=8080)
+class DateRange(BaseModel):
+    startDate: datetime
+    endDate: datetime
+
+
+@app.get("/")
+def root():
+    return {"Message": "hello"}
+
+
+# Get data by date range
+@app.get("/api/data/date")
+def get_data_by_date(dates: DateRange):
+    startDate = dates.startDate
+    endDate = dates.endDate
+
+    return {"Message": "Hello"}

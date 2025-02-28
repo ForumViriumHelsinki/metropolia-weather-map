@@ -1,4 +1,3 @@
-import enum
 from sqlalchemy.types import UserDefinedType
 
 
@@ -23,12 +22,6 @@ class Sensor:
 
     def __str__(self):
         return f"Sensor(id={self.id}, coords={self.coords}, type={self.type}, note={self.note}, attached={self.attached}, install_date={self.install_date})"
-
-
-# Types for sqlalchemy
-class TypeEnum(enum.Enum):
-    sun = "sun"
-    shade = "shade"
 
 
 class Coords(UserDefinedType):

@@ -1,13 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import TIMESTAMP, Column, Integer, String, Date, select
-from geoalchemy2 import Geometry
-from sqlalchemy import text
-from sqlalchemy import Table, Column, MetaData, TEXT, DATETIME
+from sqlalchemy import TIMESTAMP, Column, Table, MetaData, TEXT, select
 from sqlalchemy.dialects.postgresql import DATE
 from datetime import datetime
-from dateutil import parser
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -126,7 +122,7 @@ async def post_sensordata(
             "inserted": len(valid_entries),
             "Failed": errors,
         }
-    
+   
 # Get sensors using any combination of filters
 @app.get("/api/sensors/")
 async def get_sensors(
@@ -166,9 +162,10 @@ async def get_sensors(
         raise HTTPException(
             status_code=400, detail="install_date_from must be before install_date_to"
         )
-
+        
     if filters:
         query = query.where(*filters)
+
     result = await db.execute(query)
     sensors = result.mappings().all()
     return {"sensors": [dict(row) for row in sensors]}

@@ -1,26 +1,29 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from tables import sensors
+from sqlalchemy.exc import SQLAlchemyError
 
-load_dotenv(".env.local")
+# Load environment variables from .env.local file
+load_dotenv("../.env.local")
 
+# Retrieve database connection details from environment variables
 DB_NAME = os.getenv("DB_NAME")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 
+# Construct the database URL
+url = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-def get_engine():
-    url = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    engine = create_engine(url)
-    return engine
+# Create the SQLAlchemy engine
+engine = create_engine(url)
 
 
-def insert_sensor(sensor_data):
-    engine = get_engine()
-    with engine.connect() as conn:
-        stmt = sensors.insert().values(sensor_data.to_dict())
-        conn.execute(stmt)
-        conn.commit()
+def get_connection():
+    try:
+        connection = engine.connect()
+        return connection
+    except SQLAlchemyError as e:
+        print(f"Error connecting to the database: {e}")
+        return None

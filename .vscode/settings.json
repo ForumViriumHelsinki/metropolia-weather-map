@@ -5,8 +5,8 @@
       "server": "localhost",
       "port": 5432,
       "driver": "PostgreSQL",
-      "name": "weather_alt",
-      "database": "weather_alt",
+      "name": "weather",
+      "database": "weather",
       "username": "postgres",
       "password": "pass"
     }
