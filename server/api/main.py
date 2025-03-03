@@ -1,70 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import TIMESTAMP, Column, Table, MetaData, TEXT, select
-from sqlalchemy.dialects.postgresql import DATE
-from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import List, Optional
-
-DATABASE_URL = "postgresql+asyncpg://postgres:pass@localhost:5432/weather"
-
-# Set up of async engine
-engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False
-)
-
-Base = declarative_base()
-
-metadata_obj = MetaData(schema="weather")
-
-sensor_table = Table(
-    "sensors",
-    metadata_obj,
-    Column("id", TEXT, primary_key=True),
-    Column("coords", TEXT),
-    Column("type", TEXT),
-    Column("note", TEXT),
-    Column("attached", TEXT),
-    Column("install_date", DATE),
-)
-
-sensordata_table = Table(
-    "sensordata",
-    metadata_obj,
-    Column("id", TEXT, primary_key=True),
-    Column("time", TIMESTAMP),
-    Column("humidity", TEXT),
-    Column("temperature", TEXT),
-    Column("sensor", TEXT),
-)
+from datetime import datetime
+from models import sensor_table, sensordata_table, SensorDataInput
+from database import get_db
+from routes.sensor_route import router as sensor_router
 
 app = FastAPI()
 
-
-class SensorDataInput(BaseModel):
-    time: datetime
-    humidity: float = Field(..., ge=0, le=100)  # Humidity must be between 0-100%
-    temperature: float
-    sensor: str  # Sensor ID must match an existing sensor
-
-
-# Dependency for getting the session
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
-@app.get("/api/sensors")
-async def get_sensors(db: AsyncSession = Depends(get_db)):
-    qs = sensor_table.select()
-
-    res = await db.execute(qs)
-
-    sens = res.fetchall()
-
-    return {"sensors": [dict(row._mapping) for row in sens]}
+app.include_router(sensor_router)
 
 
 @app.get("/")
