@@ -50,6 +50,7 @@ class SensorDataInput(BaseModel):
     sensor: str  # Sensor ID must match an existing sensor
 
 
+# Dependency for getting the session
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
@@ -64,12 +65,6 @@ async def get_sensors(db: AsyncSession = Depends(get_db)):
     sens = res.fetchall()
 
     return {"sensors": [dict(row._mapping) for row in sens]}
-
-
-# Dependency for getting the session
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 @app.get("/")
@@ -122,12 +117,12 @@ async def post_sensordata(
             "inserted": len(valid_entries),
             "Failed": errors,
         }
-   
+
 # Get sensors using any combination of filters
 @app.get("/api/sensors/")
 async def get_sensors(
     id : Optional[str] = Query(None),
-    coods : Optional[str] = Query(None),
+    coords : Optional[str] = Query(None),
     type : Optional[str] = Query(None),
     note : Optional[str] = Query(None),
     attached : Optional[str] = Query(None),
@@ -140,8 +135,8 @@ async def get_sensors(
     if id:
         filters.append(sensor_table.c.id == id)
 
-    if coods:
-        filters.append(sensor_table.c.coords == coods)
+    if coords:
+        filters.append(sensor_table.c.coords == coords)
 
     if type:
         filters.append(sensor_table.c.type == type)
@@ -154,15 +149,15 @@ async def get_sensors(
 
     if install_date_from:
         filters.append(sensor_table.c.install_date == install_date_from)
-    
+
     if install_date_to:
         filters.append(sensor_table.c.install_date == install_date_to)
-    
+
     if install_date_from and install_date_to and install_date_from > install_date_to:
         raise HTTPException(
             status_code=400, detail="install_date_from must be before install_date_to"
         )
-        
+
     if filters:
         query = query.where(*filters)
 
@@ -205,7 +200,7 @@ async def get_sensordata(
             )
         else:
             filters.append(sensordata_table.c.humidity >= humidity_from)
-    
+
     if humidity_to:
         if humidity_to < 0 or humidity_to > 100:
             raise HTTPException(
@@ -218,10 +213,10 @@ async def get_sensordata(
         raise HTTPException(
             status_code=400, detail="humidity_from must be less than humidity_to"
         )
-    
+
     if temperature_from:
         filters.append(sensordata_table.c.temperature == temperature_from)
-    
+
     if temperature_to:
         filters.append(sensordata_table.c.temperature == temperature_to)
 
@@ -229,7 +224,7 @@ async def get_sensordata(
         raise HTTPException(
             status_code=400, detail="temperature_from must be less than temperature_to"
         )
-    
+
     if filters:
         query = query.where(*filters)
 
