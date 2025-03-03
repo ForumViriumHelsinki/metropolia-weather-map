@@ -1,78 +1,15 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import TIMESTAMP, Column, Table, MetaData, TEXT, select
-from sqlalchemy.dialects.postgresql import DATE
-from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import List, Optional
+from datetime import datetime
+from models import sensor_table, sensordata_table, SensorDataInput
+from database import get_db
 
-DATABASE_URL = "postgresql+asyncpg://postgres:pass@localhost:5432/weather"
-
-# Set up of async engine
-engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False
-)
-
-Base = declarative_base()
-
-metadata_obj = MetaData(schema="weather")
-
-sensor_table = Table(
-    "sensors",
-    metadata_obj,
-    Column("id", TEXT, primary_key=True),
-    Column("coords", TEXT),
-    Column("type", TEXT),
-    Column("note", TEXT),
-    Column("attached", TEXT),
-    Column("install_date", DATE),
-)
-
-sensordata_table = Table(
-    "sensordata",
-    metadata_obj,
-    Column("id", TEXT, primary_key=True),
-    Column("time", TIMESTAMP),
-    Column("humidity", TEXT),
-    Column("temperature", TEXT),
-    Column("sensor", TEXT),
-)
-
-app = FastAPI()
-
-
-class SensorDataInput(BaseModel):
-    time: datetime
-    humidity: float = Field(..., ge=0, le=100)  # Humidity must be between 0-100%
-    temperature: float
-    sensor: str  # Sensor ID must match an existing sensor
-
-
-# Dependency for getting the session
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
-@app.get("/api/sensors")
-async def get_sensors(db: AsyncSession = Depends(get_db)):
-    qs = sensor_table.select()
-
-    res = await db.execute(qs)
-
-    sens = res.fetchall()
-
-    return {"sensors": [dict(row._mapping) for row in sens]}
-
-
-@app.get("/")
-def home():
-    return {"message": "Hello World"}
+router = APIRouter()
 
 # Posts sensor data in batch to the database
-@app.post("/api/sensordata/batch")
+@router.post("/api/sensordata/batch")
 async def post_sensordata(
     data: List[SensorDataInput], db: AsyncSession = Depends(get_db)
 ):
@@ -117,56 +54,9 @@ async def post_sensordata(
             "inserted": len(valid_entries),
             "Failed": errors,
         }
-
-# Get sensors using any combination of filters
-@app.get("/api/sensors/")
-async def get_sensors(
-    id : Optional[str] = Query(None),
-    coords : Optional[str] = Query(None),
-    type : Optional[str] = Query(None),
-    note : Optional[str] = Query(None),
-    attached : Optional[str] = Query(None),
-    install_date_from : Optional[datetime] = Query(None),
-    install_date_to : Optional[datetime] = Query(None),
-    db: AsyncSession = Depends(get_db)
-):
-    query = select(sensor_table)
-    filters = []
-    if id:
-        filters.append(sensor_table.c.id == id)
-
-    if coords:
-        filters.append(sensor_table.c.coords == coords)
-
-    if type:
-        filters.append(sensor_table.c.type == type)
-
-    if note:
-        filters.append(sensor_table.c.note == note)
-
-    if attached:
-        filters.append(sensor_table.c.attached == attached)
-
-    if install_date_from:
-        filters.append(sensor_table.c.install_date == install_date_from)
-
-    if install_date_to:
-        filters.append(sensor_table.c.install_date == install_date_to)
-
-    if install_date_from and install_date_to and install_date_from > install_date_to:
-        raise HTTPException(
-            status_code=400, detail="install_date_from must be before install_date_to"
-        )
-
-    if filters:
-        query = query.where(*filters)
-
-    result = await db.execute(query)
-    sensors = result.mappings().all()
-    return {"sensors": [dict(row) for row in sensors]}
-
+    
 # Get sensor data using any combination of filters
-@app.get("/api/sensordata/")
+@router.get("/api/sensordata/")
 async def get_sensordata(
     sensor_id: Optional[str] = Query(None),
     start_date: Optional[datetime] = Query(None),
