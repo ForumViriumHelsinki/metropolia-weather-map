@@ -150,3 +150,37 @@ def fetch_csv_data(csv_urls):
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(fetch_csv, csv_urls))
     return pd.concat([df for df in results if df is not None], ignore_index=True)
+
+def load_and_process_cloudiness(file_path="../data/cloudiness.csv"):
+    """
+    Loads and processes the cloudiness data:
+    - Converts date columns into datetime
+    - Extracts numeric cloudiness values (0-8)
+    - Replaces 9 (undefined cloudiness) with NaN
+    - Computes daily average cloudiness
+    
+    Returns:
+        pd.DataFrame: DataFrame with daily average cloudiness
+    """
+
+    # Load cloudiness data
+    cloud_df = pd.read_csv(file_path, encoding="utf-8", sep=",")
+    cloud_df.columns = ["Havaintoasema", "Vuosi", "Kuukausi", "Päivä", "Aika", "Pilvisyys"]
+
+    # Convert to datetime
+    cloud_df["date"] = pd.to_datetime(
+        cloud_df["Vuosi"].astype(str) + "-" +
+        cloud_df["Kuukausi"].astype(str) + "-" +
+        cloud_df["Päivä"].astype(str)
+    ).dt.date
+
+    # Extract numeric cloudiness values (0-8)
+    cloud_df["Pilvisyys"] = cloud_df["Pilvisyys"].str.extract(r"(\d+)").astype(float)
+
+    # Replace 9 (undefined cloudiness) with NaN
+    cloud_df.loc[cloud_df["Pilvisyys"] == 9, "Pilvisyys"] = None
+
+    # Compute daily average cloudiness (ignoring NaN)
+    cloud_daily_avg = cloud_df.groupby("date")["Pilvisyys"].mean().reset_index()
+
+    return cloud_daily_avg
