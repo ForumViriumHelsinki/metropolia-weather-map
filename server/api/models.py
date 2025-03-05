@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base
 from pydantic import BaseModel, Field
 from sqlalchemy.dialects.postgresql import DATE
 from datetime import datetime
+
 Base = declarative_base()
 
 metadata_obj = MetaData(schema="weather")
@@ -27,6 +28,7 @@ sensordata_table = Table(
     Column("temperature", TEXT),
     Column("sensor", TEXT),
 )
+
 
 class SensorDataInput(BaseModel):
     time: datetime
