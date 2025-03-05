@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from datetime import datetime
 from models import sensor_table, sensordata_table, SensorDataInput
@@ -54,7 +54,7 @@ async def post_sensordata(
             "inserted": len(valid_entries),
             "Failed": errors,
         }
-    
+
 # Get sensor data using any combination of filters
 @router.get("/api/sensordata/")
 async def get_sensordata(
