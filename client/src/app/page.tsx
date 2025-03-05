@@ -1,4 +1,5 @@
 import SensorCard from "@/components/SensorCard";
+import TestMap from "@/components/TestMap";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 export type LatestData = {
@@ -35,18 +36,20 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div className="h-96 w-full border-2"></div>
+      <div className="2xl:flex 2xl:gap-12">
+        <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
+        <div className="2xl:w-fill aspect-[2/3] w-full border-2 sm:aspect-[2/1] 2xl:aspect-[2/1]">
+          <TestMap />
+        </div>
+      </div>
 
-      <div className="grid gap-4 min-[720px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {sortedSensors.map((sensor) => (
-          // <div
-          // >
           <SensorCard
             key={sensor.id}
             sensor={sensor}
             latestData={dataList.filter((d) => d.id === sensor.id)[0]}
           />
-          // </div>
         ))}
       </div>
     </main>
