@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from models import sensor_table, sensordata_table, SensorDataInput
-from fastapi import FastAPI, Depends, HTTPException, Query
-from typing import List, Optional
+from models import sensor_table
+from typing import Optional
 from datetime import datetime
 from sqlalchemy import select
 
