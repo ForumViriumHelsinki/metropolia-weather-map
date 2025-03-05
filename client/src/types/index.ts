@@ -1,12 +1,7 @@
-export enum SensorType {
-  "Auringossa",
-  "Varjossa",
-}
-
 export type Sensor = {
   id: string;
   location: [number, number];
-  type: SensorType;
+  type: "Auringossa" | "Varjossa" | undefined;
   note: string | null;
   attached: string;
   installDate: Date;
