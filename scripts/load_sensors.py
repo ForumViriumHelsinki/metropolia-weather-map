@@ -21,8 +21,6 @@ DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 
-print(DB_HOST)
-
 
 def insert_sensor(cursor, id, lon, lat, type, note, attached, install_date):
     insert_query = f"""
@@ -62,6 +60,7 @@ def load_sensors():
 
                     except (json.JSONDecodeError, KeyError) as e:
                         print(f"Error processing file {filename}: {e}")
+                print("Sensors loaded successfully")
     except psycopg2.DatabaseError as e:
         print(f"Database error: {e}")
 
