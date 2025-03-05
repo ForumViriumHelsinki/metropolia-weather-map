@@ -9,17 +9,18 @@ from sqlalchemy import select
 
 router = APIRouter()
 
+
 # Get sensors using any combination of filters
 @router.get("/api/sensors/")
 async def get_sensors(
-    id : Optional[str] = Query(None),
-    coords : Optional[str] = Query(None),
-    type : Optional[str] = Query(None),
-    note : Optional[str] = Query(None),
-    attached : Optional[str] = Query(None),
-    install_date_from : Optional[datetime] = Query(None),
-    install_date_to : Optional[datetime] = Query(None),
-    db: AsyncSession = Depends(get_db)
+    id: Optional[str] = Query(None),
+    coords: Optional[str] = Query(None),
+    type: Optional[str] = Query(None),
+    note: Optional[str] = Query(None),
+    attached: Optional[str] = Query(None),
+    install_date_from: Optional[datetime] = Query(None),
+    install_date_to: Optional[datetime] = Query(None),
+    db: AsyncSession = Depends(get_db),
 ):
     query = select(sensor_table)
     filters = []
@@ -54,4 +55,4 @@ async def get_sensors(
 
     result = await db.execute(query)
     sensors = result.mappings().all()
-    return {"sensors": [dict(row) for row in sensors]}
+    return [dict(row) for row in sensors]
