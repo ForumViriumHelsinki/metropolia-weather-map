@@ -5,7 +5,6 @@ import { apiFetch } from "@/utils/apiFetch";
 import { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
-
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 const Map = () => {

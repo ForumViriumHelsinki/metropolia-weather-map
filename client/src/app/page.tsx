@@ -1,13 +1,16 @@
-import Map from "@/components/Map";
+import MapWrapper from "@/components/MapWrapper";
 import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+
 export type LatestData = {
   id: string;
-  measurement: {
-    humidity: number;
-    temperature: number;
-    time: string;
+  properties: {
+    measurement: {
+      humidity: number;
+      temperature: number;
+      time: string;
+    };
   };
 };
 
@@ -34,7 +37,7 @@ export default async function Home() {
 
   if (resLatest.status === 200) {
     const data = await resLatest.json();
-    latestData = data.features.properties;
+    latestData = data.features;
   }
 
   return (
@@ -42,7 +45,7 @@ export default async function Home() {
       <div className="2xl:flex 2xl:gap-12">
         <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
         <div className="2xl:w-fill aspect-[2/3] w-full border-2 sm:aspect-[2/1] 2xl:aspect-[2/1]">
-          <Map />
+          <MapWrapper />
         </div>
       </div>
 

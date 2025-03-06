@@ -12,7 +12,7 @@ const SensorCard = ({
   const formatDate = (str: string) => {
     const date = str.slice(0, 10);
     const time = str.slice(11, 16);
-    return `${date}  ${time}`;
+    return `${time} - ${date}`;
   };
 
   const valid = !!latestData;
@@ -29,15 +29,19 @@ const SensorCard = ({
 
       <div className="flex flex-col">
         <span>
-          Lämpötila: {valid ? latestData.measurement.temperature : "-"}°C
+          Lämpötila:{" "}
+          {valid ? latestData.properties.measurement.temperature : "-"}°C
         </span>
         <span>
-          Ilmankosteus: {valid ? latestData.measurement.temperature : "-"}%
+          Ilmankosteus:{" "}
+          {valid ? latestData.properties.measurement.temperature : "-"}%
         </span>
       </div>
 
       <h3 className="">Viimeisin mittaus</h3>
-      <span>{valid ? formatDate(latestData.measurement.time) : "-"}</span>
+      <span>
+        {valid ? formatDate(latestData.properties.measurement.time) : "-"}
+      </span>
 
       <h3 className="">Sijainti</h3>
       <div>{sensor.attached}</div>
