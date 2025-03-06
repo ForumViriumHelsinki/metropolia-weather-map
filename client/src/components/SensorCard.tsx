@@ -15,6 +15,8 @@ const SensorCard = ({
     return `${date}  ${time}`;
   };
 
+  const valid = !!latestData;
+
   return (
     <div className="flex flex-col gap-1 rounded-lg bg-offWhite px-4 py-3">
       <span
@@ -27,15 +29,15 @@ const SensorCard = ({
 
       <div className="flex flex-col">
         <span>
-          Lämpötila: {latestData.properties.measurement.temperature}°C
+          Lämpötila: {valid ? latestData.measurement.temperature : "-"}°C
         </span>
         <span>
-          Ilmankosteus: {latestData.properties.measurement.temperature}%
+          Ilmankosteus: {valid ? latestData.measurement.temperature : "-"}%
         </span>
       </div>
 
       <h3 className="">Viimeisin mittaus</h3>
-      <span>{formatDate(latestData.properties.measurement.time)}</span>
+      <span>{valid ? formatDate(latestData.measurement.time) : "-"}</span>
 
       <h3 className="">Sijainti</h3>
       <div>{sensor.attached}</div>

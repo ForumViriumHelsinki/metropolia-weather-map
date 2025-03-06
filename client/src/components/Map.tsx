@@ -1,23 +1,26 @@
 "use client";
 
-import { getSensorsService } from "@/app/services/getSensorsService";
 import { Sensor } from "@/types";
+import { apiFetch } from "@/utils/apiFetch";
 import { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
-const TestMap = () => {
+const Map = () => {
   const [sensors, setSensors] = useState<Sensor[]>([]);
 
   useEffect(() => {
     const getSensors = async () => {
-      setSensors(await getSensorsService());
+      const res = await apiFetch("/sensors");
+
+      if (res.status === 200) {
+        setSensors(await res.json());
+      }
     };
     getSensors();
   }, []);
-  console.log("hello", sensors);
 
   const iconSun = new Icon({
     iconUrl: "icon_sun.png",
@@ -58,4 +61,4 @@ const TestMap = () => {
   );
 };
 
-export default TestMap;
+export default Map;
