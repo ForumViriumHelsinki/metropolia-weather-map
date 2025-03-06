@@ -9,24 +9,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        gray: "#C3C3C3",
-        orange: "#FF5000",
-        green: "#009E92",
         blueM: "rgba(175, 221, 229)",
         offWhite: "#F2F2F2",
-        magenta: "#D70074",
-        yellow: "#FFD650",
-        "yellow-pale": "#fff3ed",
-        // Dark mode
-        dark: {
-          gray: "#181a1b",
-          banner: "#3e1500",
-        },
-        // Variables
+        sun: "#FFD650",
+        shade: "#9370DB",
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      // Fonts
       fontFamily: {
         avenir: ["var(--font-avenir)"],
       },
