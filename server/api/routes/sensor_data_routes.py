@@ -65,9 +65,23 @@ async def get_sensordata(
     humidity_to: Optional[float] = Query(None),
     temperature_from: Optional[float] = Query(None),
     temperature_to: Optional[float] = Query(None),
+    fields: Optional[List[str]] = Query(None),
     db: AsyncSession = Depends(get_db)
-):
-    query = select(sensordata_table)
+):  
+    
+    valid_fields = set(sensordata_table.columns.keys())
+
+    if fields:
+        invalid_fields = [f for f in fields if f not in valid_fields]
+        if invalid_fields:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid fields: {', '.join(invalid_fields)}"
+            )
+        selected_fields = [sensordata_table.c[f] for f in fields]
+    else:
+        selected_fields = [sensordata_table]
+    
+    query = select(*selected_fields)
     filters = []
     if sensor_id:
         filters.append(sensordata_table.c.sensor == sensor_id)
