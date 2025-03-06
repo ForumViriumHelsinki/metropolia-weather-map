@@ -1,7 +1,8 @@
+import MapWrapper from "@/components/MapWrapper";
 import SensorCard from "@/components/SensorCard";
-import TestMap from "@/components/TestMap";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+
 export type LatestData = {
   id: string;
   properties: {
@@ -28,18 +29,23 @@ export default async function Home() {
     return 0;
   });
 
+  // Get latest data
+  let latestData: LatestData[] = [];
   const resLatest = await fetch(
     "https://bri3.fvh.io/opendata/makelankatu/makelankatu_latest.geojson",
   );
-  const latestData = await resLatest.json();
-  const dataList: LatestData[] = latestData.features;
+
+  if (resLatest.status === 200) {
+    const data = await resLatest.json();
+    latestData = data.features;
+  }
 
   return (
     <main className="flex flex-col gap-6">
       <div className="2xl:flex 2xl:gap-12">
         <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
         <div className="2xl:w-fill aspect-[2/3] w-full border-2 sm:aspect-[2/1] 2xl:aspect-[2/1]">
-          <TestMap />
+          <MapWrapper />
         </div>
       </div>
 
@@ -48,7 +54,9 @@ export default async function Home() {
           <SensorCard
             key={sensor.id}
             sensor={sensor}
-            latestData={dataList.filter((d) => d.id === sensor.id)[0]}
+            latestData={
+              latestData && latestData.filter((d) => d.id === sensor.id)[0]
+            }
           />
         ))}
       </div>
