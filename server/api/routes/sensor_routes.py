@@ -55,3 +55,19 @@ async def get_sensors(
     result = await db.execute(query)
     sensors = result.mappings().all()
     return [dict(row) for row in sensors]
+
+
+@router.get("/api/sensors/test")
+async def test(
+    location: Optional[bool] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    columns = [sensor_table.c.id]
+    if location:
+        columns.append(sensor_table.c.location)
+
+    stmt = select(*columns)
+    result = await db.execute(stmt)
+    sensors = result.mappings().all()
+
+    return [dict(row) for row in sensors]
