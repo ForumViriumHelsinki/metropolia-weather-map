@@ -12,7 +12,8 @@ export default {
         gray: "#C3C3C3",
         orange: "#FF5000",
         green: "#009E92",
-        blue: "#00A4CC",
+        blueM: "rgba(175, 221, 229)",
+        offWhite: "#F2F2F2",
         magenta: "#D70074",
         yellow: "#FFD650",
         "yellow-pale": "#fff3ed",
@@ -32,6 +33,7 @@ export default {
       fontWeight: {
         book: "400",
         roman: "500",
+        heavy: "800",
       },
     },
   },

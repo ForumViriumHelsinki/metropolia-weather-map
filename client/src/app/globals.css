@@ -8,8 +8,16 @@
 
 /* Light mode */
 :root {
-  --background: #9dcdc0;
+  --background: theme(colors.blueM);
   --foreground: black;
+
+  h2 {
+    @apply font-heavy;
+  }
+
+  h3 {
+    @apply font-heavy text-xl;
+  }
 }
 
 /* Dark mode overrides */

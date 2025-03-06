@@ -6,6 +6,7 @@ CREATE SCHEMA IF NOT EXISTS weather;
 
 SET search_path TO weather;
 
+
 CREATE TABLE IF NOT EXISTS weather.sensors (
     id TEXT PRIMARY KEY,
     location POINT,
