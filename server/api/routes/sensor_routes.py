@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import sensor_table
 from typing import List, Optional
-from datetime import datetime
+from datetime import date, datetime
 from sqlalchemy import select
 
 router = APIRouter()
@@ -17,8 +17,8 @@ async def get_sensors(
     type: Optional[str] = Query(None),
     note: Optional[str] = Query(None),
     attached: Optional[str] = Query(None),
-    install_date_from: Optional[datetime] = Query(None),
-    install_date_to: Optional[datetime] = Query(None),
+    install_date_from: Optional[date] = Query(None),
+    install_date_to: Optional[date] = Query(None),
     fields: Optional[List[str]] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -52,10 +52,10 @@ async def get_sensors(
         filters.append(sensor_table.c.attached == attached)
 
     if install_date_from:
-        filters.append(sensor_table.c.install_date == install_date_from)
+        filters.append(sensor_table.c.install_date >= install_date_from)
 
     if install_date_to:
-        filters.append(sensor_table.c.install_date == install_date_to)
+        filters.append(sensor_table.c.install_date <= install_date_to)
 
     if install_date_from and install_date_to and install_date_from > install_date_to:
         raise HTTPException(
