@@ -1,3 +1,4 @@
+import SearchButton from "@/components/SearchButton";
 import SensorCard from "@/components/SensorCard";
 import TestMap from "@/components/TestMap";
 import { Sensor } from "@/types";
@@ -51,6 +52,10 @@ export default async function Home() {
             latestData={dataList.filter((d) => d.id === sensor.id)[0]}
           />
         ))}
+      </div>
+
+      <div className="flex justify-center">
+        <SearchButton /> 
       </div>
     </main>
   );
