@@ -1,4 +1,5 @@
 import pandas as pd
+import requests
 
 SENSORS = [
     "24E124136E106616",
@@ -33,20 +34,34 @@ SENSOR_SHADE = [
     "24E124136E106686",
 ]
 
+BASE_URL = "https://bri3.fvh.io/opendata/makelankatu/"
+
 def get_csv(year=None):
-    files = {
-        2024: "../data/makelankatu-2024.csv",
-        2025: "../data/makelankatu-2025.csv",
-    }
-    
+    """Load sensor data for a specific year or all available years."""
+    available_years = [2024, 2025]  # Update this when new data is available
+
     if year is None:
-        df = pd.concat([pd.read_csv(f, parse_dates=["time"]) for f in files.values()], ignore_index=True)
-    elif year in files:
-        df = pd.read_csv(files[year], parse_dates=["time"])
+        dfs = [fetch_csv(y) for y in available_years]
+        df = pd.concat(dfs, ignore_index=True)
+    elif year in available_years:
+        df = fetch_csv(year)
     else:
-        raise ValueError("Invalid year. Choose 2024, 2025, or None for both.")
-    
+        raise ValueError(f"Invalid year. Choose from {available_years} or None for all years.")
+
+    print("CSV loading complete.")
     return df
+
+
+def fetch_csv(year):
+    """Fetch and load a CSV file for a given year."""
+    filename = f"makelankatu-{year}.csv.gz"
+    url = BASE_URL + filename
+
+    print(f"Fetching CSV data for {year} from {url}...")
+    response = requests.get(url, stream=True)
+    response.raise_for_status()
+
+    return pd.read_csv(url, parse_dates=["time"])
 
 
 def separate_sensors(sensor_df):
