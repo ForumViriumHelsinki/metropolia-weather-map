@@ -1,4 +1,4 @@
-import { SensorServiceParams } from "@/types";
+import { SensorParams } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
 // TODO: Implement date params, add error handling
@@ -11,7 +11,7 @@ export const getSensorService = async ({
   // install_date_from = "",
   // install_date_to = "",
   fields = [""],
-}: SensorServiceParams) => {
+}: SensorParams) => {
   const params = new URLSearchParams({
     id,
     location: location ? location.toString() : "",

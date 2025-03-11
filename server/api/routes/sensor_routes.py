@@ -13,7 +13,7 @@ router = APIRouter()
 @router.get("/api/sensors/")
 async def get_sensors(
     id: Optional[str] = Query(None),
-    coords: Optional[str] = Query(None),
+    location: Optional[str] = Query(None),
     type: Optional[str] = Query(None),
     note: Optional[str] = Query(None),
     attached: Optional[str] = Query(None),
@@ -39,8 +39,8 @@ async def get_sensors(
     if id:
         filters.append(sensor_table.c.id == id)
 
-    if coords:
-        filters.append(sensor_table.c.coords == coords)
+    if location:
+        filters.append(sensor_table.c.coords == location)
 
     if type:
         filters.append(sensor_table.c.type == type)
