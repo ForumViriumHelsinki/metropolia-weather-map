@@ -1,3 +1,4 @@
+import SearchButton from "@/components/SearchButton";
 import MapWrapper from "@/components/MapWrapper";
 import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
@@ -59,6 +60,10 @@ export default async function Home() {
             }
           />
         ))}
+      </div>
+
+      <div className="flex justify-center">
+        <SearchButton /> 
       </div>
     </main>
   );

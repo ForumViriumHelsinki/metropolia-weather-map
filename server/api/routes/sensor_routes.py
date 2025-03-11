@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import sensor_table
-from typing import Optional
-from datetime import datetime
+from typing import List, Optional
+from datetime import date, datetime
 from sqlalchemy import select
 
 router = APIRouter()
@@ -17,11 +17,24 @@ async def get_sensors(
     type: Optional[str] = Query(None),
     note: Optional[str] = Query(None),
     attached: Optional[str] = Query(None),
-    install_date_from: Optional[datetime] = Query(None),
-    install_date_to: Optional[datetime] = Query(None),
+    install_date_from: Optional[date] = Query(None),
+    install_date_to: Optional[date] = Query(None),
+    fields: Optional[List[str]] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(sensor_table)
+    valid_fields = set(sensor_table.columns.keys())
+
+    if fields:
+        invalid_fields = [f for f in fields if f not in valid_fields]
+        if invalid_fields:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid fields: {', '.join(invalid_fields)}"
+            )
+        selected_fields = [sensor_table.c[f] for f in fields]
+    else:
+        selected_fields = [sensor_table]
+
+    query = select(*selected_fields)
     filters = []
     if id:
         filters.append(sensor_table.c.id == id)
@@ -39,10 +52,10 @@ async def get_sensors(
         filters.append(sensor_table.c.attached == attached)
 
     if install_date_from:
-        filters.append(sensor_table.c.install_date == install_date_from)
+        filters.append(sensor_table.c.install_date >= install_date_from)
 
     if install_date_to:
-        filters.append(sensor_table.c.install_date == install_date_to)
+        filters.append(sensor_table.c.install_date <= install_date_to)
 
     if install_date_from and install_date_to and install_date_from > install_date_to:
         raise HTTPException(
@@ -54,20 +67,4 @@ async def get_sensors(
 
     result = await db.execute(query)
     sensors = result.mappings().all()
-    return [dict(row) for row in sensors]
-
-
-@router.get("/api/sensors/test")
-async def test(
-    location: Optional[bool] = Query(None),
-    db: AsyncSession = Depends(get_db),
-):
-    columns = [sensor_table.c.id]
-    if location:
-        columns.append(sensor_table.c.location)
-
-    stmt = select(*columns)
-    result = await db.execute(stmt)
-    sensors = result.mappings().all()
-
     return [dict(row) for row in sensors]
