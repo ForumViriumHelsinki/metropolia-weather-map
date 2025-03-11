@@ -1,8 +1,8 @@
 "use client";
 
-import { testPostAction } from "@/app/actions/debugAction";
+import { getDataService } from "@/app/services/dataService";
 import { getSensorService } from "@/app/services/sensorService";
-import { SensorParams } from "@/types";
+import { SensorDataParams, SensorParams } from "@/types";
 import { useState } from "react";
 
 const Debug = () => {
@@ -11,22 +11,35 @@ const Debug = () => {
 
   const submitDates = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStartDate(new Date(e.currentTarget.startDate.value));
-    setEndDate(new Date(e.currentTarget.endDate.value));
+    const date = e.currentTarget.startDate.value;
+    console.log(date);
+    console.log(typeof date);
+    // setStartDate(new Date(e.currentTarget.startDate.value));
+    // setEndDate(new Date(e.currentTarget.endDate.value));
 
-    if (!startDate || !endDate) return;
+    // if (!startDate || !endDate) return;
 
-    console.log("action");
-    await testPostAction(startDate, endDate);
+    // console.log("action");
+    // await testPostAction(startDate, endDate);
   };
 
   const testGet = async () => {
     console.log("test");
+    console.log();
     const testParams: SensorParams = {
       id: "24E124136E106616",
     };
 
     const res = await getSensorService(testParams);
+    console.log(res);
+  };
+
+  const dataService = async () => {
+    const testParams: SensorDataParams = {
+      sensor_id: "24E124136E106616",
+    };
+
+    const res = await getDataService(testParams);
     console.log(res);
   };
 
@@ -43,7 +56,7 @@ const Debug = () => {
           <label>Start date</label>
           <input
             name="startDate"
-            type="date"
+            type="datetime-local"
           />
 
           <label>End date</label>
@@ -68,6 +81,8 @@ const Debug = () => {
         </div>
       </div>
       <button onClick={testGet}>Test Get</button>
+
+      <button onClick={dataService}>getDataService</button>
     </div>
   );
 };
