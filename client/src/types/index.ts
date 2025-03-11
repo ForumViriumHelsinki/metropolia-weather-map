@@ -15,7 +15,7 @@ export type SensorData = {
   sensor: string;
 };
 
-export interface SensorServiceParams {
+export interface SensorParams {
   id?: string;
   location?: [number, number];
   type?: string;
@@ -24,4 +24,14 @@ export interface SensorServiceParams {
   install_date_from?: string;
   install_date_to?: string;
   fields?: string[];
+}
+
+export interface SensorDataParams {
+  sensor_id?: string;
+  start_date?: Date;
+  end_date?: Date;
+  humidity_from?: number;
+  humidity_to?: number;
+  temperature_from?: number;
+  temperature_to?: number;
 }

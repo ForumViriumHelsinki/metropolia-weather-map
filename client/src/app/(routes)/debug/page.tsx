@@ -2,7 +2,7 @@
 
 import { testPostAction } from "@/app/actions/debugAction";
 import { getSensorService } from "@/app/services/sensorService";
-import { SensorServiceParams } from "@/types";
+import { SensorParams } from "@/types";
 import { useState } from "react";
 
 const Debug = () => {
@@ -22,7 +22,7 @@ const Debug = () => {
 
   const testGet = async () => {
     console.log("test");
-    const testParams: SensorServiceParams = {
+    const testParams: SensorParams = {
       id: "24E124136E106616",
     };
 
