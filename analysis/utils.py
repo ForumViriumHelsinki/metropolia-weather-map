@@ -33,7 +33,6 @@ SENSOR_SHADE = [
     "24E124136E106686",
 ]
 
-
 def get_csv(year=None):
     files = {
         2024: "../data/makelankatu-2024.csv",
@@ -41,12 +40,13 @@ def get_csv(year=None):
     }
     
     if year is None:
-        # Load all years if year is not specified
-        return pd.concat([pd.read_csv(f) for f in files.values()], ignore_index=True)
+        df = pd.concat([pd.read_csv(f, parse_dates=["time"]) for f in files.values()], ignore_index=True)
     elif year in files:
-        return pd.read_csv(files[year])
+        df = pd.read_csv(files[year], parse_dates=["time"])
     else:
         raise ValueError("Invalid year. Choose 2024, 2025, or None for both.")
+    
+    return df
 
 
 def separate_sensors(sensor_df):
@@ -92,7 +92,8 @@ def get_cloudiness_data(file_path="../data/cloudiness.csv"):
     cloud_df = pd.read_csv(file_path, encoding="utf-8", sep=",")
     cloud_df.columns = ["Havaintoasema", "Vuosi", "Kuukausi", "Päivä", "Aika", "Pilvisyys"]
 
-    cloud_df["date"] = pd.to_datetime(cloud_df[["Vuosi", "Kuukausi", "Päivä"]]).dt.date
+    cloud_df = cloud_df.rename(columns={"Vuosi": "year", "Kuukausi": "month", "Päivä": "day"})
+    cloud_df["date"] = pd.to_datetime(cloud_df[["year", "month", "day"]]).dt.date
     cloud_df["Pilvisyys"] = cloud_df["Pilvisyys"].str.extract(r"(\d+)").astype(float)
     cloud_df.loc[cloud_df["Pilvisyys"] == 9, "Pilvisyys"] = None
 
