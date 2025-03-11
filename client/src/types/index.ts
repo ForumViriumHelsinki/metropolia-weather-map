@@ -28,8 +28,8 @@ export interface SensorParams {
 
 export interface SensorDataParams {
   sensor_id?: string;
-  start_date?: Date;
-  end_date?: Date;
+  start_date?: string;
+  end_date?: string;
   humidity_from?: number;
   humidity_to?: number;
   temperature_from?: number;
