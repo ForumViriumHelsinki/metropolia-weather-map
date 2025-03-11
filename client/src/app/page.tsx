@@ -3,6 +3,7 @@ import MapWrapper from "@/components/MapWrapper";
 import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import FilterComponent from "@/components/FilterComponent";
 
 export type LatestData = {
   id: string;
@@ -63,8 +64,9 @@ export default async function Home() {
       </div>
 
       <div className="flex justify-center">
-        <SearchButton /> 
+        <SearchButton />
       </div>
+      <FilterComponent />
     </main>
   );
 }

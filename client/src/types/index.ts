@@ -25,3 +25,13 @@ export interface SensorServiceParams {
   install_date_to?: string;
   fields?: string[];
 }
+
+export type SensorSearchFilter = {
+  dateRange?: [string, string];
+  installed?: string;
+  attachedTo?: string;
+  type?: string;
+  note?: string;
+  tempRange?: [number, number];
+  humidityRange?: [number, number];
+}
