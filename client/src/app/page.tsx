@@ -3,6 +3,8 @@ import SearchButton from "@/components/SearchButton";
 import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import FilterComponent from "@/components/FilterComponent";
+import SensorSearchFilter from "@/components/SensorSearchFilter";
 
 export type LatestData = {
   id: string;
@@ -74,6 +76,7 @@ export default async function Home() {
       <div className="flex justify-center">
         <SearchButton />
       </div>
+      <SensorSearchFilter />
     </main>
   );
 }
