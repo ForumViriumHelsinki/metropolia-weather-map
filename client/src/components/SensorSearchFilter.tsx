@@ -32,9 +32,41 @@ export default function SensorSearchFilter() {
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log("Filter Values:", values);
         // Further processing logic here
+        const params = new URLSearchParams();
+        Object.entries(values).forEach(([key, value]) => {
+            if(value !== undefined) {
+                if(Array.isArray(value)) {
+                    params.append("start_date", value[0]);
+                    params.append("end_date", value[1]);
+                } else {
+                    if(key === "attachedTo") {
+                        params.append("attached", value as string);
+                    }
+                    else if (key === "type") {
+                        params.append("type", value as string);
+                    }
+                    else if (key === "note") {
+                        params.append("note", value as string);
+                    }
+                }
+            }
+
+        });
+        const url = 'http://localhost:8000/api/sensors/?' + params.toString();
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error('Failed to fetch sensors');
+            }
+            const data = await res.json();
+            console.log(data);
+        }catch (error){
+            console.error(error);
+        }
     };
 
     return (
@@ -114,7 +146,7 @@ export default function SensorSearchFilter() {
                                 id={key}
                                 name={key}
                                 placeholder={label}
-                                value={values[key as keyof SensorSearchFilter] || " "}
+                                value={values[key as keyof SensorSearchFilter] || ""}
                                 disabled={!checkedState[key as keyof SensorSearchFilter]}
                                 onChange={(e) =>
                                     handleInputChange(
