@@ -12,12 +12,23 @@ services:
       - 5432:5432
 
   next-client:
+    container_name: client-dev
     build:
       context: ./client
+    image: nextjs-dev
+    develop:
+      watch:
+        - action: sync
+          path: ./client/src
+          target: /app/src
+          ignore:
+            - ./client/node_modules/
+        - action: rebuild
+          path: ./client/package.json
     ports:
       - 3000:3000
     environment:
-      NODE_ENV: development
+      - NODE_ENV=development
 
   python-server:
     container_name: python-server

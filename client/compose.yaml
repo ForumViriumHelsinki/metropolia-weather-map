@@ -1,8 +1,18 @@
 services:
   app:
+    container_name: client-dev
     build:
       context: .
     image: nextjs-dev
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
     ports:
       - 3000:3000
     environment:

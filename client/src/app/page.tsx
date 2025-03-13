@@ -1,6 +1,5 @@
 import MapWrapper from "@/components/MapWrapper";
 import SearchButton from "@/components/SearchButton";
-import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
@@ -31,7 +30,7 @@ export default async function Home() {
   });
 
   // Get latest data
-  let latestData: LatestData[] = [];
+  // let latestData: LatestData[] = [];
   // const resLatest = await fetch(
   //   "https://bri3.fvh.io/opendata/makelankatu/makelankatu_latest.geojson",
   // );
@@ -51,7 +50,7 @@ export default async function Home() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {sortedSensors.map((sensor) => (
+        {/* {sortedSensors.map((sensor) => (
           <SensorCard
             key={sensor.id}
             sensor={sensor}
@@ -59,7 +58,7 @@ export default async function Home() {
               latestData && latestData.filter((d) => d.id === sensor.id)[0]
             }
           />
-        ))}
+        ))} */}
       </div>
 
       <div className="flex justify-center">
