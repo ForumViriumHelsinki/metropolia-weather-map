@@ -1,11 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+
+# from dotenv import load_dotenv
 import os
 
-load_dotenv(".env.local")
+# load_dotenv(".env.local")
 DB_NAME = os.getenv("DB_NAME", "weatherdb")
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_HOST = os.getenv("DB_HOST", "weatherdb")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASS = os.getenv("DB_PASS", "pass")

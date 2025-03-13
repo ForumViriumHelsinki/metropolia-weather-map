@@ -11,5 +11,27 @@ services:
     ports:
       - 5432:5432
 
+  next-client:
+    build:
+      context: ./client
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+
+  python-server:
+    container_name: python-server
+    build:
+      context: ./server
+    working_dir: /usr/src/app
+    volumes:
+      - ./server:/usr/src/app
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - db
 volumes:
   db_data:
