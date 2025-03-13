@@ -1,5 +1,5 @@
-import SearchButton from "@/components/SearchButton";
 import MapWrapper from "@/components/MapWrapper";
+import SearchButton from "@/components/SearchButton";
 import SensorCard from "@/components/SensorCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
@@ -34,13 +34,17 @@ export default async function Home() {
 
   // Get latest data
   let latestData: LatestData[] = [];
-  const resLatest = await fetch(
-    "https://bri3.fvh.io/opendata/makelankatu/makelankatu_latest.geojson",
-  );
+  try {
+    const resLatest = await fetch(
+      "https://bri3.fvh.io/opendata/makelankatu/makelankatu_latest.geojson",
+    );
 
-  if (resLatest.status === 200) {
-    const data = await resLatest.json();
-    latestData = data.features;
+    if (resLatest.status === 200) {
+      const data = await resLatest.json();
+      latestData = data.features;
+    }
+  } catch (error) {
+    if (error instanceof Error) console.log(error.message);
   }
 
   return (
@@ -52,6 +56,11 @@ export default async function Home() {
         </div>
       </div>
 
+      {latestData && (
+        <div className="text-xl text-red-800">
+          Error fetching latest data from server
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {sortedSensors.map((sensor) => (
           <SensorCard

@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-from utils import get_day_data, SENSOR_SUN, SENSOR_SHADE, load_and_process_cloudiness, apply_date_range
+from utils import get_day_data, SENSOR_SUN, SENSOR_SHADE, get_cloudiness_data, apply_date_range
 
 DATE_RANGE = {"start_date": "2024-07-01", "end_date": "2024-12-30"}
 
@@ -54,7 +54,7 @@ df["date"] = pd.to_datetime(df["time"]).dt.date
 temp_diff = compute_daily_temp_difference(df)
 
 # Load cloudiness data and merge
-cloud_daily_avg = load_and_process_cloudiness()
+cloud_daily_avg = get_cloudiness_data()
 merged_df = pd.merge(temp_diff, cloud_daily_avg, on="date", how="left").fillna({"Pilvisyys": 0})
 
 # Visualize results
