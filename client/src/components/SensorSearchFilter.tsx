@@ -6,15 +6,12 @@ import { SensorSearchFilter } from "../types";
 
 const filterFields: { key: string; label: string; type: string }[] = [
     { key: "dateRange", label: "Date Range", type: "datetime-local" },
-    { key: "installed", label: "Installed Date", type: "datetime-local" },
     { key: "attachedTo", label: "Attached To", type: "text" },
     { key: "type", label: "Type", type: "text" },
-    { key: "note", label: "Note", type: "text" },
-    { key: "tempRange", label: "Temperature Range", type: "number" },
-    { key: "humidityRange", label: "Humidity Range", type: "number" },
+    { key: "note", label: "Note", type: "text" }
 ];
 
-export default function FilterComponent() {
+export default function SensorSearchFilter() {
     const [checkedState, setCheckedState] = useState<{ [key in keyof SensorSearchFilter]?: boolean }>({});
     const [values, setValues] = useState<SensorSearchFilter>({});
 
@@ -30,10 +27,6 @@ export default function FilterComponent() {
             if (key === "dateRange" && typeof value === "string") {
                 const [start, end] = prev.dateRange || ["", ""];
                 return { ...prev, dateRange: isEndValue ? [start, value] : [value, end] };
-            }
-            if ((key === "tempRange" || key === "humidityRange") && typeof value === "number") {
-                const [min, max] = prev[key] || [0, 0];
-                return { ...prev, [key]: isEndValue ? [min, value] : [value, max] };
             }
             return { ...prev, [key]: value };
         });
@@ -89,6 +82,7 @@ export default function FilterComponent() {
                                     id={`${key}-start`}
                                     name={`${key}-start`}
                                     disabled={!checkedState[key]}
+                                    value={values[key as keyof SensorSearchFilter]?.[0] || ""}
                                     onChange={(e) => handleInputChange(key, e.target.value)}
                                     style={{
                                         width: 170,
@@ -103,6 +97,7 @@ export default function FilterComponent() {
                                     id={`${key}-end`}
                                     name={`${key}-end`}
                                     disabled={!checkedState[key]}
+                                    value={values[key as keyof SensorSearchFilter]?.[1] || ""}
                                     onChange={(e) => handleInputChange(key, e.target.value, true)}
                                     style={{
                                         width: 170,
@@ -113,47 +108,13 @@ export default function FilterComponent() {
                                     }}
                                 />
                             </>
-                        ) : key === "tempRange" || key === "humidityRange" ? (
-                            <>
-                                <input
-                                    type="number"
-                                    id={`${key}-min`}
-                                    name={`${key}-min`}
-                                    placeholder="Min"
-                                    disabled={!checkedState[key]}
-                                    onChange={(e) => handleInputChange(key, Number(e.target.value))}
-                                    style={{
-                                        width: 70,
-                                        height: 30,
-                                        borderRadius: 4,
-                                        border: "1px solid #9BA1A6",
-                                        padding: "4px",
-                                        opacity: checkedState[key] ? 1 : 0.5,
-                                    }}
-                                />
-                                <input
-                                    type="number"
-                                    id={`${key}-max`}
-                                    name={`${key}-max`}
-                                    placeholder="Max"
-                                    disabled={!checkedState[key]}
-                                    onChange={(e) => handleInputChange(key, Number(e.target.value), true)}
-                                    style={{
-                                        width: 70,
-                                        height: 30,
-                                        borderRadius: 4,
-                                        border: "1px solid #9BA1A6",
-                                        padding: "4px",
-                                        opacity: checkedState[key] ? 1 : 0.5,
-                                    }}
-                                />
-                            </>
                         ) : (
                             <input
                                 type={type}
                                 id={key}
                                 name={key}
                                 placeholder={label}
+                                value={values[key as keyof SensorSearchFilter] || " "}
                                 disabled={!checkedState[key as keyof SensorSearchFilter]}
                                 onChange={(e) =>
                                     handleInputChange(
