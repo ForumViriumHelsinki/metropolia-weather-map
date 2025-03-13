@@ -1,0 +1,15 @@
+services:
+  app:
+    container_name: server-dev
+    build:
+      context: .
+    image: python-dev
+    # volumes:
+    #   - .:/usr/src/app
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /usr/src/app
+    ports:
+      - 8000:8000
