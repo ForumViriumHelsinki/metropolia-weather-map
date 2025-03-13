@@ -19,10 +19,10 @@ export default function FilterComponent() {
     const [values, setValues] = useState<SensorSearchFilter>({});
 
     const handleCheckboxChange = (key: string) => {
-        if (checkedState[key]) {
+        if (checkedState[key as keyof SensorSearchFilter]) {
             setValues((prev) => ({ ...prev, [key]: undefined })); // Reset value if unchecked
         }
-        setCheckedState((prev) => ({ ...prev, [key]: !prev[key] }));
+        setCheckedState((prev) => ({ ...prev, [key as keyof SensorSearchFilter]: !prev[key as keyof SensorSearchFilter] }));
     };
 
     const handleInputChange = (key: string, value: string | number, isEndValue = false) => {
@@ -67,7 +67,7 @@ export default function FilterComponent() {
                         <input
                             type="checkbox"
                             id={`${key}-checkbox`}
-                            checked={checkedState[key] || false}
+                            checked={checkedState[key as keyof SensorSearchFilter] || false}
                             onChange={() => handleCheckboxChange(key)}
                             style={{ width: 20, height: 20 }}
                         />
@@ -76,7 +76,7 @@ export default function FilterComponent() {
                             style={{
                                 fontSize: 14,
                                 color: "black",
-                                opacity: checkedState[key] ? 1 : 0.5,
+                                opacity: checkedState[key as keyof SensorSearchFilter] ? 1 : 0.5,
                             }}
                         >
                             {label}
@@ -154,7 +154,7 @@ export default function FilterComponent() {
                                 id={key}
                                 name={key}
                                 placeholder={label}
-                                disabled={!checkedState[key]}
+                                disabled={!checkedState[key as keyof SensorSearchFilter]}
                                 onChange={(e) =>
                                     handleInputChange(
                                         key,
@@ -167,7 +167,7 @@ export default function FilterComponent() {
                                     borderRadius: 4,
                                     border: "1px solid #9BA1A6",
                                     padding: "4px",
-                                    opacity: checkedState[key] ? 1 : 0.5,
+                                    opacity: checkedState[key as keyof SensorSearchFilter] ? 1 : 0.5,
                                 }}
                             />
                         )}
