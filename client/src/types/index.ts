@@ -32,6 +32,7 @@ export type SensorSearchFilter = {
   attachedTo?: string;
   type?: string;
   note?: string;
+}
 
 export interface SensorDataParams {
   sensor_id?: string;
