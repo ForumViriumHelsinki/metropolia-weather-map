@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: client-dev
+    container_name: client-test
     build:
       context: .
     image: nextjs-dev

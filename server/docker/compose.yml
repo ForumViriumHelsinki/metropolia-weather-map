@@ -1,11 +1,9 @@
 services:
   app:
-    container_name: server-dev
+    container_name: server-test
     build:
       context: .
     image: python-dev
-    # volumes:
-    #   - .:/usr/src/app
     develop:
       watch:
         - action: sync
@@ -13,3 +11,9 @@ services:
           target: /usr/src/app
     ports:
       - 8000:8000
+    environment:
+      DB_NAME: weatherdb
+      DB_HOST: weatherdb
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: pass
