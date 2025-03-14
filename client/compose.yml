@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: client-test-wsl
+    build:
+      context: .
+      dockerfile: ./Dockerfile.wsl
+    image: nextjs-dev
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    environment:
+     - NEXT_PUBLIC_PYTHON_API="http://python-server:8000"
+

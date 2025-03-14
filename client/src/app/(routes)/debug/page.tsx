@@ -43,6 +43,11 @@ const Debug = () => {
     console.log(res);
   };
 
+  const testDbConn = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_PYTHON_API}/api/sensors`)
+    console.log(await res.json())
+  }
+
   return (
     <div className="">
       <button onClick={testGet}>TEST</button>
@@ -83,6 +88,8 @@ const Debug = () => {
       <button onClick={testGet}>Test Get</button>
 
       <button onClick={dataService}>getDataService</button>
+
+      <button onClick={testDbConn}>DB conn</button>
     </div>
   );
 };
