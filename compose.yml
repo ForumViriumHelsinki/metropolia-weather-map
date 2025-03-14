@@ -11,24 +11,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
 
-  next-client:
-    container_name: client-dev
-    build:
-      context: ./client
-      dockerfile: ./Dockerfile.wsl
-    volumes:
-      - ./client:/app
-    ports:
-      - 3000:3000
-    environment:
-      - NEXT_PUBLIC_PYTHON_API=http://localhost:8000
-
+  # next-client:
+  #   container_name: client-dev
+  #   build:
+  #     context: ./client
+  #     dockerfile: ./Dockerfile.wsl
+  #   volumes:
+  #     - ./client:/app
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     - NEXT_PUBLIC_PYTHON_API=http://localhost:8000
 
   python-server:
     container_name: python-server
     build:
       context: ./server
-      dockerfile: ./server/docker/Dockerfile.wsl
+      dockerfile: ./Dockerfile
     volumes:
       - ./server:/usr/src/app
     ports:
@@ -41,6 +40,6 @@ services:
       DB_PASS: pass
     depends_on:
       - db
-      
+
 volumes:
   db_data:

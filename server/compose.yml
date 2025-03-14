@@ -3,10 +3,10 @@ services:
     container_name: server-test-wsl
     build:
       context: .
-      dockerfile: ./Dockerfile.wsl
+      dockerfile: ./Dockerfile
     image: python-dev
     volumes:
-      - ../:/usr/src/app
+      - ./:/usr/src/app
     ports:
       - 8000:8000
     environment:
