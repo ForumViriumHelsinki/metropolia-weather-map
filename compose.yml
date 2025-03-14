@@ -2,46 +2,45 @@ services:
   db:
     container_name: weatherdb
     image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pass
     volumes:
       - ./db_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
 
   next-client:
     container_name: client-dev
     build:
       context: ./client
-    image: nextjs-dev
-    develop:
-      watch:
-        - action: sync
-          path: ./client/src
-          target: /app/src
-          ignore:
-            - ./client/node_modules/
-        - action: rebuild
-          path: ./client/package.json
+      dockerfile: ./Dockerfile.wsl
+    volumes:
+      - ./client:/app
     ports:
       - 3000:3000
     environment:
-      - NODE_ENV=development
+      - NEXT_PUBLIC_PYTHON_API=http://localhost:8000
+
 
   python-server:
     container_name: python-server
     build:
       context: ./server
+      dockerfile: ./server/docker/Dockerfile.wsl
+    volumes:
+      - ./server:/usr/src/app
     ports:
       - "8000:8000"
-    develop:
-      watch:
-        - action: sync
-          path: ./server
-          target: /usr/src/app
+    environment:
+      DB_NAME: weatherdb
+      DB_HOST: weatherdb
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: pass
     depends_on:
       - db
+      
 volumes:
   db_data:

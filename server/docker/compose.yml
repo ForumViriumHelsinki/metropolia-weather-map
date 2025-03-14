@@ -1,14 +1,12 @@
 services:
   app:
-    container_name: server-test
+    container_name: server-test-wsl
     build:
       context: .
+      dockerfile: ./Dockerfile.wsl
     image: python-dev
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /usr/src/app
+    volumes:
+      - ../:/usr/src/app
     ports:
       - 8000:8000
     environment:
