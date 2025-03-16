@@ -1,3 +1,50 @@
+# Startup
+
+## Docker compose
+
+All parts of the project can be started with docker compose. Compose starts the Client, server and database.
+
+```bash
+docker-compose up
+```
+
+## Starting components separately
+
+### Client
+
+Starting the client on localhost:3000
+
+```bash
+cd /client
+pnpm install
+pnpm run dev
+```
+
+### Server
+
+Starting the server on localhost:8000
+
+```bash
+cd /server
+pip install -r requirements.txt
+py ./run.py
+```
+
+### Database
+
+Starting the database locally
+
+```bash
+docker compose -f compose.db.yml up
+```
+
+#### Loading data to database
+
+```bash
+py scripts/load_sensors.py
+py scripts/csvToDb.py
+```
+
 # Visio
 
 Verkkosovellus, joka näyttää kartalla lämpötilojen muutoksen paikkakohtaisesti. Omien antureiden lisäksi tietoja haetaan läheisiltä sääasemilta. Näiltä sääasemilta haetaan myös säätiedot, kuten pilvisyys ja ilmankosteus. Datan analysointiin voidaan luoda haluttuja työkaluja, asiakkaan toiveiden mukaan. Tiedot tallennetaan Google Cloudissa olevaan PostgreSQL tietokantaan.
@@ -27,15 +74,3 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 - Analysointi selviää tavoitteiden määrittämisen jälkeen.
 - Knime tai joku muu soveltuva teknologia
-
-# Projekti
-
-## Client
-
-- `pnpm install`
-- `pnpm run dev`
-
-## Server
-
-- `pip install -r requirements.txt`
-- `py .\main.py`
