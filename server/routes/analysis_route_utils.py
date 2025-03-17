@@ -25,26 +25,31 @@ SENSOR_SHADE = [
 
 SENSORS_ALL = SENSOR_SUN + SENSOR_SHADE
 
+CSV_CACHE = {}
 
 def fetch_csv(start_year, end_year=None):
-    """Fetch and combine CSV data for one or multiple years."""
+    """Fetch and cache CSV data for one or multiple years."""
     BASE_URL = "https://bri3.fvh.io/opendata/makelankatu/"
     
-    # If only one year is provided, set end_year to start_year
     if end_year is None:
         end_year = start_year
 
     all_dfs = []
     for year in range(start_year, end_year + 1):
-        filename = f"makelankatu-{year}.csv.gz"
-        url = BASE_URL + filename
-
-        print(f"Fetching CSV data for {year} from {url}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-
-        df = pd.read_csv(url, parse_dates=["time"])
-        all_dfs.append(df)
+        if year in CSV_CACHE:
+            print(f"Using cached data for {year}")
+            all_dfs.append(CSV_CACHE[year])
+        else:
+            filename = f"makelankatu-{year}.csv.gz"
+            url = BASE_URL + filename
+            print(f"Fetching CSV data for {year} from {url}...")
+            
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            df = pd.read_csv(url, parse_dates=["time"])
+            CSV_CACHE[year] = df  # Store in cache
+            all_dfs.append(df)
 
     return pd.concat(all_dfs, ignore_index=True)
 
