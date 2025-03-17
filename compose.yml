@@ -12,12 +12,13 @@ services:
       POSTGRES_PASSWORD: pass
 
   next-client:
-    container_name: client-dev
+    container_name: next-client
     build:
       context: ./client
       dockerfile: ./Dockerfile
     volumes:
       - ./client:/app
+      - /app/node_modules
     ports:
       - 3000:3000
     environment:
