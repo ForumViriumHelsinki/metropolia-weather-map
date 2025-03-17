@@ -1,7 +1,8 @@
-import MapWrapper from "@/components/MapWrapper";
-import SearchButton from "@/components/SearchButton";
-import SensorCard from "@/components/SensorCard";
-import SensorSearchFilter from "@/components/SensorSearchFilter";
+import GraphDisplay from "@/components/GraphDisplay";
+import MapWrapper from "@/components/Map/MapWrapper";
+import SensorCard from "@/components/SensorCard/SensorCard";
+import SearchButton from "@/components/SensorSearch/SearchButton";
+import SensorSearchFilter from "@/components/SensorSearch/SensorSearchFilter";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
@@ -48,6 +49,7 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col gap-6">
+      {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
         <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
         <div className="2xl:w-fill aspect-[2/3] w-full border-2 sm:aspect-[2/1] 2xl:aspect-[2/1]">
@@ -55,6 +57,7 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Sensor cards */}
       {!latestData && (
         <div className="text-xl text-red-800">
           Error fetching latest data from server
@@ -72,6 +75,11 @@ export default async function Home() {
         ))}
       </div>
 
+      <div>
+        <GraphDisplay />
+      </div>
+
+      {/* Sensor filter search */}
       <div className="flex justify-center">
         <SearchButton />
       </div>
