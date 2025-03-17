@@ -89,18 +89,30 @@ def create_plot_chart(x, y, title, xlabel, ylabel, color="red"):
 
 def filter_sensors(df, sensor_id):
     """Filters data based on a sensor ID, sun sensors, shade sensors, or all sensors."""
+    sensor_groups = {
+        "sun": (SENSOR_SUN, "Sun Sensors"),
+        "shade": (SENSOR_SHADE, "Shade Sensors"),
+    }
+    if sensor_id in sensor_groups:
+        filtered_df = df[df["dev-id"].isin(sensor_groups[sensor_id][0])]
+        return filtered_df, sensor_groups[sensor_id][1]
     if sensor_id:
-        if sensor_id == "sun":
-            return df[df["dev-id"].isin(SENSOR_SUN)], "Sun Sensors"
-        elif sensor_id == "shade":
-            return df[df["dev-id"].isin(SENSOR_SHADE)], "Shade Sensors"
-        else:
-            return df[df["dev-id"] == sensor_id], f"Sensor {sensor_id}"
+        return df[df["dev-id"] == sensor_id], f"Sensor {sensor_id}"
+
     return df[df["dev-id"].isin(SENSORS_ALL)], "All Sensors"
 
 
 def filter_date_range(df, start_date, end_date):
     """Filters data based on a date range."""
-    df["time"] = pd.to_datetime(df["time"])
+    
+    if "time" not in df.columns:
+        raise ValueError("Missing 'time' column in DataFrame.")
+    
+    df["time"] = pd.to_datetime(df["time"], errors='coerce')  # Convert to datetime safely
+    df = df.dropna(subset=["time"])
     df["date"] = df["time"].dt.date
-    return df[(df["date"] >= pd.to_datetime(start_date).date()) & (df["date"] <= pd.to_datetime(end_date).date())]
+
+    start_date = pd.to_datetime(start_date).date()
+    end_date = pd.to_datetime(end_date).date()
+
+    return df[(df["date"] >= start_date) & (df["date"] <= end_date)]
