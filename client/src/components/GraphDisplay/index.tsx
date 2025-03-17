@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/utils/apiFetch";
 import { useState } from "react";
 
 const sensors = {
@@ -48,6 +49,7 @@ interface GraphOptions {
   analysisType?: "humidity" | "temperature";
   dateType?: "single" | "range";
   start_date?: string;
+  sensor_type: "all" | "sun" | "shade";
   end_date?: string;
   sensorIds: string[];
   singleId?: string;
@@ -56,7 +58,10 @@ interface GraphOptions {
 const GraphDisplay = () => {
   const [options, setOptions] = useState<GraphOptions>({
     sensorIds: sensors.all,
+    sensor_type: "all",
   });
+
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const handleOptionChange = (option: React.ChangeEvent<HTMLSelectElement>) => {
     const key = option.currentTarget.name;
@@ -66,6 +71,7 @@ const GraphDisplay = () => {
       const selectedSensors = sensors[value as keyof typeof sensors]; // Get the correct sensor array
       setOptions((prevOptions) => ({
         ...prevOptions,
+        sensor_type: value as "all" | "sun" | "shade",
         sensorIds: selectedSensors,
       }));
       return;
@@ -103,8 +109,21 @@ const GraphDisplay = () => {
     }));
   };
 
+  const testFetch = async () => {
+    const urlParams = new URLSearchParams({
+      start_date: options.start_date!,
+      // sensor_id: options.sensor_type!,
+    });
+    console.log(urlParams.toString());
+    const res = await apiFetch(`/analysis/daily-humidity-graph?${urlParams}`);
+    const data = await res.blob();
+    const graphUrl = URL.createObjectURL(data);
+    setImgUrl(graphUrl);
+  };
+
   return (
     <div className="flex bg-green-300">
+      <button onClick={testFetch}>Test Fetch</button>
       <div className="flex w-1/5 flex-col">
         {/* ------ ANALYSIS METRIC ------ */}
         <label>Analysis type</label>
@@ -187,7 +206,12 @@ const GraphDisplay = () => {
         </select>
       </div>
 
-      <div className="w-full flex-1 bg-violet-300"></div>
+      {imgUrl && (
+        <img
+          src={imgUrl}
+          alt="test"
+        />
+      )}
     </div>
   );
 };
