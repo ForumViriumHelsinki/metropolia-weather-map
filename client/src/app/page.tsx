@@ -1,10 +1,9 @@
 import MapWrapper from "@/components/MapWrapper";
 import SearchButton from "@/components/SearchButton";
 import SensorCard from "@/components/SensorCard";
+import SensorSearchFilter from "@/components/SensorSearchFilter";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
-import FilterComponent from "@/components/FilterComponent";
-import SensorSearchFilter from "@/components/SensorSearchFilter";
 
 export type LatestData = {
   id: string;
@@ -56,7 +55,7 @@ export default async function Home() {
         </div>
       </div>
 
-      {latestData && (
+      {!latestData && (
         <div className="text-xl text-red-800">
           Error fetching latest data from server
         </div>
