@@ -4,8 +4,14 @@ import { apiFetch } from "@/utils/apiFetch";
 import Image from "next/image";
 import { useState } from "react";
 
+enum SensorType {
+  All = "all",
+  Sun = "sun",
+  Shade = "shade",
+}
+
 const sensors = {
-  all: [
+  [SensorType.All]: [
     "24E124136E106616",
     "24E124136E106617",
     "24E124136E106618",
@@ -19,13 +25,13 @@ const sensors = {
     "24E124136E106674",
     "24E124136E106686",
   ],
-  sun: [
+  [SensorType.Sun]: [
     "24E124136E106637",
     "24E124136E106638",
     "24E124136E106619",
     "24E124136E106661",
   ],
-  shade: [
+  [SensorType.Shade]: [
     "24E124136E106616",
     "24E124136E106617",
     "24E124136E106618",
@@ -36,103 +42,126 @@ const sensors = {
     "24E124136E106686",
   ],
 };
-// Humidity per day
-// start_date: yyyy-mm-dd
-// end_date: yyyy-mm-dd
-// sensorid: sun, shade, all, id
 
-// Temperature per day
-// start_date: yyyy-mm-dd
-// end_date: yyyy-mm-dd
-// sensorid: sun, shade, all, id
-
-interface GraphOptions {
-  analysisType?: "humidity" | "temperature";
-  dateType?: "single" | "range";
-  start_date?: string;
-  sensor_type: "all" | "sun" | "shade";
-  end_date?: string;
-  sensorIds: string[];
-  singleId?: string;
+interface Options {
+  dateOptions: "single" | "range" | "none";
+  listedSensors: string[];
 }
 
+interface GraphParameters {
+  analysisType: "unselected" | "humidity" | "temperature";
+  sensorType: "all" | "sun" | "shade";
+
+  startDate?: string;
+  endDate?: string;
+  sensors?: SensorType;
+
+  sensorId?: string;
+}
+
+// Works by leveraging the holy spirit and prayers
+// Will get refactored later
+
 const GraphDisplay = () => {
-  const [options, setOptions] = useState<GraphOptions>({
-    sensorIds: sensors.all,
-    sensor_type: "all",
+  const [options, setOptions] = useState<Options>({
+    dateOptions: "none",
+    listedSensors: sensors[SensorType.All],
+  });
+  const [params, setParams] = useState<GraphParameters>({
+    sensorType: "all",
+    sensorId: "all",
+    analysisType: "unselected",
   });
 
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
-  const handleOptionChange = (option: React.ChangeEvent<HTMLSelectElement>) => {
-    const key = option.currentTarget.name;
-    const value = option.currentTarget.value;
+  const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const key = e.currentTarget.name;
+    const value = e.currentTarget.value;
 
-    if (key === "sensorIds") {
-      const selectedSensors = sensors[value as keyof typeof sensors]; // Get the correct sensor array
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        sensor_type: value as "all" | "sun" | "shade",
-        sensorIds: selectedSensors,
-      }));
+    if (key === "sensorType") {
+      const newSensors = sensors[value as SensorType];
+      setOptions((prev) => ({ ...prev, listedSensors: newSensors }));
+      setParams((prev) => ({ ...prev, sensorId: value }));
       return;
     }
 
-    if (key === "idSelection") {
-      if (!value) {
-        setOptions((prevOptions) => ({
-          ...prevOptions,
-          singleId: value,
-        }));
-        return;
-      }
-
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        singleId: value,
+    if (key === "dateOptions") {
+      setOptions((prev) => ({
+        ...prev,
+        dateOptions: value as "single" | "range" | "none",
       }));
-      return;
     }
 
-    setOptions((prevOptions) => ({
-      ...prevOptions,
-      [key]: value,
-    }));
+    setOptions((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const key = e.currentTarget.name;
     const value = e.currentTarget.value;
 
-    setOptions((prevOptions) => ({
-      ...prevOptions,
+    setParams((prev) => ({
+      ...prev,
       [key]: value,
     }));
   };
 
-  const testFetch = async () => {
+  const fetchGraph = async () => {
+    console.log("fetch graph");
+    console.log(params.startDate);
+    if (params.analysisType === "unselected") return;
+    if (!params.startDate) return;
+
     const urlParams = new URLSearchParams({
-      start_date: options.start_date!,
-      // sensor_id: options.sensor_type!,
+      start_date: params.startDate,
     });
+
+    if (params.endDate) {
+      urlParams.append("end_date", params.endDate);
+    }
+
+    if (params.sensorId) {
+      urlParams.append("sensor_id", params.sensorId);
+    }
+
     console.log(urlParams.toString());
-    const res = await apiFetch(`/analysis/daily-humidity-graph?${urlParams}`);
+    const res = await apiFetch(
+      `/analysis/daily-${params.analysisType}-graph?${urlParams}`,
+    );
     const data = await res.blob();
     const graphUrl = URL.createObjectURL(data);
     setImgUrl(graphUrl);
+  };
+
+  const handleGraphOptions = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const key = e.currentTarget.name;
+    const value = e.currentTarget.value;
+
+    if (key === "sensorId" && value === "all") {
+      setParams((prev) => ({
+        ...prev,
+        sensorId: params.sensorType,
+      }));
+      return;
+    }
+
+    setParams((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex">
         {/* ----- QUERY OPTIONS ----- */}
-        <div className="graph-selection bg-off-white flex flex-col gap-2 rounded-l-xl px-4 py-3">
+        <div className="graph-selection bg-off-white flex min-h-[370px] min-w-[200px] flex-col gap-2 rounded-l-xl px-4 py-3">
           {/* ------ ANALYSIS METRIC ------ */}
           <div>
             <label>Analysis type</label>
             <select
               name="analysisType"
-              onChange={(e) => handleOptionChange(e)}
+              onChange={(e) => handleGraphOptions(e)}
             >
               <option value="unselected">Select</option>
               <option value="humidity">Humidity</option>
@@ -144,23 +173,23 @@ const GraphDisplay = () => {
           <div>
             <label>Graph range</label>
             <select
-              name="dateType"
+              name="dateOptions"
               onChange={(e) => handleOptionChange(e)}
             >
-              <option value="unselected">Select</option>
+              <option value="none">Select</option>
               <option value="single">Single day</option>
               <option value="range">Date range</option>
             </select>
           </div>
 
           {/* ------ DATES ------ */}
-          {options.dateType && (
+          {options.dateOptions !== "none" && (
             <div>
-              {options.dateType === "single" ? (
+              {options.dateOptions === "single" ? (
                 <>
                   <label>Date</label>
                   <input
-                    name="start_date"
+                    name="startDate"
                     type="date"
                     onChange={(e) => handleDateChange(e)}
                   />
@@ -170,12 +199,12 @@ const GraphDisplay = () => {
                   <label>Date range</label>
                   <input
                     className="mb-1"
-                    name="start_date"
+                    name="startDate"
                     type="date"
                     onChange={(e) => handleDateChange(e)}
                   />
                   <input
-                    name="end_date"
+                    name="endDate"
                     type="date"
                     onChange={(e) => handleDateChange(e)}
                   />
@@ -188,12 +217,15 @@ const GraphDisplay = () => {
           <div>
             <label>Sensor location</label>
             <select
-              name="sensorIds"
-              onChange={(e) => handleOptionChange(e)}
+              name="sensorType"
+              onChange={(e) => {
+                handleGraphOptions(e);
+                handleOptionChange(e);
+              }}
             >
-              <option value="all">All</option>
-              <option value="sun">Sun</option>
-              <option value="shade">Shade</option>
+              <option value={SensorType.All}>All</option>
+              <option value={SensorType.Sun}>Sun</option>
+              <option value={SensorType.Shade}>Shade</option>
             </select>
           </div>
 
@@ -201,11 +233,11 @@ const GraphDisplay = () => {
           <div>
             <label>Sensor Id</label>
             <select
-              name="idSelection"
-              onChange={(e) => handleOptionChange(e)}
+              name="sensorId"
+              onChange={(e) => handleGraphOptions(e)}
             >
-              <option value="">All in group</option>
-              {options.sensorIds.map((s) => (
+              <option value="all">All in group</option>
+              {options.listedSensors.map((s) => (
                 <option
                   key={s}
                   value={s}
@@ -218,7 +250,7 @@ const GraphDisplay = () => {
         </div>
 
         {/* ----- IMAGE ----- */}
-        <div className="relative grow-1 border-2">
+        <div className="relative aspect-10/5 grow-1 border-2">
           {imgUrl && (
             <Image
               src={imgUrl}
@@ -231,7 +263,7 @@ const GraphDisplay = () => {
 
       <button
         className="btn-primary w-fit"
-        onClick={testFetch}
+        onClick={fetchGraph}
       >
         Test Fetch
       </button>
