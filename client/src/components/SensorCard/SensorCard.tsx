@@ -18,9 +18,9 @@ const SensorCard = ({
   const valid = !!latestData;
 
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-offWhite px-4 py-3">
+    <div className="bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3">
       <span
-        className="inline-block w-full rounded-xl bg-[] px-3 py-[2px] font-heavy"
+        className="font-heavy inline-block w-full rounded-xl px-3 py-[2px]"
         style={{ backgroundColor: idColor }}
       >
         {sensor.id.slice(-4)}
