@@ -80,7 +80,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${avenir.className} mx-auto w-11/12 pt-8 antialiased lg:w-4/6`}
+        className={`${avenir.className} mx-auto w-11/12 py-8 antialiased lg:w-4/6`}
       >
         {children}
       </body>

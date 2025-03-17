@@ -26,13 +26,12 @@ export interface SensorParams {
   fields?: string[];
 }
 
-
-export type SensorSearchFilter = {
+export type SensorFilter = {
   dateRange?: [string, string];
   attachedTo?: string;
   type?: string;
   note?: string;
-}
+};
 
 export interface SensorDataParams {
   sensor_id?: string;
