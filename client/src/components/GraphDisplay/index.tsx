@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/utils/apiFetch";
+import Image from "next/image";
 import { useState } from "react";
 
 const sensors = {
@@ -122,96 +123,118 @@ const GraphDisplay = () => {
   };
 
   return (
-    <div className="flex bg-green-300">
-      <button onClick={testFetch}>Test Fetch</button>
-      <div className="flex w-1/5 flex-col">
-        {/* ------ ANALYSIS METRIC ------ */}
-        <label>Analysis type</label>
-        <select
-          name="analysisType"
-          onChange={(e) => handleOptionChange(e)}
-        >
-          <option value="unselected">Select</option>
-          <option value="humidity">Humidity</option>
-          <option value="temperature">Temperature</option>
-        </select>
-
-        {/* ------ DATE RANGE OPTION ------ */}
-        <label>Graph range</label>
-        <select
-          name="dateType"
-          onChange={(e) => handleOptionChange(e)}
-        >
-          <option value="unselected">Select</option>
-          <option value="single">Single day</option>
-          <option value="range">Date range</option>
-        </select>
-
-        {/* ------ DATES ------ */}
-        {options.dateType && (
-          <>
-            {options.dateType === "single" ? (
-              <>
-                <label>Date</label>
-                <input
-                  name="start_date"
-                  type="date"
-                  onChange={(e) => handleDateChange(e)}
-                />
-              </>
-            ) : (
-              <>
-                <label>Date range</label>
-                <input
-                  name="start_date"
-                  type="date"
-                  onChange={(e) => handleDateChange(e)}
-                />
-                <input
-                  name="end_date"
-                  type="date"
-                  onChange={(e) => handleDateChange(e)}
-                />
-              </>
-            )}
-          </>
-        )}
-
-        {/* ------ SENSOR LOCATION ------ */}
-        <label>Sensor location</label>
-        <select
-          name="sensorIds"
-          onChange={(e) => handleOptionChange(e)}
-        >
-          <option value="all">All</option>
-          <option value="sun">Sun</option>
-          <option value="shade">Shade</option>
-        </select>
-
-        {/* ------ SENSOR ID ------ */}
-        <label>Sensor Id</label>
-        <select
-          name="idSelection"
-          onChange={(e) => handleOptionChange(e)}
-        >
-          <option value="">All in group</option>
-          {options.sensorIds.map((s) => (
-            <option
-              key={s}
-              value={s}
+    <div className="flex flex-col gap-4">
+      <div className="flex">
+        {/* ----- QUERY OPTIONS ----- */}
+        <div className="graph-selection bg-off-white flex flex-col gap-2 rounded-l-xl px-4 py-3">
+          {/* ------ ANALYSIS METRIC ------ */}
+          <div>
+            <label>Analysis type</label>
+            <select
+              name="analysisType"
+              onChange={(e) => handleOptionChange(e)}
             >
-              {s.slice(-4)}
-            </option>
-          ))}
-        </select>
+              <option value="unselected">Select</option>
+              <option value="humidity">Humidity</option>
+              <option value="temperature">Temperature</option>
+            </select>
+          </div>
+
+          {/* ------ DATE RANGE OPTION ------ */}
+          <div>
+            <label>Graph range</label>
+            <select
+              name="dateType"
+              onChange={(e) => handleOptionChange(e)}
+            >
+              <option value="unselected">Select</option>
+              <option value="single">Single day</option>
+              <option value="range">Date range</option>
+            </select>
+          </div>
+
+          {/* ------ DATES ------ */}
+          {options.dateType && (
+            <div>
+              {options.dateType === "single" ? (
+                <>
+                  <label>Date</label>
+                  <input
+                    name="start_date"
+                    type="date"
+                    onChange={(e) => handleDateChange(e)}
+                  />
+                </>
+              ) : (
+                <>
+                  <label>Date range</label>
+                  <input
+                    className="mb-1"
+                    name="start_date"
+                    type="date"
+                    onChange={(e) => handleDateChange(e)}
+                  />
+                  <input
+                    name="end_date"
+                    type="date"
+                    onChange={(e) => handleDateChange(e)}
+                  />
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ------ SENSOR LOCATION ------ */}
+          <div>
+            <label>Sensor location</label>
+            <select
+              name="sensorIds"
+              onChange={(e) => handleOptionChange(e)}
+            >
+              <option value="all">All</option>
+              <option value="sun">Sun</option>
+              <option value="shade">Shade</option>
+            </select>
+          </div>
+
+          {/* ------ SENSOR ID ------ */}
+          <div>
+            <label>Sensor Id</label>
+            <select
+              name="idSelection"
+              onChange={(e) => handleOptionChange(e)}
+            >
+              <option value="">All in group</option>
+              {options.sensorIds.map((s) => (
+                <option
+                  key={s}
+                  value={s}
+                >
+                  {s.slice(-4)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* ----- IMAGE ----- */}
+        <div className="relative grow-1 border-2">
+          {imgUrl && (
+            <Image
+              src={imgUrl}
+              fill
+              alt="Graph displaying data"
+            />
+          )}
+        </div>
       </div>
 
-      {imgUrl && (
-        <img
-          src={imgUrl}
-          alt="test"
-        />
-      )}
+      <button
+        className="btn-primary w-fit"
+        onClick={testFetch}
+      >
+        Test Fetch
+      </button>
     </div>
   );
 };
