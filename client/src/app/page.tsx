@@ -1,8 +1,6 @@
-import GraphDisplay from "@/components/GraphDisplay";
+import GraphDisplay from "@/components/GraphDisplay/";
 import MapWrapper from "@/components/Map/MapWrapper";
 import SensorCard from "@/components/SensorCard/SensorCard";
-import SearchButton from "@/components/SensorSearch/SearchButton";
-import SensorSearchFilter from "@/components/SensorSearch/SensorSearchFilter";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
@@ -52,7 +50,7 @@ export default async function Home() {
       {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
         <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
-        <div className="2xl:w-fill aspect-[2/3] w-full border-2 sm:aspect-[2/1] 2xl:aspect-[2/1]">
+        <div className="2xl:w-fill aspect-2/3 w-full border-2 sm:aspect-2/1 2xl:aspect-2/1">
           <MapWrapper />
         </div>
       </div>
@@ -63,7 +61,7 @@ export default async function Home() {
           Error fetching latest data from server
         </div>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid-scaling">
         {sortedSensors.map((sensor) => (
           <SensorCard
             key={sensor.id}
@@ -75,15 +73,14 @@ export default async function Home() {
         ))}
       </div>
 
-      <div>
-        <GraphDisplay />
-      </div>
+      <GraphDisplay />
 
+      <div></div>
       {/* Sensor filter search */}
-      <div className="flex justify-center">
+      {/* <div className="flex justify-center">
         <SearchButton />
       </div>
-      <SensorSearchFilter />
+      <SensorSearchFilter /> */}
     </main>
   );
 }

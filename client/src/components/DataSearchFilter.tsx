@@ -84,7 +84,7 @@ const FilterDataComponent: React.FC = () => {
   };
 
   return (
-    <div className="w-min rounded border border-gray-300 bg-offWhite p-4 shadow">
+    <div className="w-min rounded-sm border border-gray-300 bg-offWhite p-4 shadow-sm">
       {/* Header */}
       <div className="mb-4 bg-offWhite py-2">
         <h2 className="text-center text-lg font-semibold">Search Data</h2>
@@ -101,7 +101,7 @@ const FilterDataComponent: React.FC = () => {
         <label className="mr-2 text-sm font-medium">Sensor</label>
         <input
           type="text"
-          className="flex-grow rounded border border-gray-300 px-2 py-1 text-sm"
+          className="grow rounded-sm border border-gray-300 px-2 py-1 text-sm"
           placeholder="Enter value"
           value={sensorId}
           onChange={(e) => setSensorId(e.target.value)}
@@ -122,13 +122,13 @@ const FilterDataComponent: React.FC = () => {
           />
           <input
             type="datetime-local"
-            className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+            className="w-1/2 rounded-sm border border-gray-300 px-2 py-1 text-sm"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
           <input
             type="datetime-local"
-            className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+            className="w-1/2 rounded-sm border border-gray-300 px-2 py-1 text-sm"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
@@ -146,14 +146,14 @@ const FilterDataComponent: React.FC = () => {
         <label className="mr-2 text-sm font-medium">Temperature</label>
         <input
           type="number"
-          className="mr-2 w-16 rounded border border-gray-300 px-2 py-1 text-sm"
+          className="mr-2 w-16 rounded-sm border border-gray-300 px-2 py-1 text-sm"
           placeholder="From"
           value={temperatureFrom}
           onChange={(e) => setTemperatureFrom(e.target.value)}
         />
         <input
           type="number"
-          className="w-16 rounded border border-gray-300 px-2 py-1 text-sm"
+          className="w-16 rounded-sm border border-gray-300 px-2 py-1 text-sm"
           placeholder="To"
           value={temperatureTo}
           onChange={(e) => setTemperatureTo(e.target.value)}
@@ -171,14 +171,14 @@ const FilterDataComponent: React.FC = () => {
         <label className="mr-2 text-sm font-medium">Humidity</label>
         <input
           type="number"
-          className="mr-2 w-16 rounded border border-gray-300 px-2 py-1 text-sm"
+          className="mr-2 w-16 rounded-sm border border-gray-300 px-2 py-1 text-sm"
           placeholder="From"
           value={humidityFrom}
           onChange={(e) => setHumidityFrom(e.target.value)}
         />
         <input
           type="number"
-          className="w-16 rounded border border-gray-300 px-2 py-1 text-sm"
+          className="w-16 rounded-sm border border-gray-300 px-2 py-1 text-sm"
           placeholder="To"
           value={humidityTo}
           onChange={(e) => setHumidityTo(e.target.value)}
@@ -189,13 +189,13 @@ const FilterDataComponent: React.FC = () => {
       <div className="mt-4 flex justify-end">
         <button
           onClick={handleSubmit}
-          className="mr-2 rounded bg-blue-500 px-4 py-1 text-sm font-semibold text-white hover:bg-blue-600"
+          className="mr-2 rounded-sm bg-blue-500 px-4 py-1 text-sm font-semibold text-white hover:bg-blue-600"
         >
           Submit
         </button>
         <button
           onClick={handleClear}
-          className="rounded bg-gray-300 px-4 py-1 text-sm font-semibold text-gray-800 hover:bg-gray-400"
+          className="rounded-sm bg-gray-300 px-4 py-1 text-sm font-semibold text-gray-800 hover:bg-gray-400"
         >
           Clear
         </button>

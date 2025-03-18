@@ -1,50 +1,46 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-* {
-  @apply m-0 p-0;
+@theme {
+  --color-blue-m: rgba(175, 221, 229);
+  --color-off-white: #f2f2f2;
+  --color-sun: #ffd650;
+  --color-shade: #9370db;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-avenir: var(--font-avenir);
+
+  --font-weight-book: 400;
+  --font-weight-roman: 500;
+  --font-weight-heavy: 800;
+}
+
+@utility btn-primary {
+  @apply rounded-md bg-blue-500 px-4 py-2 text-white;
 }
 
 /* Light mode */
 :root {
-  --background: theme(colors.blueM);
+  --background: var(--color-blue-m);
   --foreground: black;
 
-  --sun: theme(colors.sun);
-  --shade: theme(colors.shade);
+  --sun: var(--color-sun);
+  --shade: var(--color-shade);
 
   h2 {
     @apply font-heavy;
   }
+
   h3 {
-    @apply text-xl font-heavy;
+    @apply font-heavy text-xl;
   }
 }
-
-/* Dark mode overrides */
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: theme(colors.dark.gray);
-    --foreground: white;
-  }
-} */
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: theme(fontFamily.avenir), Arial, Helvetica, sans-serif;
-}
-
-@layer components {
-  .offset-border {
-    @apply after:absolute after:left-[14px] after:top-[10px] after:block;
-    @apply after:border-4 after:border-orange after:border-l-transparent after:border-t-transparent;
-  }
-
-  .sensor-info-shadow {
-    @apply shadow-[5px_15px_10px_var(--background)];
-  }
+  font-family: var(--font-avenir), Arial, Helvetica, sans-serif;
 }
 
 /* Leaflet */
@@ -55,4 +51,49 @@ body {
 
 .leaflet-popup-content-wrapper {
   background-color: red;
+}
+
+.graph-selection {
+  label {
+    @apply font-heavy w-fit text-lg;
+  }
+
+  select,
+  input {
+    @apply border-1 text-lg;
+  }
+
+  > div {
+    @apply flex flex-col;
+  }
+}
+
+.graph-display {
+  div {
+    @apply flex flex-col;
+  }
+
+  > div {
+    @apply rounded-lg;
+  }
+
+  label {
+    @apply font-heavy text-xl;
+  }
+
+  option {
+    @apply text-base;
+  }
+}
+
+.grid-scaling {
+  @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
+}
+
+.card-padding-border {
+  @apply bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3;
+}
+
+@utility flex-col-4 {
+  @apply flex flex-col gap-4;
 }
