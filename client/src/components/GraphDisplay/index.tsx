@@ -10,9 +10,9 @@ enum AnalysisDate {
 }
 
 enum SensorType {
-  All = "All",
-  Sun = "Sun",
-  Shade = "Shade",
+  All = "all",
+  Sun = "sun",
+  Shade = "shade",
 }
 
 enum AnalysisTypes {
@@ -53,6 +53,7 @@ interface Settings {
   sensorType: SensorType;
   startDate: string;
   endDate: string;
+  selectedSensor: SensorType | string;
 }
 
 const sensors = {
@@ -96,14 +97,15 @@ interface ResponseSummary {
 }
 
 const GraphDisplay = () => {
-  const [selectedSensor, setSelectedSensor] = useState<SensorType | string>(
-    SensorType.All,
-  );
+  // Options to show needed input fields and for creating URL for data fetching
   const [options, setOptions] = useState<AnalysisOption>(ops[0]);
+  // Parameters sent to API
+  // SensorType saves the used type in case user selects "All in group"
   const [settings, setSettings] = useState<Settings>({
     sensorType: SensorType.All,
     startDate: "",
     endDate: "",
+    selectedSensor: SensorType.All,
   });
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [summary, setSummary] = useState<ResponseSummary | null>(null);
@@ -119,22 +121,20 @@ const GraphDisplay = () => {
     setSettings((prev) => ({
       ...prev,
       sensorType: value,
-      listedSensors: sensors[value],
+      selectedSensor: value,
     }));
-
-    setSelectedSensor(value);
   };
 
   const handleSensorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.currentTarget.value;
     console.log(value);
 
+    // Set the value to a group if "All in group" is selected
     if (!sensors[SensorType.All].includes(value)) {
-      setSelectedSensor(settings.sensorType);
+      setSettings((prev) => ({ ...prev, selectedSensor: settings.sensorType }));
       return;
     }
-
-    setSelectedSensor(value);
+    setSettings((prev) => ({ ...prev, selectedSensor: value }));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,26 +148,32 @@ const GraphDisplay = () => {
   };
 
   const fetchGraph = async () => {
+    // Check that required params exist
     if (!settings.startDate) return;
+
+    // Return if end date is missing on analyses
     if (options.dates === AnalysisDate.between && !settings.endDate) return;
 
     const params = new URLSearchParams({
       start_date: settings.startDate,
       end_date: settings.endDate,
-      sensor_id: settings.sensorType,
+      sensor_id: settings.selectedSensor,
     });
 
+    // If sensorType is "all" remove "sensor_id"
+    // API returns data from all sensors if "sensor_id" is empty
+    // TODO: refactor API to accept "all" to get data from all sensors
     if (settings.sensorType === SensorType.All) {
       params.delete("sensor_id");
     }
 
+    // Remove params depending on options
     if (options.dates === AnalysisDate.single) {
       params.delete("end_date");
     }
 
-    console.log(options);
-    console.log(`/analysis/daily-${options.type}-graph?${params.toString()}`);
-
+    // Currently image has to be fetched separately from data
+    // because broken image is returned from normal API route
     const imageRes = await apiFetch(
       `/analysis/daily-${options.type}-graph/image?${params.toString()}`,
     );
@@ -182,8 +188,8 @@ const GraphDisplay = () => {
   };
 
   return (
-    <div className="grid-scaling">
-      <div className="graph-display col-span-1 flex h-fit grid-rows-2 flex-col gap-4">
+    <div className="flex-col-4 2xl:grid 2xl:grid-cols-4">
+      <div className="graph-display flex-col-4 h-fit w-full sm:grid sm:grid-cols-2 2xl:col-span-1 2xl:grid-cols-1 2xl:grid-rows-2">
         <div className="bg-off-white px-4 py-3">
           {/* ANALYSIS */}
           <div>
@@ -201,6 +207,8 @@ const GraphDisplay = () => {
             </select>
           </div>
 
+          {/* DATE */}
+          {/* TODO: Handle case where end date is before start date and either are past current date*/}
           <div>
             <label>Date</label>
             <input
@@ -219,22 +227,27 @@ const GraphDisplay = () => {
             )}
           </div>
 
+          {/* SENSOR TYPE */}
           <div>
             <label>Sensor type</label>
-            <select onChange={(e) => handleSettings(e)}>
+            <select
+              className="capitalize"
+              onChange={(e) => handleSettings(e)}
+            >
               {Object.values(SensorType).map((t) => (
                 <option key={t}>{t}</option>
               ))}
             </select>
           </div>
 
+          {/* SENSORS */}
           <div>
             <label>Sensors</label>
             <select
               onChange={(e) => handleSensorChange(e)}
               value={
-                sensors[SensorType.All].includes(selectedSensor)
-                  ? selectedSensor
+                sensors[SensorType.All].includes(settings.selectedSensor)
+                  ? settings.selectedSensor
                   : "All in group"
               }
             >
@@ -249,33 +262,39 @@ const GraphDisplay = () => {
               ))}
             </select>
           </div>
+
           <button
-            className="btn-primary"
+            className="btn-primary mt-2"
             onClick={fetchGraph}
           >
             Fetch
           </button>
         </div>
+
         {/* SUMMARY */}
         {summary && (
-          <div className="bg-off-white px-4 py-3">
+          <div className="bg-off-white h-h-full px-4 py-3 2xl:h-fit">
             <label>Summary</label>
-            <span>Average: {summary.average}</span>
-            <span>Max: {summary.max}</span>
-            <span>Min: {summary.min}</span>
-            <span>Deviation: {summary.std_dev}</span>
+            <span className="font-heavy">Average: </span>
+            <span>{summary.average}</span>
+            <span className="font-heavy">Max: </span> <span>{summary.max}</span>
+            <span className="font-heavy">Min: </span> <span>{summary.min}</span>
+            <span className="font-heavy">Deviation: </span>
+            <span>{summary.std_dev}</span>
           </div>
         )}
       </div>
+
+      {/* GRAPH IMAGE */}
       <div className="relative col-span-3">
         {imgUrl && (
           <Image
+            className="h-auto w-full rounded-lg"
             src={imgUrl}
             alt="Image of graph"
             width={0}
             height={0}
             sizes="100vw"
-            style={{ width: "100%", height: "auto" }} // optional
           />
         )}
       </div>

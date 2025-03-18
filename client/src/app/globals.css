@@ -93,3 +93,7 @@ body {
 .card-padding-border {
   @apply bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3;
 }
+
+@utility flex-col-4 {
+  @apply flex flex-col gap-4;
+}

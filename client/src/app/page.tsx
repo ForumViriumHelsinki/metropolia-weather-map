@@ -73,9 +73,7 @@ export default async function Home() {
         ))}
       </div>
 
-      <div>
-        <GraphDisplay />
-      </div>
+      <GraphDisplay />
 
       <div></div>
       {/* Sensor filter search */}
