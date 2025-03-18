@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import requests
 import io
+import numpy as np
 
 
 SENSOR_SUN = [
@@ -108,7 +109,7 @@ def filter_date_range(df, start_date, end_date):
     if "time" not in df.columns:
         raise ValueError("Missing 'time' column in DataFrame.")
     
-    df["time"] = pd.to_datetime(df["time"], errors='coerce')  # Convert to datetime safely
+    df["time"] = pd.to_datetime(df["time"], errors='coerce') 
     df = df.dropna(subset=["time"])
     df["date"] = df["time"].dt.date
 
@@ -116,3 +117,26 @@ def filter_date_range(df, start_date, end_date):
     end_date = pd.to_datetime(end_date).date()
 
     return df[(df["date"] >= start_date) & (df["date"] <= end_date)]
+
+
+def compute_summary_stats(df, column):
+    """Computes key summary statistics for the given column."""
+    if df.empty or column not in df.columns:
+        return {
+            "average": None,
+            "max": None,
+            "min": None,
+            "std_dev": None
+        }
+
+    avg = round(df[column].mean(), 2)
+    max_value = round(df[column].max(), 2)
+    min_value = round(df[column].min(), 2)
+    std_dev = round(np.std(df[column]), 2)
+
+    return {
+        "average": avg,
+        "max": max_value,
+        "min": min_value,
+        "std_dev": std_dev
+    }
