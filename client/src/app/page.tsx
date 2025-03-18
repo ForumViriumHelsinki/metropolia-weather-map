@@ -61,7 +61,7 @@ export default async function Home() {
           Error fetching latest data from server
         </div>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid-scaling">
         {sortedSensors.map((sensor) => (
           <SensorCard
             key={sensor.id}

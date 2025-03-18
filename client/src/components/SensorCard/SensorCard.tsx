@@ -18,7 +18,7 @@ const SensorCard = ({
   const valid = !!latestData;
 
   return (
-    <div className="bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3">
+    <div className="card-padding-border bg-off-white">
       <span
         className="font-heavy inline-block w-full rounded-xl px-3 py-[2px]"
         style={{ backgroundColor: idColor }}

@@ -72,4 +72,24 @@ body {
   div {
     @apply flex flex-col;
   }
+
+  > div {
+    @apply rounded-lg;
+  }
+
+  label {
+    @apply font-heavy text-xl;
+  }
+
+  option {
+    @apply text-base;
+  }
+}
+
+.grid-scaling {
+  @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4;
+}
+
+.card-padding-border {
+  @apply bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3;
 }
