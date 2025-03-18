@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import requests
 import io
+import numpy as np
 
 
 SENSOR_SUN = [
@@ -25,26 +26,31 @@ SENSOR_SHADE = [
 
 SENSORS_ALL = SENSOR_SUN + SENSOR_SHADE
 
+CSV_CACHE = {}
 
 def fetch_csv(start_year, end_year=None):
-    """Fetch and combine CSV data for one or multiple years."""
+    """Fetch and cache CSV data for one or multiple years."""
     BASE_URL = "https://bri3.fvh.io/opendata/makelankatu/"
     
-    # If only one year is provided, set end_year to start_year
     if end_year is None:
         end_year = start_year
 
     all_dfs = []
     for year in range(start_year, end_year + 1):
-        filename = f"makelankatu-{year}.csv.gz"
-        url = BASE_URL + filename
-
-        print(f"Fetching CSV data for {year} from {url}...")
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-
-        df = pd.read_csv(url, parse_dates=["time"])
-        all_dfs.append(df)
+        if year in CSV_CACHE:
+            print(f"Using cached data for {year}")
+            all_dfs.append(CSV_CACHE[year])
+        else:
+            filename = f"makelankatu-{year}.csv.gz"
+            url = BASE_URL + filename
+            print(f"Fetching CSV data for {year} from {url}...")
+            
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            df = pd.read_csv(url, parse_dates=["time"])
+            CSV_CACHE[year] = df  # Store in cache
+            all_dfs.append(df)
 
     return pd.concat(all_dfs, ignore_index=True)
 
@@ -84,18 +90,53 @@ def create_plot_chart(x, y, title, xlabel, ylabel, color="red"):
 
 def filter_sensors(df, sensor_id):
     """Filters data based on a sensor ID, sun sensors, shade sensors, or all sensors."""
+    sensor_groups = {
+        "sun": (SENSOR_SUN, "Sun Sensors"),
+        "shade": (SENSOR_SHADE, "Shade Sensors"),
+    }
+    if sensor_id in sensor_groups:
+        filtered_df = df[df["dev-id"].isin(sensor_groups[sensor_id][0])]
+        return filtered_df, sensor_groups[sensor_id][1]
     if sensor_id:
-        if sensor_id == "sun":
-            return df[df["dev-id"].isin(SENSOR_SUN)], "Sun Sensors"
-        elif sensor_id == "shade":
-            return df[df["dev-id"].isin(SENSOR_SHADE)], "Shade Sensors"
-        else:
-            return df[df["dev-id"] == sensor_id], f"Sensor {sensor_id}"
+        return df[df["dev-id"] == sensor_id], f"Sensor {sensor_id}"
+
     return df[df["dev-id"].isin(SENSORS_ALL)], "All Sensors"
 
 
 def filter_date_range(df, start_date, end_date):
     """Filters data based on a date range."""
-    df["time"] = pd.to_datetime(df["time"])
+    
+    if "time" not in df.columns:
+        raise ValueError("Missing 'time' column in DataFrame.")
+    
+    df["time"] = pd.to_datetime(df["time"], errors='coerce') 
+    df = df.dropna(subset=["time"])
     df["date"] = df["time"].dt.date
-    return df[(df["date"] >= pd.to_datetime(start_date).date()) & (df["date"] <= pd.to_datetime(end_date).date())]
+
+    start_date = pd.to_datetime(start_date).date()
+    end_date = pd.to_datetime(end_date).date()
+
+    return df[(df["date"] >= start_date) & (df["date"] <= end_date)]
+
+
+def compute_summary_stats(df, column):
+    """Computes key summary statistics for the given column."""
+    if df.empty or column not in df.columns:
+        return {
+            "average": None,
+            "max": None,
+            "min": None,
+            "std_dev": None
+        }
+
+    avg = round(df[column].mean(), 2)
+    max_value = round(df[column].max(), 2)
+    min_value = round(df[column].min(), 2)
+    std_dev = round(np.std(df[column]), 2)
+
+    return {
+        "average": avg,
+        "max": max_value,
+        "min": min_value,
+        "std_dev": std_dev
+    }
