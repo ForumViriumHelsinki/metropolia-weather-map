@@ -1,8 +1,6 @@
-import GraphDisplay from "@/components/GraphDisplay";
+import GraphDisplay from "@/components/GraphDisplay/";
 import MapWrapper from "@/components/Map/MapWrapper";
 import SensorCard from "@/components/SensorCard/SensorCard";
-import SearchButton from "@/components/SensorSearch/SearchButton";
-import SensorSearchFilter from "@/components/SensorSearch/SensorSearchFilter";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
@@ -79,11 +77,12 @@ export default async function Home() {
         <GraphDisplay />
       </div>
 
+      <div></div>
       {/* Sensor filter search */}
-      <div className="flex justify-center">
+      {/* <div className="flex justify-center">
         <SearchButton />
       </div>
-      <SensorSearchFilter />
+      <SensorSearchFilter /> */}
     </main>
   );
 }

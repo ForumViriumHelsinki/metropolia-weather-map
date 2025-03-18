@@ -67,3 +67,9 @@ body {
     @apply flex flex-col;
   }
 }
+
+.graph-display {
+  div {
+    @apply flex flex-col;
+  }
+}
