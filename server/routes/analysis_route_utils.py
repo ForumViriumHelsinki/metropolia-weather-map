@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import requests
 import io
+import seaborn as sns
 import numpy as np
 
 
@@ -55,29 +56,31 @@ def fetch_csv(start_year, end_year=None):
     return pd.concat(all_dfs, ignore_index=True)
 
 
-def save_plot_as_png(fig):
-    """Converts a Matplotlib figure to a PNG response."""
+def save_plot_as_svg(fig):
+    """Converts a Matplotlib figure to a SVG response."""
     img_buffer = io.BytesIO()
-    fig.savefig(img_buffer, format="png")
+    fig.savefig(img_buffer, format="svg", bbox_inches="tight", dpi=300)
     plt.close(fig)
     img_buffer.seek(0)
 
-    return Response(content=img_buffer.getvalue(), media_type="image/png")
+    return Response(content=img_buffer.getvalue(), media_type="image/svg+xml")
 
 
 def create_bar_chart(x, y, title, xlabel, ylabel, color="blue"):
-    """Generates a bar chart and returns a PNG response."""
+    """Generates a bar chart and returns a SVG response."""
+    sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.bar(x, y, color=color, alpha=0.7, width=0.6)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ax.grid(axis="y", linestyle="--", alpha=0.7)
-    return save_plot_as_png(fig)
+    return save_plot_as_svg(fig)
 
 
 def create_plot_chart(x, y, title, xlabel, ylabel, color="red"):
-    """Generates a line plot and returns a PNG response."""
+    """Generates a line plot and returns a SVG response."""
+    sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(x, y, marker="o", linestyle="-", color=color, label=ylabel)
     ax.set_xlabel(xlabel)
@@ -85,7 +88,7 @@ def create_plot_chart(x, y, title, xlabel, ylabel, color="red"):
     ax.set_title(title)
     ax.legend()
     ax.grid()
-    return save_plot_as_png(fig)
+    return save_plot_as_svg(fig)
 
 
 def filter_sensors(df, sensor_id):
