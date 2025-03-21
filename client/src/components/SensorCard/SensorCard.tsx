@@ -9,7 +9,10 @@ const SensorCard = ({
   sensor: Sensor;
   latestData: LatestData;
 }) => {
-  const idColor = "var(--color-green-leaf)";
+  let idColor =
+    sensor.location === "Koivukylä" ? "var(--color-shade)" : "var(--color-sun)";
+
+  if (sensor.location === "makelankatu") idColor = "var(--color-green-leaf)";
 
   const formatDate = (str: string) => {
     const date = str.slice(0, 10);

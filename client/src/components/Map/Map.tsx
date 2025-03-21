@@ -22,10 +22,22 @@ const Map = () => {
     getSensors();
   }, []);
 
-  const iconSun = new Icon({
+  const iconMakelankatu = new Icon({
     iconUrl: "icon_makelankatu.png",
     iconSize: [38, 38],
   });
+
+  const iconKoivukyla = new Icon({
+    iconUrl: "icon_koivukyla.png",
+    iconSize: [38, 38],
+  });
+
+  const iconLaajasalo = new Icon({
+    iconUrl: "icon_laajasalo.png",
+    iconSize: [38, 38],
+  });
+
+  let icon = iconMakelankatu;
 
   return (
     <MapContainer
@@ -38,19 +50,23 @@ const Map = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {sensors &&
-        sensors.map((sensor) => (
-          <Marker
-            key={sensor.id}
-            position={[sensor.coordinates[1], sensor.coordinates[0]]}
-            icon={iconSun}
-          >
-            <Popup>
-              <div className="text-center text-sm font-semibold [&>span]:block">
-                <span>{sensor.id.slice(-4)}</span>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        sensors.map((sensor) => {
+          if (sensor.location === "Koivukylä") icon = iconKoivukyla;
+          if (sensor.location === "Laajasalo") icon = iconLaajasalo;
+          return (
+            <Marker
+              key={sensor.id}
+              position={[sensor.coordinates[1], sensor.coordinates[0]]}
+              icon={icon}
+            >
+              <Popup>
+                <div className="text-center text-sm font-semibold [&>span]:block">
+                  <span>{sensor.id.slice(-4)}</span>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
     </MapContainer>
   );
 };
