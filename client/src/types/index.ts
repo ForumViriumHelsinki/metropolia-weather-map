@@ -1,10 +1,9 @@
 export type Sensor = {
   id: string;
-  location: [number, number];
-  type: "Auringossa" | "Varjossa" | undefined;
-  note: string | null;
-  attached: string;
-  installDate: Date;
+  coordinates: [number, number];
+  location: string;
+  install_date: Date;
+  csv_link: string;
 };
 
 export type SensorData = {

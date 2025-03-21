@@ -15,25 +15,21 @@ const Map = () => {
       const res = await apiFetch("/sensors");
 
       if (res.status === 200) {
-        setSensors(await res.json());
+        const data = await res.json();
+        setSensors(data);
       }
     };
     getSensors();
   }, []);
 
   const iconSun = new Icon({
-    iconUrl: "icon_sun.png",
+    iconUrl: "icon_makelankatu.png",
     iconSize: [38, 38],
-  });
-
-  const iconShade = new Icon({
-    iconUrl: "icon_shade.png",
-    iconSize: [40, 40],
   });
 
   return (
     <MapContainer
-      center={[60.19628790558516, 24.953944343215543]}
+      center={[60.19691015749769, 24.952021110782997]}
       zoom={16}
       scrollWheelZoom={true}
     >
@@ -45,13 +41,12 @@ const Map = () => {
         sensors.map((sensor) => (
           <Marker
             key={sensor.id}
-            position={[sensor.location[1], sensor.location[0]]}
-            icon={sensor.type === "Auringossa" ? iconSun : iconShade}
+            position={[sensor.coordinates[1], sensor.coordinates[0]]}
+            icon={iconSun}
           >
             <Popup>
               <div className="text-center text-sm font-semibold [&>span]:block">
                 <span>{sensor.id.slice(-4)}</span>
-                <span>{sensor.note}</span>
               </div>
             </Popup>
           </Marker>

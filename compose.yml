@@ -37,7 +37,7 @@ services:
       - "8000:8000"
     environment:
       DB_NAME: weatherdb
-      DB_HOST: weatherdb
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASS: pass
