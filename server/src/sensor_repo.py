@@ -1,6 +1,6 @@
 import os
 from datetime import date
-from typing import NamedTuple, Optional, Tuple
+from typing import NamedTuple, Optional
 
 from sqlalchemy import Column, String
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -13,8 +13,6 @@ class Point(NamedTuple):
     y: float
 
 
-import os
-
 meta = MetaData(schema="weather")
 
 DB_USER = os.getenv("DB_USER", "postgres")
@@ -23,6 +21,11 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "weatherdb")
 
+print(f"DB_USER: {DB_USER}")
+print(f"DB_PASS: {DB_PASS}")
+print(f"DB_HOST: {DB_HOST}")
+print(f"DB_PORT: {DB_PORT}")
+print(f"DB_NAME: {DB_NAME}")
 
 engine = create_async_engine(
     f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}", echo=True

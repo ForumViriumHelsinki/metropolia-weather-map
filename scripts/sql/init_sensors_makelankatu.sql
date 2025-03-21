@@ -12,4 +12,5 @@ INSERT INTO weather.sensors(id, coordinates, location, install_date, csv_link)
 ('24E124136E106643', '(24.95440486752224, 60.19778118227482)', 'makelankatu', '2024-05-27', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106643.geojson'),
 ('24E124136E106661', '(24.95566158371556, 60.19641839065333)', 'makelankatu', '2024-06-16', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106661.geojson'),
 ('24E124136E106674', '(24.949697722407258, 60.19760495885829)', 'makelankatu', '2024-05-30', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106674.geojson'),
-('24E124136E106686', '(24.954281110891024, 60.19476461138742)', 'makelankatu', '2024-05-27', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106686.geojson')
+('24E124136E106686', '(24.954281110891024, 60.19476461138742)', 'makelankatu', '2024-05-27', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106686.geojson');
+
