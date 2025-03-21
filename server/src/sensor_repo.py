@@ -1,23 +1,40 @@
-from sqlalchemy import MetaData
-from sqlmodel import Field, SQLModel, select
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.ext.asyncio import create_async_engine
-from typing import Optional
+import os
+from datetime import date
+from typing import NamedTuple, Optional, Tuple
 
+from sqlalchemy import Column, String
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import Column, Field, MetaData, SQLModel, select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+
+class Point(NamedTuple):
+    x: float
+    y: float
+
+
+import os
 
 meta = MetaData(schema="weather")
 
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASS = os.getenv("DB_PASS", "pass")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "weatherdb")
+
+
 engine = create_async_engine(
-    "postgresql+asyncpg://postgres:pass@host.docker.internal:5432/weatherdb", echo=True
+    f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}", echo=True
 )
 
 
 class Sensors(SQLModel, table=True):
     metadata = meta
     id: str = Field(primary_key=True)
-    coordinates: Optional[str]
+    coordinates: Optional[Point] = Field(sa_column=Column(String))
     location: Optional[str]
-    install_date: Optional[str]
+    install_date: Optional[date]
     csv_link: Optional[str]
 
 
