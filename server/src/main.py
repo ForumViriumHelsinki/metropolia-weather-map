@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from .sensor_repo import get_sensors  # Use relative import
+from .routes import router as routes
+# from .sensor_repo import get_sensors # Depricated
 
 app = FastAPI()
 
@@ -20,8 +20,15 @@ app.add_middleware(
 def home():
     return {"Hello"}
 
+@app.get("/api")
+def home():
+    return {"This is the api home"}
 
+app.include_router(routes)
+
+""" #Depricated
 @app.get("/api/sensors")
 async def test_get():
     sensors = await get_sensors()
     return sensors
+"""
