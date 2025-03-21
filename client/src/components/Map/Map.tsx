@@ -15,25 +15,33 @@ const Map = () => {
       const res = await apiFetch("/sensors");
 
       if (res.status === 200) {
-        setSensors(await res.json());
+        const data = await res.json();
+        setSensors(data);
       }
     };
     getSensors();
   }, []);
 
-  const iconSun = new Icon({
-    iconUrl: "icon_sun.png",
+  const iconMakelankatu = new Icon({
+    iconUrl: "icon_makelankatu.png",
     iconSize: [38, 38],
   });
 
-  const iconShade = new Icon({
-    iconUrl: "icon_shade.png",
-    iconSize: [40, 40],
+  const iconKoivukyla = new Icon({
+    iconUrl: "icon_koivukyla.png",
+    iconSize: [38, 38],
   });
+
+  const iconLaajasalo = new Icon({
+    iconUrl: "icon_laajasalo.png",
+    iconSize: [38, 38],
+  });
+
+  let icon = iconMakelankatu;
 
   return (
     <MapContainer
-      center={[60.19628790558516, 24.953944343215543]}
+      center={[60.19691015749769, 24.952021110782997]}
       zoom={16}
       scrollWheelZoom={true}
     >
@@ -42,20 +50,23 @@ const Map = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {sensors &&
-        sensors.map((sensor) => (
-          <Marker
-            key={sensor.id}
-            position={[sensor.location[1], sensor.location[0]]}
-            icon={sensor.type === "Auringossa" ? iconSun : iconShade}
-          >
-            <Popup>
-              <div className="text-center text-sm font-semibold [&>span]:block">
-                <span>{sensor.id.slice(-4)}</span>
-                <span>{sensor.note}</span>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        sensors.map((sensor) => {
+          if (sensor.location === "Koivukylä") icon = iconKoivukyla;
+          if (sensor.location === "Laajasalo") icon = iconLaajasalo;
+          return (
+            <Marker
+              key={sensor.id}
+              position={[sensor.coordinates[1], sensor.coordinates[0]]}
+              icon={icon}
+            >
+              <Popup>
+                <div className="text-center text-sm font-semibold [&>span]:block">
+                  <span>{sensor.id.slice(-4)}</span>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
     </MapContainer>
   );
 };

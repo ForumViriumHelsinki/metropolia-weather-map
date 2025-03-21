@@ -19,16 +19,6 @@ export default async function Home() {
   const res = await apiFetch("/sensors");
 
   const sensors: Sensor[] = await res.json();
-  // Sort sensors to have sensors in the sun to be displayed first
-  const sortedSensors = sensors.sort((a) => {
-    if (a.type === "Auringossa") {
-      return -1;
-    }
-    if (a.type === "Varjossa") {
-      return 1;
-    }
-    return 0;
-  });
 
   // Get latest data
   let latestData: LatestData[] = [];
@@ -62,25 +52,20 @@ export default async function Home() {
         </div>
       )}
       <div className="grid-scaling">
-        {sortedSensors.map((sensor) => (
-          <SensorCard
-            key={sensor.id}
-            sensor={sensor}
-            latestData={
-              latestData && latestData.filter((d) => d.id === sensor.id)[0]
-            }
-          />
-        ))}
+        {sensors.map((sensor) => {
+          return (
+            <SensorCard
+              key={sensor.id}
+              sensor={sensor}
+              latestData={
+                latestData && latestData.filter((d) => d.id === sensor.id)[0]
+              }
+            />
+          );
+        })}
       </div>
 
       <GraphDisplay />
-
-      <div></div>
-      {/* Sensor filter search */}
-      {/* <div className="flex justify-center">
-        <SearchButton />
-      </div>
-      <SensorSearchFilter /> */}
     </main>
   );
 }

@@ -24,7 +24,7 @@ services:
     environment:
       - NEXT_PUBLIC_PYTHON_API=http://python-server:8000
       - NEXT_PUBLIC_CLIENT_API=http://localhost:8000
-    command: pnpm run dev -p 3000
+    command: ["pnpm", "run", "dev", "-p", "3000"]
 
   python-server:
     container_name: python-server
@@ -33,11 +33,12 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ./server:/usr/src/app
+      - ./server/wait-for-it.sh:/usr/src/app/wait-for-it.sh
     ports:
       - "8000:8000"
     environment:
       DB_NAME: weatherdb
-      DB_HOST: weatherdb
+      DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASS: pass

@@ -1,5 +1,6 @@
 import { LatestData } from "@/app/page";
 import { Sensor } from "@/types";
+import { fixLocation } from "@/utils/fixLocation";
 
 const SensorCard = ({
   sensor,
@@ -8,13 +9,16 @@ const SensorCard = ({
   sensor: Sensor;
   latestData: LatestData;
 }) => {
-  const idColor = sensor.type === "Auringossa" ? "var(--sun)" : "var(--shade)";
+  let idColor =
+    sensor.location === "Koivukylä" ? "var(--color-shade)" : "var(--color-sun)";
+
+  if (sensor.location === "makelankatu") idColor = "var(--color-green-leaf)";
+
   const formatDate = (str: string) => {
     const date = str.slice(0, 10);
     const time = str.slice(11, 16);
     return `${time} - ${date}`;
   };
-
   const valid = !!latestData;
 
   return (
@@ -25,26 +29,37 @@ const SensorCard = ({
       >
         {sensor.id.slice(-4)}
       </span>
-      <h2 className="text-4xl">{sensor.type}</h2>
+      <div>
+        <h2 className="text-3xl">{fixLocation(sensor.location)}</h2>
 
-      <div className="flex flex-col">
+        <div className="flex flex-col">
+          <span>
+            Lämpötila:{" "}
+            {valid ? latestData.properties.measurement.temperature : "-"}°C
+          </span>
+          <span>
+            Ilmankosteus:{" "}
+            {valid ? latestData.properties.measurement.temperature : "-"}%
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Viimeisin mittaus</h3>
         <span>
-          Lämpötila:{" "}
-          {valid ? latestData.properties.measurement.temperature : "-"}°C
-        </span>
-        <span>
-          Ilmankosteus:{" "}
-          {valid ? latestData.properties.measurement.temperature : "-"}%
+          {valid ? formatDate(latestData.properties.measurement.time) : "-"}
         </span>
       </div>
 
-      <h3 className="">Viimeisin mittaus</h3>
-      <span>
-        {valid ? formatDate(latestData.properties.measurement.time) : "-"}
-      </span>
-
-      <h3 className="">Sijainti</h3>
-      <div>{sensor.attached}</div>
+      <div>
+        <h3>Data</h3>
+        <a
+          href={sensor.csv_link}
+          target="_blank"
+        >
+          geojson
+        </a>
+      </div>
     </div>
   );
 };
