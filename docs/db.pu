@@ -1,0 +1,22 @@
+@startuml Weather
+entity "Sensors" {
+    *id: string
+    *coordinates: point
+    *location: string
+    *install_date: date
+    *csv_link: string
+}
+
+entity "Tags" {
+    *id: string
+}
+
+entity "SensorTags" {
+    *sensor_id: FK
+    *tag_id: FK
+}
+
+Sensors ||--o{ SensorTags : "has"
+Tags ||--o{ SensorTags : "belongs to"
+
+@enduml
