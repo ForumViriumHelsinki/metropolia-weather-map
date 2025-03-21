@@ -15,8 +15,8 @@ const Map = () => {
       const res = await apiFetch("/sensors");
 
       if (res.status === 200) {
-        const data = await res.json();
-        setSensors(data);
+        const json = await res.json();
+        setSensors(json.data);
       }
     };
     getSensors();

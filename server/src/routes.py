@@ -11,7 +11,7 @@ async def get_sensors(db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(Sensor))
         sensors = result.scalars().all()
-        return {"sensors": sensors}
+        return {"data": sensors}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 

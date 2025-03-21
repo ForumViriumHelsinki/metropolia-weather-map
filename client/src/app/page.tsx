@@ -17,8 +17,8 @@ export type LatestData = {
 
 export default async function Home() {
   const res = await apiFetch("/sensors");
-
-  const sensors: Sensor[] = await res.json();
+  const json = await res.json();
+  const sensors: Sensor[] = json.data;
 
   // Get latest data
   let latestData: LatestData[] = [];
