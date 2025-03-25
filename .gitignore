@@ -53,3 +53,5 @@ vscode
 
 # pycache
 **/__pycache__
+
+db.session.sql
