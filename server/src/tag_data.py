@@ -1,51 +1,86 @@
 import asyncio
-import requests
+import os
+from collections import defaultdict
+
+import matplotlib.pyplot as plt
 import pandas as pd
-
-from sqlmodel import select
-
 from database import get_db
 from models import Sensor, SensorTag
 from sqlalchemy.ext.asyncio import AsyncSession
-import matplotlib.pyplot as plt
-
+from sqlmodel import select
 
 
 def filter_daytime_data(df):
+    # daylight csv location
+    csv_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "data", "daylight.csv"
+    )
+
     # Sunrise and sunset data
-    daylight_info = pd.read_csv("../data/daylight.csv", parse_dates=["sunrise", "sunset"])
+    daylight_info = pd.read_csv(csv_path, parse_dates=["sunrise", "sunset"])
 
-    df['date'] = df['time'].dt.date 
-    daylight_info['date'] = daylight_info['sunrise'].dt.date
-    df = pd.merge(df, daylight_info, on='date', how="left")
+    # Add date column to dataframae and daylight_info
+    df["date"] = df["time"].dt.date
+    daylight_info["date"] = daylight_info["sunrise"].dt.date
 
+    # Merge dataframes on date
+    df = pd.merge(df, daylight_info, on="date", how="left")
+
+    # Create mask from the dates and filter the times
     mask = (df["time"] >= df["sunrise"]) & (df["time"] <= df["sunset"])
-    filtered_df = df[mask]
-    return filtered_df
 
-def create_graph(df, sensor_ids):
-    plt.figure(figsize=(12, 8))  # Create a single figure
-    grouped = df.groupby("dev-id")
-    for sensor_id, group in grouped:
-        if sensor_id in sensor_ids:
-            plt.plot(group["time"], group["temperature"], label=f"Sensor {sensor_id}")
-    
-    # Add labels, title, legend, and grid to the single figure
-    plt.xlabel("Time")
-    plt.ylabel("Temperature")
-    plt.title("Sensor Data for All Sensor IDs")
+    # Apply the mask to filter out timestamps after sunset
+    daylight_df = df[mask]
+    return daylight_df
+
+
+def group_by_location(sensors):
+    grouped_sensor_ids = defaultdict(list)
+    for sensor in sensors:
+        grouped_sensor_ids[sensor.location].append(sensor.id)
+
+    return grouped_sensor_ids
+
+
+def create_graph(df, location_sensors):
+    plt.figure(figsize=(12, 8))
+
+    # Draw a line from each sensor set
+    for key in location_sensors:
+        location_df = df[df["dev-id"].isin(location_sensors[key])]
+
+        # The data that will be used for the line
+        daily_avg_temp = location_df.groupby("date")["temperature"].mean()
+
+        plt.plot(
+            daily_avg_temp.index,
+            daily_avg_temp.values,
+            linestyle="-",
+            label=f"Location: {key}",
+        )
+
+    # Show the graph
+    plt.xticks(rotation=45)
+    plt.xlabel("Date")
+    plt.ylabel("Temperature (°C)")
+    plt.title("Daily Average Temperatures per Location")
     plt.legend()
     plt.grid(True)
-    
-    # Save the single figure
-    plt.savefig("all_sensors.png")
-    plt.close()
+    # Save the graph
+    abs_path = os.path.dirname(
+        os.path.abspath(__file__)
+    )  # Figures out the absolute path for you in case your working directory moves around.
 
-async def tag_data(tag="viheralue"):
+    plt.savefig(abs_path + "/graphs/tag_test.svg", format="svg")
+    plt.show()
+
+
+async def tag_data(tag="harmaa-alue"):
     sensors = []
+
+    # Query database for sensors with the specified tag
     async for db in get_db():
         if isinstance(db, AsyncSession):
-            # Simplified query to match the provided SQL
             result = await db.execute(
                 select(Sensor)
                 .join(SensorTag, Sensor.id == SensorTag.sensor_id)
@@ -53,21 +88,30 @@ async def tag_data(tag="viheralue"):
             )
             sensors = result.scalars().all()
 
-    sensor_ids = [i.id for i in sensors]
+    # Group sensors by location
+    location_sensors = group_by_location(sensors)
 
+    # Fetch data for sensors
     # Mäkelänkatu
-    dfM = pd.read_csv("https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz", parse_dates=["time"])
-    # Laajasalo & Koivukylä
-    dfLK = pd.read_csv("https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"])
+    dfM = pd.read_csv(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
+        parse_dates=["time"],
+    )
+    # # Laajasalo & Koivukylä
+    dfLK = pd.read_csv(
+        "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
+    )
 
+    # Merge all the datasets
     df = pd.concat([dfM, dfLK], ignore_index=True)
-    
+
+    # Get data from only daytime
     df = filter_daytime_data(df)
-    print(df.head())
-    
-    create_graph(df, sensor_ids)
+
+    # Create the graph
+    create_graph(df, location_sensors)
+    return
 
 
 if __name__ == "__main__":
     asyncio.run(tag_data())
-
