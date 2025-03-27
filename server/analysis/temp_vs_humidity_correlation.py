@@ -10,11 +10,12 @@ def load_data():
     df.columns = df.columns.str.strip()  # Remove leading/trailing spaces
     df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%S.%f%z', errors='coerce')
     df.rename(columns={'dev-id': 'sensor'}, inplace=True)  # Rename sensor column
+    data_frames.append(df)
     return pd.concat(data_frames, ignore_index=True)
 
 def compute_monthly_avgs(df):
     df["month"] = pd.to_datetime(df["time"]).dt.to_period("M")
-    monthly_avgs = df.groupby(['month', 'sensor'])["temperature", "humidity"].mean().reset_index()
+    monthly_avgs = df.groupby(['month', 'sensor'])[["temperature", "humidity"]].mean().reset_index()
     return monthly_avgs
 
 def plot_humidity_trends(monthly_avgs):
@@ -42,4 +43,13 @@ def plot_temp_vs_humidity(df):
     plt.show()
 
     print(f"correlation coefficient: {correlation:}")
+
+def main():
+    df = load_data()
+    monthly_avgs = compute_monthly_avgs(df)
+    plot_humidity_trends(monthly_avgs)
+    plot_temp_vs_humidity(monthly_avgs)
+
+if __name__ == "__main__":
+    main()
     
