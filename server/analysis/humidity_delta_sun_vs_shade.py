@@ -2,11 +2,14 @@ import utils
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def load_data():
-    df = utils.get_csv()
+def load_data(year):
+    df = utils.get_csv(year)
     data = utils.separate_sensors(df)
     return data
 
+"""
+Sensors in sun and shade are currently hardcoded in the utils.py file.
+"""
 def filter_sundata(data):
     data_sun = {sensor_id: data[sensor_id] for sensor_id in utils.SENSOR_SUN if sensor_id in data}
     return data_sun
@@ -14,6 +17,17 @@ def filter_sundata(data):
 def filter_shadedata(data):
     data_shade = {sensor_id: data[sensor_id] for sensor_id in utils.SENSOR_SHADE if sensor_id in data}
     return data_shade
+
+def ask_user_for_year():
+    year = input("Enter year for source data or 'all' for all available: ")
+    try:
+        year = int(year)
+    except ValueError:
+        if(year == "" or year == "all"):
+            return None
+        print("Please enter a valid year.")
+        return ask_user_for_year()
+    return year
 
 def compute_humidity_change(sensor_data, resample_period):
     """
@@ -41,7 +55,7 @@ def compute_humidity_change(sensor_data, resample_period):
     return merged_df
 
 def main():
-    data = load_data()
+    data = load_data(ask_user_for_year())
 
     # Filter data using existing functions
     data_sun = filter_sundata(data)
