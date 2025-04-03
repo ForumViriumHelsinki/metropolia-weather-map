@@ -1,6 +1,9 @@
 import pandas as pd
 import requests
+import json
+from bs4 import BeautifulSoup
 
+""" These values are loaded dynamically at the end of the script file with get_sensors() function.
 SENSORS = [
     "24E124136E106616",
     "24E124136E106617",
@@ -33,6 +36,7 @@ SENSOR_SHADE = [
     "24E124136E106674",
     "24E124136E106686",
 ]
+"""
 
 BASE_URL = "https://bri3.fvh.io/opendata/makelankatu/"
 
@@ -113,3 +117,70 @@ def get_cloudiness_data(file_path="../data/cloudiness.csv"):
     cloud_df.loc[cloud_df["Pilvisyys"] == 9, "Pilvisyys"] = None
 
     return cloud_df.groupby("date")["Pilvisyys"].mean().reset_index()
+
+"""
+returns a list of links to .geojson files found at the BASE_URL
+"""
+def get_geojson_files():
+    """Fetch the list of available .geojson files from the URL."""
+    response = requests.get(BASE_URL)
+    if response.status_code != 200:
+        print("Failed to fetch file list")
+        return []
+
+    # Parse the HTML to find all .geojson file links
+    soup = BeautifulSoup(response.text, 'html.parser')
+    files = [a['href'] for a in soup.find_all('a') if a['href'].endswith('.geojson')]
+
+    return files
+
+"""
+files is a list of links to .geojson files, you can get them using the get_geojson_files function
+This function returns the "id" and "Tyyppi" from each file
+"""
+def fetch_sensorid_and_type(files):
+    """Download each .geojson file and extract 'id' and 'Tyyppi'."""
+    extracted_data = []
+
+    for file in files:
+        file_url = BASE_URL + file
+        response = requests.get(file_url)
+        if response.status_code != 200:
+            print(f"Failed to fetch {file}")
+            continue
+
+        try:
+            geojson_data = response.json()
+            # Extracting required fields
+            sensor_id = geojson_data.get("id", "Unknown ID")
+            tyyppi = geojson_data.get("properties", {}).get("Tyyppi", "Unknown Tyyppi")
+            extracted_data.append((sensor_id, tyyppi))
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON in {file}")
+
+    return extracted_data
+
+def get_sensors():
+    sensordata = fetch_sensorid_and_type(get_geojson_files())  # Fetch sensor data
+    sensors = []
+    sensor_sun = []
+    sensor_shade = []
+
+    for item in sensordata:  # Iterate through the list of tuples (id, Tyyppi)
+        sensor_id, sensor_type = item  # Unpack tuple
+        if sensor_id != "Unknown ID":
+            sensors.append(sensor_id)  # Add sensor ID to the main list
+
+        if sensor_type == "Auringossa":  # Sunlight sensors
+            sensor_sun.append(sensor_id)
+        elif sensor_type == "Varjossa":  # Shade sensors
+            sensor_shade.append(sensor_id)
+    """
+    print("Sensor IDs:", sensors)
+    print("Sensor IDs in sunlight:", sensor_sun)
+    print("Sensor IDs in shade:", sensor_shade)
+    """
+    return sensors, sensor_sun, sensor_shade  # Return lists if needed
+
+SENSORS, SENSOR_SUN, SENSOR_SHADE = get_sensors()
+
