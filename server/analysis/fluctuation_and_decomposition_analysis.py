@@ -4,11 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from numpy.fft import fft
 from statsmodels.tsa.seasonal import STL
+from matplotlib.widgets import CheckButtons
 
 def load_data():
-    df = utils.get_csv()  # Already a DataFrame, no need for concat
+    year = input("Enter year for source data or 'all' for all available: ")
+    try:    
+        year = int(year)
+    except ValueError:
+        if(year == "" or year == "all"):
+            year = None
+        else:
+            print("Please enter a valid year.")
+    df = utils.get_csv(year)  
 
-    # Debug: Check initial DataFrame structure
     print("Initial DataFrame Columns:", df.columns)
 
     if 'time' not in df.columns:
@@ -20,60 +28,104 @@ def load_data():
     print (f'{df.columns} load check')
     return df
 
+def plot_raw_humidity(df):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sensor_lines = {}
+    
+    for sensor_id, sensor_data in df.groupby('sensor'):
+        line, = ax.plot(sensor_data['time'], sensor_data['humidity'], label=f"Sensor {sensor_id}", alpha=0.7)
+        sensor_lines[sensor_id] = line
+    
+    plt.xlabel('Time')
+    plt.ylabel('Humidity (%)')
+    plt.title('Raw Humidity Data Over Time')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    
+    legend = plt.legend(title="Sensors", bbox_to_anchor=(1, 1))
+    plt.subplots_adjust(right=0.8)
+    
+    # Separate checkboxes
+    fig_checkbox, ax_checkbox = plt.subplots(figsize=(2, 6))
+    ax_checkbox.set_xticks([])
+    ax_checkbox.set_yticks([])
+    ax_checkbox.set_frame_on(False)
+    
+    labels = list(sensor_lines.keys())
+    visibility = [line.get_visible() for line in sensor_lines.values()]
+    check = CheckButtons(ax_checkbox, labels, visibility)
+    
+    def toggle_visibility(label):
+        sensor_lines[label].set_visible(not sensor_lines[label].get_visible())
+        fig.canvas.draw()
+    
+    check.on_clicked(toggle_visibility)
+    plt.show()
+    plt.show()
+
 def plot_fft_analysis(df):
-    df_copy = df.copy()  # Create a copy of the DataFrame for safety
-    print (f'{df_copy.columns} fft check') # Debugging output
-    print(f'{df_copy.info()} fft info 1')# Check if 'time' exists and is a datetime object
+    df_copy = df.copy()
     df_copy.set_index('time', inplace=True)
-    print(f'{df_copy.info()} fft info 2')  # Confirm it's now the index
-
     grouped = df_copy.groupby('sensor').resample('D').mean().reset_index(level='sensor')
-
-    plt.figure(figsize=(8, 6))
+    grouped['humidity'] = grouped['humidity'].rolling(window=7, min_periods=1).mean()
+    
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sensor_lines = {}
     
     for sensor_id in grouped['sensor'].unique():
         sensor_df = grouped[grouped['sensor'] == sensor_id]
         humidity_fft = fft(sensor_df['humidity'].dropna())
         freqs = np.fft.fftfreq(len(humidity_fft))
-
-        plt.plot(freqs[:len(freqs)//2], np.abs(humidity_fft[:len(freqs)//2]), label=f'Sensor {sensor_id}')
+        line, = ax.plot(freqs[:len(freqs)//2], np.abs(humidity_fft[:len(freqs)//2]), label=f'Sensor {sensor_id}')
+        sensor_lines[sensor_id] = line
     
+    plt.yscale('log')
     plt.title('Fourier Transform of Humidity Data')
     plt.xlabel('Frequency')
     plt.ylabel('Magnitude')
-    plt.legend(title="Sensors", loc='upper right')  # Move legend to upper right
     plt.grid(True)
+    plt.tight_layout()
+    
+    legend = plt.legend(title="Sensors", loc='upper left', bbox_to_anchor=(1, 1))
+    plt.subplots_adjust(right=0.8)
+    
+    # Separate checkboxes
+    fig_checkbox, ax_checkbox = plt.subplots(figsize=(2, 6))
+    ax_checkbox.set_xticks([])
+    ax_checkbox.set_yticks([])
+    ax_checkbox.set_frame_on(False)
+    
+    labels = list(sensor_lines.keys())
+    visibility = [line.get_visible() for line in sensor_lines.values()]
+    check = CheckButtons(ax_checkbox, labels, visibility)
+    
+    def toggle_visibility(label):
+        sensor_lines[label].set_visible(not sensor_lines[label].get_visible())
+        fig.canvas.draw()
+    
+    check.on_clicked(toggle_visibility)
+    plt.show()
     plt.show()
 
 def plot_seasonal_decomposition(df):
-    print("Columns at start of seasonal decomposition:", df.dtypes)  # Debugging
+    print("Columns at start of seasonal decomposition:", df.dtypes)
     
     if 'time' not in df.columns:
         print("Error: 'time' column missing before STL decomposition!")
         return
     
-    df = df.copy()  # Avoid modifying the original DataFrame
+    df = df.copy()
     df.set_index('time', inplace=True)
-
-    # Convert numeric columns explicitly
     df['humidity'] = pd.to_numeric(df['humidity'], errors='coerce')
-
-    # Select only numeric columns for resampling (avoid sensor ID issues)
-    numeric_cols = ['humidity']  # Add 'temperature' if needed
-    df = df[numeric_cols].resample('H').mean()  # Change 'H' to 'D' for daily if needed
-
-    # Fill missing values using interpolation
+    df = df[['humidity']].resample('h').mean()
     df['humidity'] = df['humidity'].interpolate(method='time')
-
-    # Drop NaNs that may still be present
     df = df.dropna()
-
-    # Ensure enough data points before running STL
-    if len(df) < 14:  # Needs at least 2 cycles (e.g., 14 days for weekly data)
+    
+    if len(df) < 14:
         print("Error: Not enough data points for STL decomposition!")
         return
-
-    stl = STL(df['humidity'], seasonal=143)  # 24 = One day cycle (Hourly data)
+    
+    stl = STL(df['humidity'], seasonal=143)
     result = stl.fit()
     
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
@@ -82,13 +134,12 @@ def plot_seasonal_decomposition(df):
     result.resid.plot(ax=axes[2], title='Residual')
     plt.show()
 
-
-
 def main():
     df = load_data()
-    print (f'{df.columns} main check') # Debugging output
-    plot_fft_analysis(df)
-    plot_seasonal_decomposition(df)
+    if df is not None:
+        plot_raw_humidity(df)
+        plot_fft_analysis(df)
+        plot_seasonal_decomposition(df)
 
 if __name__ == "__main__":
     main()
