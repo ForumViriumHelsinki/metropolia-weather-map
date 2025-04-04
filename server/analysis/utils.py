@@ -38,7 +38,34 @@ SENSOR_SHADE = [
 ]
 """
 
-BASE_URL = "https://bri3.fvh.io/opendata/makelankatu/"
+MAKELA_URL = "https://bri3.fvh.io/opendata/makelankatu/"
+R4C_URL = "https://bri3.fvh.io/opendata/r4c/"
+
+def get_r4c_csv(year=None):
+    """Load R4C sensor data for a specific year or all available years."""
+    available_years = [2024, 2025]  # Update this when new data is available
+
+    if year is None:
+        dfs = [fetch_r4c_csv(y) for y in available_years]
+        df = pd.concat(dfs, ignore_index=True)
+    elif year in available_years:
+        df = fetch_r4c_csv(year)
+    else:
+        raise ValueError(f"Invalid year. Choose from {available_years} or None for all years.")
+
+    print("R4C CSV loading complete.")
+    return df
+
+def fetch_r4c_csv(year):
+    """Fetch and load a CSV file for a given year."""
+    filename = f"r4c_all-{year}.csv.gz"
+    url = R4C_URL + filename
+
+    print(f"Fetching CSV data for {year} from {url}...")
+    response = requests.get(url, stream=True)
+    response.raise_for_status()
+
+    return pd.read_csv(url, parse_dates=["time"])
 
 def get_csv(year=None):
     """Load sensor data for a specific year or all available years."""
@@ -59,7 +86,7 @@ def get_csv(year=None):
 def fetch_csv(year):
     """Fetch and load a CSV file for a given year."""
     filename = f"makelankatu-{year}.csv.gz"
-    url = BASE_URL + filename
+    url = MAKELA_URL + filename
 
     print(f"Fetching CSV data for {year} from {url}...")
     response = requests.get(url, stream=True)
@@ -119,11 +146,11 @@ def get_cloudiness_data(file_path="../data/cloudiness.csv"):
     return cloud_df.groupby("date")["Pilvisyys"].mean().reset_index()
 
 """
-returns a list of links to .geojson files found at the BASE_URL
+returns a list of links to .geojson files found at the MAKELA_URL
 """
 def get_geojson_files():
     """Fetch the list of available .geojson files from the URL."""
-    response = requests.get(BASE_URL)
+    response = requests.get(MAKELA_URL)
     if response.status_code != 200:
         print("Failed to fetch file list")
         return []
@@ -143,7 +170,7 @@ def fetch_sensorid_and_type(files):
     extracted_data = []
 
     for file in files:
-        file_url = BASE_URL + file
+        file_url = MAKELA_URL + file
         response = requests.get(file_url)
         if response.status_code != 200:
             print(f"Failed to fetch {file}")
