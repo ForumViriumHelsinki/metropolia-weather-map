@@ -7,6 +7,7 @@ from statsmodels.tsa.seasonal import STL
 from matplotlib.widgets import CheckButtons
 
 def load_data():
+    data_frames = []
     year = input("Enter year for source data or 'all' for all available: ")
     try:    
         year = int(year)
@@ -15,7 +16,9 @@ def load_data():
             year = None
         else:
             print("Please enter a valid year.")
-    df = utils.get_csv(year)  
+    data_frames.append(utils.get_csv(year=year))
+    data_frames.append(utils.get_r4c_csv(year=year))
+    df = pd.concat(data_frames, ignore_index=True)
 
     print("Initial DataFrame Columns:", df.columns)
 
