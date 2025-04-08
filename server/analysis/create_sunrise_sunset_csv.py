@@ -40,7 +40,7 @@ for m in range(1, 13):
 # print(line.)
 # print(replace(" ", "T"))
 
-with open("../data/daylight.csv", "w", newline="") as csvfile:
+with open("../../data/daylight.csv", "w", newline="") as csvfile:
     fieldNames = ["sunrise", "sunset"]
     writer = csv.DictWriter(csvfile, fieldnames=fieldNames)
     writer.writeheader()

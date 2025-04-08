@@ -49,7 +49,7 @@ def get_csv(year=None):
 
 
 def fetch_csv(year):
-    """Fetch and load a CSV file for a given year."""
+    """For MAKELA_URL only. Fetch and load a CSV file for a given year."""
     filename = f"makelankatu-{year}.csv.gz"
     url = MAKELA_URL + filename
 
@@ -75,7 +75,7 @@ def apply_date_range(df, start_date, end_date):
 
 
 def filter_data_by_sunlight(daytime=True):
-    daylight_info = pd.read_csv("../data/daylight.csv", parse_dates=["sunrise", "sunset"])
+    daylight_info = pd.read_csv("../../data/daylight.csv", parse_dates=["sunrise", "sunset"])
     sensor_readings = get_csv()
 
     sensor_readings["date"] = sensor_readings["time"].dt.date
@@ -99,7 +99,7 @@ def get_night_data():
     return filter_data_by_sunlight(daytime=False)
 
 
-def get_cloudiness_data(file_path="../data/cloudiness.csv"):
+def get_cloudiness_data(file_path="../../data/cloudiness.csv"):
     cloud_df = pd.read_csv(file_path, encoding="utf-8", sep=",")
     cloud_df.columns = ["Havaintoasema", "Vuosi", "Kuukausi", "Päivä", "Aika", "Pilvisyys"]
 
