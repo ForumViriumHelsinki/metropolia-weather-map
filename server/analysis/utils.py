@@ -186,15 +186,19 @@ def get_sensors_by_location():
 
     for item in r4c_files:
         sensor_id, sensor_type, district = item
-        
         if district == "Laajasalo":
+            print(sensor_id)
             laajasalo_sensors.append(sensor_id)
         elif district == "Koivukyla":
+            print(sensor_id)
             koivukyla_sensors.append(sensor_id)
         else:
+            print(sensor_id)
             koivukyla_sensors.append(sensor_id)
 
-    for sensor_id in makela_files:
+    for item in makela_files:
+        sensor_id, sensor_type, district = item
+        print(sensor_id)
         makela_sensors.append(sensor_id)
 
     return makela_sensors, laajasalo_sensors, koivukyla_sensors
