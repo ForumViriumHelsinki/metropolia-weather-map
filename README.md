@@ -48,6 +48,7 @@ py scripts/csvToDb.py
 ### Running python analysis scripts
 ```bash
 cd server/analysis
+pip install -r requirements.txt
 py *Insert script name*
 ```
 
