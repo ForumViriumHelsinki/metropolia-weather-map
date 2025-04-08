@@ -43,7 +43,7 @@ DATE_RANGE = {"start_date": "2024-07-1", "end_date": "2024-9-30"}
 # Mean temperatures from sensors in the sun and shade are calculated separately.
 # Max temperatures are plotted by "dev-id" and mean temperatures are overlaid on the graph
 
-df = pd.read_csv("../data/makelankatu-2024.csv")
+df = pd.read_csv("../../data/makelankatu-2024.csv")
 
 df["time"] = pd.to_datetime(df["time"])
 
