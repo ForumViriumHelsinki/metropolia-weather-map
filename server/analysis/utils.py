@@ -3,41 +3,6 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-""" These values are loaded dynamically at the end of the script file with get_sensors() function.
-SENSORS = [
-    "24E124136E106616",
-    "24E124136E106617",
-    "24E124136E106618",
-    "24E124136E106619",
-    "24E124136E106635",
-    "24E124136E106636",
-    "24E124136E106637",
-    "24E124136E106638",
-    "24E124136E106643",
-    "24E124136E106661",
-    "24E124136E106674",
-    "24E124136E106686",
-]
-
-SENSOR_SUN = [
-    "24E124136E106637",
-    "24E124136E106638",
-    "24E124136E106619",
-    "24E124136E106661",
-]
-
-SENSOR_SHADE = [
-    "24E124136E106616",
-    "24E124136E106617",
-    "24E124136E106618",
-    "24E124136E106635",
-    "24E124136E106636",
-    "24E124136E106643",
-    "24E124136E106674",
-    "24E124136E106686",
-]
-"""
-
 MAKELA_URL = "https://bri3.fvh.io/opendata/makelankatu/"
 R4C_URL = "https://bri3.fvh.io/opendata/r4c/"
 
@@ -57,7 +22,7 @@ def get_r4c_csv(year=None):
     return df
 
 def fetch_r4c_csv(year):
-    """Fetch and load a CSV file for a given year."""
+    
     filename = f"r4c_all-{year}.csv.gz"
     url = R4C_URL + filename
 
@@ -148,9 +113,9 @@ def get_cloudiness_data(file_path="../data/cloudiness.csv"):
 """
 returns a list of links to .geojson files found at the MAKELA_URL
 """
-def get_geojson_files():
+def get_geojson_files(url):
     """Fetch the list of available .geojson files from the URL."""
-    response = requests.get(MAKELA_URL)
+    response = requests.get(url)
     if response.status_code != 200:
         print("Failed to fetch file list")
         return []
@@ -165,12 +130,12 @@ def get_geojson_files():
 files is a list of links to .geojson files, you can get them using the get_geojson_files function
 This function returns the "id" and "Tyyppi" from each file
 """
-def fetch_sensorid_and_type(files):
+def fetch_sensorid_and_info(files, url):
     """Download each .geojson file and extract 'id' and 'Tyyppi'."""
     extracted_data = []
 
     for file in files:
-        file_url = MAKELA_URL + file
+        file_url = url + file
         response = requests.get(file_url)
         if response.status_code != 200:
             print(f"Failed to fetch {file}")
@@ -181,20 +146,21 @@ def fetch_sensorid_and_type(files):
             # Extracting required fields
             sensor_id = geojson_data.get("id", "Unknown ID")
             tyyppi = geojson_data.get("properties", {}).get("Tyyppi", "Unknown Tyyppi")
-            extracted_data.append((sensor_id, tyyppi))
+            district = geojson_data.get("properties", {}).get("district", "Unknown District")
+            extracted_data.append((sensor_id, tyyppi, district))
         except json.JSONDecodeError:
             print(f"Error decoding JSON in {file}")
 
     return extracted_data
 
 def get_sensors():
-    sensordata = fetch_sensorid_and_type(get_geojson_files())  # Fetch sensor data
+    sensordata = fetch_sensorid_and_info(get_geojson_files(MAKELA_URL), MAKELA_URL)  # Fetch sensor data
     sensors = []
     sensor_sun = []
     sensor_shade = []
 
     for item in sensordata:  # Iterate through the list of tuples (id, Tyyppi)
-        sensor_id, sensor_type = item  # Unpack tuple
+        sensor_id, sensor_type, district = item  # Unpack tuple
         if sensor_id != "Unknown ID":
             sensors.append(sensor_id)  # Add sensor ID to the main list
 
@@ -210,4 +176,29 @@ def get_sensors():
     return sensors, sensor_sun, sensor_shade  # Return lists if needed
 
 SENSORS, SENSOR_SUN, SENSOR_SHADE = get_sensors()
+
+def get_sensors_by_location():
+    makela_sensors = []
+    laajasalo_sensors = []
+    koivukyla_sensors = []
+    r4c_files = fetch_sensorid_and_info(get_geojson_files(R4C_URL), R4C_URL)
+    makela_files = fetch_sensorid_and_info(get_geojson_files(MAKELA_URL), MAKELA_URL)
+
+    for item in r4c_files:
+        sensor_id, sensor_type, district = item
+        
+        if district == "Laajasalo":
+            laajasalo_sensors.append(sensor_id)
+        elif district == "Koivukyla":
+            koivukyla_sensors.append(sensor_id)
+        else:
+            koivukyla_sensors.append(sensor_id)
+
+    for sensor_id in makela_files:
+        makela_sensors.append(sensor_id)
+
+    return makela_sensors, laajasalo_sensors, koivukyla_sensors
+    
+MAKELA_SENSORS, LAAJASALO_SENSORS, KOIVUKYLA_SENSORS = get_sensors_by_location()
+
 
