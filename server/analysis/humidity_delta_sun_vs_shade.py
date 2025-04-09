@@ -2,6 +2,8 @@ import utils
 import pandas as pd
 import matplotlib.pyplot as plt
 
+SENSORS, SENSOR_SUN, SENSOR_SHADE = utils.get_makela_sensors()
+
 def load_data(year):
     df = utils.get_csv(year)
     data = utils.separate_sensors(df)
@@ -11,11 +13,11 @@ def load_data(year):
 Sensors in sun and shade are currently hardcoded in the utils.py file.
 """
 def filter_sundata(data):
-    data_sun = {sensor_id: data[sensor_id] for sensor_id in utils.SENSOR_SUN if sensor_id in data}
+    data_sun = {sensor_id: data[sensor_id] for sensor_id in SENSOR_SUN if sensor_id in data}
     return data_sun
 
 def filter_shadedata(data):
-    data_shade = {sensor_id: data[sensor_id] for sensor_id in utils.SENSOR_SHADE if sensor_id in data}
+    data_shade = {sensor_id: data[sensor_id] for sensor_id in SENSOR_SHADE if sensor_id in data}
     return data_shade
 
 def ask_user_for_year():
