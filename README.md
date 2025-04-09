@@ -45,6 +45,12 @@ py scripts/load_sensors.py
 py scripts/csvToDb.py
 ```
 
+### Running python analysis scripts
+```bash
+cd server/analysis
+py *Insert script name*
+```
+
 # Visio
 
 Verkkosovellus, joka näyttää kartalla lämpötilojen muutoksen paikkakohtaisesti. Omien antureiden lisäksi tietoja haetaan läheisiltä sääasemilta. Näiltä sääasemilta haetaan myös säätiedot, kuten pilvisyys ja ilmankosteus. Datan analysointiin voidaan luoda haluttuja työkaluja, asiakkaan toiveiden mukaan. Tiedot tallennetaan Google Cloudissa olevaan PostgreSQL tietokantaan.
