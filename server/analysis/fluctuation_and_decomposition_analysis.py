@@ -6,7 +6,6 @@ from numpy.fft import fft
 from statsmodels.tsa.seasonal import STL
 from matplotlib.widgets import CheckButtons
 import matplotlib.gridspec as gridspec
-from utils import MAKELA_SENSORS, LAAJASALO_SENSORS, KOIVUKYLA_SENSORS
 
 def load_data():
     data_frames = []
@@ -96,45 +95,65 @@ def plot_fft_analysis(df):
     df_copy.set_index('time', inplace=True)
     grouped = df_copy.groupby('sensor').resample('D').mean().reset_index(level='sensor')
     grouped['humidity'] = grouped['humidity'].rolling(window=7, min_periods=1).mean()
-    
-    fig, ax = plt.subplots(figsize=(8, 6))
+
+    fig = plt.figure(figsize=(14, 6))
+    gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])
+    ax = fig.add_subplot(gs[0])
+    ax_cb = fig.add_subplot(gs[1])
+
     sensor_lines = {}
-    
+
     for sensor_id in grouped['sensor'].unique():
         sensor_df = grouped[grouped['sensor'] == sensor_id]
         humidity_fft = fft(sensor_df['humidity'].dropna())
         freqs = np.fft.fftfreq(len(humidity_fft))
-        line, = ax.plot(freqs[:len(freqs)//2], np.abs(humidity_fft[:len(freqs)//2]), label=sensor_id)
+        line, = ax.plot(freqs[:len(freqs)//2], np.abs(humidity_fft[:len(freqs)//2]), label=sensor_id, alpha=0.7)
         sensor_lines[sensor_id] = line
-    
-    plt.yscale('log')
-    plt.title('Fourier Transform of Humidity Data')
-    plt.xlabel('Frequency')
-    plt.ylabel('Magnitude')
-    plt.grid(True)
-    plt.tight_layout()
-    
-    legend = plt.legend(title="Sensors", loc='upper left', bbox_to_anchor=(1, 1))
-    plt.subplots_adjust(right=0.8)
-    
-    # Separate checkboxes
-    fig_checkbox, ax_checkbox = plt.subplots(figsize=(2, 6))
-    ax_checkbox.set_xticks([])
-    ax_checkbox.set_yticks([])
-    ax_checkbox.set_frame_on(False)
-    
-    labels = list(sensor_lines.keys())
-    visibility = [line.get_visible() for line in sensor_lines.values()]
-    check = CheckButtons(ax_checkbox, labels, visibility)
-    
-    def toggle_visibility(label):
-        sensor_lines[label].set_visible(not sensor_lines[label].get_visible())
-        fig.canvas.draw()
-    
-    check.on_clicked(toggle_visibility)
-    plt.show()
-    plt.show()
 
+    ax.set_yscale('log')
+    ax.set_title('Fourier Transform of Humidity Data')
+    ax.set_xlabel('Frequency')
+    ax.set_ylabel('Magnitude')
+    ax.grid(True)
+    ax.legend(title="Sensors", bbox_to_anchor=(1, 1))
+
+    ax_cb.set_xticks([])
+    ax_cb.set_yticks([])
+    ax_cb.set_frame_on(False)
+
+    makela, laajasalo, koivukyla = utils.get_sensors_by_location()
+    location_map = {
+        'Makela': makela,
+        'Laajasalo': laajasalo,
+        'Koivukyla': koivukyla,
+    }
+
+    all_sensor_ids = list(sensor_lines.keys())
+    location_labels = list(location_map.keys())
+    all_labels = location_labels + all_sensor_ids
+    visibility = [True] * len(all_labels)
+
+    check = CheckButtons(ax_cb, all_labels, visibility)
+    label_to_index = {label: i for i, label in enumerate(all_labels)}
+
+    def toggle(label):
+        status = check.get_status()
+        if label in sensor_lines:
+            sensor_lines[label].set_visible(status[label_to_index[label]])
+        elif label in location_map:
+            sensors = location_map[label]
+            new_state = status[label_to_index[label]]
+            for sid in sensors:
+                if sid in sensor_lines:
+                    sensor_lines[sid].set_visible(new_state)
+                    idx = label_to_index.get(sid)
+                    if idx is not None and check.get_status()[idx] != new_state:
+                        check.set_active(idx)
+        fig.canvas.draw_idle()
+
+    check.on_clicked(toggle)
+    plt.tight_layout()
+    plt.show()
 def plot_seasonal_decomposition(df):
     print("Columns at start of seasonal decomposition:", df.dtypes)
     
