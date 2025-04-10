@@ -26,75 +26,76 @@ def fetch_csv(url):
 
 def get_sensor_metadata(locations):
     """
-    Fetch sensor metadata for selected locations (Vallila, Laajasalo, Koivukylä).
-    - Vallila: All sensors listed as .geojson files are assumed to be Vallila and included if 'Vallila' is selected.
-    - Laajasalo, Koivukylä: Each .geojson file is parsed, and sensors are included only if their district matches.
+    Fetch specific sensor metadata based on the provided locations and pre-defined sensor IDs.
+    - Vallila: A fixed set of Vallila sensor IDs.
+    - Laajasalo, Koivukylä: A fixed set of sensor IDs for these districts.
     """
     print(f"[INFO] Fetching sensor metadata for locations: {locations}")
     if isinstance(locations, str):
         locations = [locations]
 
+    # Predefined sensor IDs for each district
+    vallila_sensors = [
+        "24E124136E106616", "24E124136E106617", "24E124136E106618", "24E124136E106619",
+        "24E124136E106635", "24E124136E106636", "24E124136E106637", "24E124136E106638",
+        "24E124136E106643", "24E124136E106661", "24E124136E106674", "24E124136E106686"
+    ]
+    
+    laajasalo_koivukylä_sensors = [
+        "24E124136E140271", "24E124136E140283", "24E124136E140287", "24E124136E146069",
+        "24E124136E146080", "24E124136E146083", "24E124136E146087", "24E124136E146118",
+        "24E124136E146126", "24E124136E146128", "24E124136E146155", "24E124136E146157",
+        "24E124136E146167", "24E124136E146186", "24E124136E146190", "24E124136E146198",
+        "24E124136E146218", "24E124136E146224", "24E124136E146235", "24E124136E146237"
+    ]
+    
     metadata = []
-    vallila_count = 0
 
+    # Fetch Vallila sensors (if Vallila is in the requested locations)
     if "Vallila" in locations:
-        try:
-            response = requests.get(BASE_URL_VALLILA, timeout=10)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, "html.parser")
-            links = soup.find_all('a')
-            ids = [link.get("href").replace(".geojson", "") for link in links if link.get("href", "").endswith(".geojson")]
-            vallila_count = len(ids)
-
-            for sensor_id in ids:
-                try:
-                    url = f"{BASE_URL_VALLILA}{sensor_id}.geojson"
-                    r = requests.get(url, timeout=10)
-                    r.raise_for_status()
-                    data = r.json()
-                    props = data.get("properties", {})
-                    coords = data.get("geometry", {}).get("coordinates", [None, None])
-
-                    metadata.append({
-                        "device_id": data.get("id"),
-                        "district": "Vallila",
-                        "name": None,
-                        "street": None,
-                        "lat": coords[1],
-                        "lon": coords[0],
-                        "tyyppi": props.get("Tyyppi", ""),
-                        "huomiot": props.get("Huomiot", ""),
-                        "kiinnitystapa": props.get("Kiinnitystapa", ""),
-                        "asennettu_pvm": props.get("Asennettu_pvm", ""),
-                        "sensori": props.get("Sensori", ""),
-                        "fid": props.get("fid", "")
-                    })
-                except Exception as e:
-                    print(f"[ERROR] Failed to fetch metadata for Vallila sensor {sensor_id}: {e}")
-        except Exception as e:
-            print(f"[ERROR] Failed to fetch Vallila sensor list: {e}")
-
-    r4c_counts = {"Laajasalo": 0, "Koivukylä": 0}
-
-    if any(loc in locations for loc in ["Laajasalo", "Koivukylä"]):
-        try:
-            response = requests.get(BASE_URL_LAAJASALO_KOIVUKYLA, timeout=10)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, "html.parser")
-            links = [link.get("href") for link in soup.find_all('a') if link.get("href", "").endswith(".geojson")]
-        except Exception as e:
-            print(f"[ERROR] Failed to fetch R4C listing: {e}")
-            links = []
-
-        for href in links:
-            sensor_id = href.replace(".geojson", "")
-            url = f"{BASE_URL_LAAJASALO_KOIVUKYLA}{href}"
+        for sensor_id in vallila_sensors:
             try:
+                url = f"{BASE_URL_VALLILA}{sensor_id}.geojson"
+                r = requests.get(url, timeout=10)
+                r.raise_for_status()
+                data = r.json()
+                props = data.get("properties", {})
+                coords = data.get("geometry", {}).get("coordinates", [None, None])
+
+                metadata.append({
+                    "device_id": data.get("id"),
+                    "district": "Vallila",
+                    "name": None,
+                    "street": None,
+                    "lat": coords[1],
+                    "lon": coords[0],
+                    "tyyppi": props.get("Tyyppi", ""),
+                    "huomiot": props.get("Huomiot", ""),
+                    "kiinnitystapa": props.get("Kiinnitystapa", ""),
+                    "asennettu_pvm": props.get("Asennettu_pvm", ""),
+                    "sensori": props.get("Sensori", ""),
+                    "fid": props.get("fid", "")
+                })
+            except Exception as e:
+                print(f"[ERROR] Failed to fetch metadata for Vallila sensor {sensor_id}: {e}")
+
+    # Fetch Laajasalo and Koivukylä sensors (if any of them are in the requested locations)
+    if any(loc in locations for loc in ["Laajasalo", "Koivukylä"]):
+        for sensor_id in laajasalo_koivukylä_sensors:
+            try:
+                url = f"{BASE_URL_LAAJASALO_KOIVUKYLA}{sensor_id}.geojson"
                 r = requests.get(url, timeout=10)
                 r.raise_for_status()
                 data = r.json()
                 props = data.get("properties", {})
                 district = props.get("district", "").strip()
+
+                # Manually assign Koivukylä for sensor 24E124136E140283 if no district is provided
+                if not district and sensor_id == "24E124136E140283":
+                    district = "Koivukylä"
+                    print(f"[INFO] Sensor {sensor_id} manually assigned to district: Koivukylä")
+
+                # Only include sensors if they match the requested locations
                 if district in locations:
                     coords = data.get("geometry", {}).get("coordinates", [None, None])
                     metadata.append({
@@ -115,20 +116,15 @@ def get_sensor_metadata(locations):
                         "field_3": props.get("field_3", ""),
                         "field_4": props.get("field_4", "")
                     })
-                    if district in r4c_counts:
-                        r4c_counts[district] += 1
             except Exception as e:
                 print(f"[ERROR] Failed to fetch metadata for sensor {sensor_id}: {e}")
 
-    if vallila_count > 0:
-        print(f"[INFO] Vallila: {vallila_count} sensors fetched.")
-    for district, count in r4c_counts.items():
-        if count > 0:
-            print(f"[INFO] {district}: {count} sensors fetched.")
-
+    print(f"[INFO] Total sensor metadata rows: {len(metadata)}")
+    
+    # Convert to DataFrame and return
     df_meta = pd.DataFrame(metadata)
-    print(f"[INFO] Total sensor metadata rows: {len(df_meta)}")
     return df_meta
+
 
 
 def load_sensor_data(start_date, end_date, locations=None):
