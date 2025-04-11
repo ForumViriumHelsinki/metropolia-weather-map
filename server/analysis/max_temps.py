@@ -1,41 +1,11 @@
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
+from utils import get_makela_sensors
 
 startTime = datetime.now()
 
-SENSOR_IDS = [
-    "24E124136E106616",
-    "24E124136E106617",
-    "24E124136E106618",
-    "24E124136E106619",
-    "24E124136E106635",
-    "24E124136E106636",
-    "24E124136E106637",
-    "24E124136E106638",
-    "24E124136E106643",
-    "24E124136E106661",
-    "24E124136E106674",
-    "24E124136E106686",
-]
-
-SENSOR_SUN = [
-    "24E124136E106637",
-    "24E124136E106638",
-    "24E124136E106619",
-    "24E124136E106661",
-]
-
-SENSOR_SHADE = [
-    "24E124136E106616",
-    "24E124136E106617",
-    "24E124136E106618",
-    "24E124136E106635",
-    "24E124136E106636",
-    "24E124136E106643",
-    "24E124136E106674",
-    "24E124136E106686",
-]
+SENSOR_IDS, SENSOR_SUN, SENSOR_SHADE = get_makela_sensors()
 
 DATE_RANGE = {"start_date": "2024-07-1", "end_date": "2024-9-30"}
 

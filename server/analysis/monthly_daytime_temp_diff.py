@@ -2,17 +2,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import utils
 
+SENSORS, SENSOR_SUN, SENSOR_SHADE = utils.get_makela_sensors()
+
 df = utils.get_day_data()
 df = utils.apply_date_range(df, "2024-06-24", "2024-12-31")
 df["month"] = df["time"].dt.month
 print(df.head())
 
 sun_sensors = [
-    group for dev_id, group in df.groupby("dev-id") if dev_id in utils.SENSOR_SUN
+    group for dev_id, group in df.groupby("dev-id") if dev_id in SENSOR_SUN
 ]
 
 shade_sensors = [
-    group for dev_id, group in df.groupby("dev-id") if dev_id in utils.SENSOR_SHADE
+    group for dev_id, group in df.groupby("dev-id") if dev_id in SENSOR_SHADE
 ]
 
 

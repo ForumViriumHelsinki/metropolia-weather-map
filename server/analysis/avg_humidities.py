@@ -1,8 +1,9 @@
 import pandas as pd
 import utils
-from utils import SENSORS, SENSOR_SUN, SENSOR_SHADE
+from utils import get_makela_sensors
 import matplotlib.pyplot as plt
 
+SENSORS, SENSOR_SUN, SENSOR_SHADE = get_makela_sensors()
 
 start_date = "2024-07-1"
 end_date = "2024-9-30"

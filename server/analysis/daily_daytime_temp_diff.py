@@ -2,11 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import utils
 
+SENSORS, SENSOR_SUN, SENSOR_SHADE = utils.get_makela_sensors()
+
 df = utils.get_day_data()
 df["hour"] = df["time"].dt.hour
 
-sun_sensors = [group for dev_id, group in df.groupby("dev-id") if dev_id in utils.SENSOR_SUN]
-shade_sensors = [group for dev_id, group in df.groupby("dev-id") if dev_id in utils.SENSOR_SHADE]
+sun_sensors = [group for dev_id, group in df.groupby("dev-id") if dev_id in SENSOR_SUN]
+shade_sensors = [group for dev_id, group in df.groupby("dev-id") if dev_id in SENSOR_SHADE]
 
 def get_sensor_hourly_average(df):
     avg_frame = df.groupby("hour")["temperature"].mean().reset_index()
