@@ -1,15 +1,15 @@
 import asyncio
 
+import matplotlib.pyplot as plt
 from utils.filter_tag import filter_location_with_tag, sensors_with_tag
-from utils.get_data_util import get_koivukyla
+from utils.get_data_util import get_koivukyla, get_makelankatu
+from utils.utils import filter_daytime_data
 
 
 async def test_func():
-    # df = await get_koivukyla()
-    tag_ids = await sensors_with_tag("viheralue")
-    print(tag_ids)
-    # asd = await filter_location_with_tag("Koivukylä", "viheralue")
-    # print(filtered_df["dev-id"].unique)
+    # df = await get_makelankatu()
+    df = await filter_location_with_tag("Mäkelänkatu", "viheralue")
+    return
 
 
 if __name__ == "__main__":

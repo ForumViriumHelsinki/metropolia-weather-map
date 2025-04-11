@@ -33,7 +33,6 @@ async def filter_df_by_tag(df, tag):
 async def filter_location_with_tag(location, tag):
     print("filter_location_with_tag()")
 
-    print("match")
     match location:
         case "Koivukylä":
             df = await get_koivukyla()
@@ -44,7 +43,6 @@ async def filter_location_with_tag(location, tag):
         case _:
             raise Exception("Invalid location")
 
-    print("query")
     location_with_tag_ids = []
     async for db in get_db():
         res = await db.execute(
@@ -56,7 +54,6 @@ async def filter_location_with_tag(location, tag):
         location_with_tag_ids = res.scalars().all()
 
     print(location_with_tag_ids)
+
     df = df[df["dev-id"].isin(location_with_tag_ids)]
-    print(df["dev-id"].unique())
-    # asd = await filter_df_by_tag(df, tag)
-    # print(asd)
+    return df
