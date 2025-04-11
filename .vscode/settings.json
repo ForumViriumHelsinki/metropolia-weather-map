@@ -10,5 +10,6 @@
       "username": "postgres",
       "password": "pass"
     }
-  ]
+  ],
+  "python.analysis.extraPaths": ["./server/src"]
 }

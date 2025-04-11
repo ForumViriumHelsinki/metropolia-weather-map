@@ -4,34 +4,13 @@ from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import utils
 from database import get_db
 from models import Sensor, SensorTag
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-
-def filter_daytime_data(df):
-    # daylight csv location
-    csv_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "data", "daylight.csv"
-    )
-
-    # Sunrise and sunset data
-    daylight_info = pd.read_csv(csv_path, parse_dates=["sunrise", "sunset"])
-
-    # Add date column to dataframae and daylight_info
-    df["date"] = df["time"].dt.date
-    daylight_info["date"] = daylight_info["sunrise"].dt.date
-
-    # Merge dataframes on date
-    df = pd.merge(df, daylight_info, on="date", how="left")
-
-    # Create mask from the dates and filter the times
-    mask = (df["time"] >= df["sunrise"]) & (df["time"] <= df["sunset"])
-
-    # Apply the mask to filter out timestamps after sunset
-    daylight_df = df[mask]
-    return daylight_df
+# from utils import filter_daytime_data
 
 
 def group_by_location(sensors):
@@ -93,20 +72,14 @@ async def tag_data(tag="harmaa-alue"):
 
     # Fetch data for sensors
     # Mäkelänkatu
-    dfM = pd.read_csv(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
-        parse_dates=["time"],
-    )
-    # # Laajasalo & Koivukylä
-    dfLK = pd.read_csv(
-        "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
-    )
+    dfM = utils.get_makelankatu()
+    dfLK = utils.get_rest()
 
     # Merge all the datasets
     df = pd.concat([dfM, dfLK], ignore_index=True)
 
     # Get data from only daytime
-    df = filter_daytime_data(df)
+    df = utils.filter_daytime_data(df)
 
     # Create the graph
     create_graph(df, location_sensors)
