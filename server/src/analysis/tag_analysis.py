@@ -1,8 +1,7 @@
 import asyncio
 
 import matplotlib.pyplot as plt
-from utils.filter_tag import filter_location_with_tag, sensors_with_tag
-from utils.get_data_util import get_koivukyla, get_makelankatu
+from utils.filter_tag import filter_location_with_tag
 from utils.utils import filter_daytime_data
 
 

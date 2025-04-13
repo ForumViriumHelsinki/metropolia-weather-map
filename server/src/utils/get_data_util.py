@@ -51,10 +51,19 @@ async def get_koivukyla():
 
     # get Koivukylä sensors
     sensor_ids = await get_ids_by_location("Koivukylä")
-    print(len(sensor_ids))
     df = df[df["dev-id"].isin(sensor_ids)]
 
     return df
+
+
+async def get_all_locations():
+    dfM = await get_makelankatu()
+    dfK = await get_koivukyla()
+    dfL = await get_laajasalo()
+
+    df_merged = pd.concat([dfM, dfK, dfL])
+
+    return df_merged
 
 
 def get_rest():

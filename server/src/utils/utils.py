@@ -24,6 +24,6 @@ def filter_daytime_data(df):
 
     # Apply the mask to filter out timestamps after sunset
     daylight_df = df[mask]
-    daylight_df.drop("sunrise", axis=1, inplace=True)
-    daylight_df.drop("sunset", axis=1, inplace=True)
+    daylight_df = daylight_df.drop("sunrise", axis=1)
+    daylight_df = daylight_df.drop("sunset", axis=1)
     return daylight_df

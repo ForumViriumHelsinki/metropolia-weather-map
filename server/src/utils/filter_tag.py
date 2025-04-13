@@ -5,29 +5,32 @@ from sqlmodel import select
 
 from .get_data_util import get_koivukyla, get_laajasalo, get_makelankatu
 
-
 # Get ids with the specified tag
-async def sensors_with_tag(tag):
-    print("sensors_with_tag()")
-    sensor_with_tag_id = []
-    async for db in get_db():
-        result = await db.execute(
-            select(Sensor.id)
-            .join(SensorTag, Sensor.id == SensorTag.sensor_id)
-            .where(SensorTag.tag_id == tag)
-        )
-        sensor_with_tag_id = result.scalars().all()
-    return sensor_with_tag_id
+# async def sensors_with_tag(tag):
+#     print("sensors_with_tag()")
+#     sensor_with_tag_id = []
+#     async for db in get_db():
+#         result = await db.execute(
+#             select(Sensor.id)
+#             .join(SensorTag, Sensor.id == SensorTag.sensor_id)
+#             .where(SensorTag.tag_id == tag)
+#         )
+#         sensor_with_tag_id = result.scalars().all()
+#     return sensor_with_tag_id
 
 
 async def filter_df_by_tag(df, tag):
     print("filter_df_by_tag()")
-    # sensors that have specified tag
-    sensor_ids_with_tag = await sensors_with_tag(tag)
+    async for db in get_db():
+        res = await db.execute(
+            select(Sensor.id)
+            .join(SensorTag, Sensor.id == SensorTag.sensor_id)
+            .where(SensorTag.tag_id == tag)
+        )
+        ids = res.scalars().all()
 
-    # filter df with the tag
-    df = df[df["dev-id"].isin(sensor_ids_with_tag)]
-    return df
+    print(ids)
+    return df[df["dev-id"].isin(ids)]
 
 
 async def filter_location_with_tag(location, tag):
