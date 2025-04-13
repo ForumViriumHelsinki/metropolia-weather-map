@@ -56,6 +56,12 @@ async def area_daily_temp_diff():
     return
 
 
+# async def coastal_continental_temp_diff():
+#     dfCoastal = await filter_location_with_tag(L)
+
+#     return
+
+
 async def test_func():
     await avg_daily_temps_sun_shade()
     await area_daily_temp_diff()
