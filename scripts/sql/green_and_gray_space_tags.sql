@@ -1,3 +1,6 @@
+INSERT into weather.tags VALUES('viheralue');
+INSERT into weather.tags VALUES('harmaa-alue');
+
 -- Mäkelänkatu
 INSERT into weather.sensor_tags (sensor_id, tag_id)
 VALUES 
