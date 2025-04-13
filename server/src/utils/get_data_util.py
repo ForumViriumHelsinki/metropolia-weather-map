@@ -12,13 +12,51 @@ async def get_makelankatu():
         parse_dates=["time"],
     )
 
+    df = await filter_install_date(df, "Mäkelänkatu")
+
+    return df
+
+
+async def get_laajasalo():
+    df = get_rest()
+
+    # get Laajasalo sensors
+    sensor_ids = await get_ids_by_location("Laajasalo")
+    df = df[df["dev-id"].isin(sensor_ids)]
+
+    df = await filter_install_date(df, "Laajasalo")
+
+    return df
+
+
+async def get_koivukyla():
+    df = get_rest()
+
+    # get Koivukylä sensors
+    sensor_ids = await get_ids_by_location("Koivukylä")
+    df = df[df["dev-id"].isin(sensor_ids)]
+
+    df = await filter_install_date(df, "Koivukylä")
+
+    return df
+
+
+async def get_all_locations():
+    dfM = await get_makelankatu()
+    dfK = await get_koivukyla()
+    dfL = await get_laajasalo()
+
+    df_merged = pd.concat([dfM, dfK, dfL])
+
+    return df_merged
+
+
+async def filter_install_date(df, location):
     sensor_install = dict()
     # Get ids and install dates
     async for db in get_db():
         res = await db.execute(
-            select(Sensor.id, Sensor.install_date).where(
-                Sensor.location == "Mäkelänkatu"
-            )
+            select(Sensor.id, Sensor.install_date).where(Sensor.location == location)
         )
         for sensor_id, install_date in res:
             sensor_install[sensor_id] = install_date
@@ -34,36 +72,6 @@ async def get_makelankatu():
     merged_df = pd.concat(dfs, ignore_index=True)
 
     return merged_df
-
-
-async def get_laajasalo():
-    df = get_rest()
-
-    # get Laajasalo sensors
-    sensor_ids = await get_ids_by_location("Laajasalo")
-    df = df[df["dev-id"].isin(sensor_ids)]
-
-    return df
-
-
-async def get_koivukyla():
-    df = get_rest()
-
-    # get Koivukylä sensors
-    sensor_ids = await get_ids_by_location("Koivukylä")
-    df = df[df["dev-id"].isin(sensor_ids)]
-
-    return df
-
-
-async def get_all_locations():
-    dfM = await get_makelankatu()
-    dfK = await get_koivukyla()
-    dfL = await get_laajasalo()
-
-    df_merged = pd.concat([dfM, dfK, dfL])
-
-    return df_merged
 
 
 def get_rest():
