@@ -2,7 +2,6 @@ import asyncio
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from analysis.tag_analysis import get_avg_temp, plot_data
 from utils.filter_tag import filter_df_by_tag
 from utils.get_data_util import (
     get_all_locations,

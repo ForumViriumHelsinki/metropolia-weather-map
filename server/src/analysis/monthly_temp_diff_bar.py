@@ -3,7 +3,6 @@ import asyncio
 import matplotlib.pyplot as plt
 import pandas as pd
 from analysis.save_graph import save_graph
-from analysis.tag_analysis import get_avg_temp, plot_data
 from utils.filter_tag import filter_df_by_tag
 from utils.get_data_util import get_all_locations
 
@@ -31,7 +30,7 @@ async def main():
     plt.title("Average Monthly Temperature: Meri vs Manner")
     plt.xlabel("Month")
     plt.ylabel("Temperature")
-    save_graph(plt)
+    save_graph("average_monthly_temperature", plt)
     plt.show()
 
     # diff.plot(kind="bar")
