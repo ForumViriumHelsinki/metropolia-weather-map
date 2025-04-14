@@ -1,3 +1,4 @@
+from matplotlib.pylab import ifft
 import numpy as np
 import utils
 import pandas as pd
@@ -154,6 +155,36 @@ def plot_fft_analysis(df):
     check.on_clicked(toggle)
     plt.tight_layout()
     plt.show()
+
+def reconstruct_weekly_cycle(df):
+    sensor_id = input("Enter sensor ID to analyze for weekly pattern: ")
+    df_sensor = df[df['sensor'] == sensor_id].copy()
+    df_sensor.set_index('time', inplace=True)
+    df_sensor = df_sensor.resample('D').mean()
+    df_sensor['humidity'] = df_sensor['humidity'].interpolate(method='time')
+
+    y = df_sensor['humidity'].dropna()
+    Y = fft(y)
+    freqs = np.fft.fftfreq(len(Y))
+
+    weekly_band = (freqs > 0.125) & (freqs < 0.15)
+    Y_filtered = np.zeros_like(Y, dtype=complex)
+    Y_filtered[weekly_band] = Y[weekly_band]
+    Y_filtered[-weekly_band] = Y[-weekly_band]  # mirror frequencies for real signal
+
+    reconstructed = np.real(ifft(Y_filtered))
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(y.index, y, label='Original', alpha=0.5)
+    plt.plot(y.index, reconstructed, label='Reconstructed ~Weekly Cycle', linewidth=2)
+    plt.title(f"Weekly Humidity Cycle for Sensor {sensor_id}")
+    plt.xlabel("Date")
+    plt.ylabel("Humidity (%)")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
 def plot_seasonal_decomposition(df):
     print("Columns at start of seasonal decomposition:", df.dtypes)
     
@@ -186,6 +217,7 @@ def main():
     if df is not None:
         plot_raw_humidity(df)
         plot_fft_analysis(df)
+        reconstruct_weekly_cycle(df)
         plot_seasonal_decomposition(df)
 
 if __name__ == "__main__":
