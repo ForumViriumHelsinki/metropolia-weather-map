@@ -39,7 +39,6 @@ def plot_diff_bar(df1, df2, title):
     mean2 = df2.groupby("month")["temperature"].mean()
 
     diff = mean1 - mean2
-    diff = diff.drop(index=5)
 
     diff.plot(kind="bar", ylim=(-1, 1), figsize=(10, 5), zorder=3)
     plt.grid(True, zorder=0)
@@ -54,10 +53,10 @@ def plot_diff_bar(df1, df2, title):
 
 
 async def avg_daily_temps_sun_shade():
-    dfA = await filter_location_with_tag("Mäkelänkatu", "aurinko")
+    dfA = await filter_location_with_tag("Vallila", "aurinko")
     avg_sun = get_avg_temp(dfA)
 
-    dfV = await filter_location_with_tag("Mäkelänkatu", "varjo")
+    dfV = await filter_location_with_tag("Vallila", "varjo")
     avg_shade = get_avg_temp(dfV)
 
     # plt1 = plot_data(
@@ -87,7 +86,6 @@ def plot_area_diff_bar(df1, df2, title):
     mean2 = df2.groupby("month")["temperature"].mean()
 
     diff = mean1 - mean2
-    diff = diff.drop(index=5)
 
     diff.plot(kind="bar", ylim=(0, -1), figsize=(10, 5))
     plt.title(title)
@@ -97,8 +95,8 @@ def plot_area_diff_bar(df1, df2, title):
 
 
 async def area_daily_temp_diff():
-    dfGreen = await filter_location_with_tag("Mäkelänkatu", "viheralue")
-    dfGray = await filter_location_with_tag("Mäkelänkatu", "harmaa-alue")
+    dfGreen = await filter_location_with_tag("Vallila", "viheralue")
+    dfGray = await filter_location_with_tag("Vallila", "harmaa-alue")
 
     avg_green = get_avg_temp(dfGreen)
     avg_gray = get_avg_temp(dfGray)
