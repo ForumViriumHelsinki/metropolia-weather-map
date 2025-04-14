@@ -1,78 +1,38 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def detect_sensors_with_median_deviation(
-    df,
-    threshold=3.0,
-    min_ratio=0.3,
-    time_round="1h"
-):
+def detect_sensors_with_median_deviation(df, threshold=3.0, min_ratio=0.3, time_round="1h"):
+    """
+    Detects sensors with anomalies based on the deviation from the median temperature.
+    """
     print("[INFO] Detecting sensors with median deviation anomalies...")
+    
     df = df.copy()
     df["week"] = df["time"].dt.tz_localize(None).dt.to_period("W").astype(str)
     df["rounded_time"] = df["time"].dt.floor(time_round)
 
-    result = {}
-    for week, group in df.groupby("week"):
-        group = group.copy()
-        medians = (
-            group.groupby(["district", "rounded_time"])["temperature"]
-            .median()
-            .rename("district_median")
-        )
-        group = group.join(medians, on=["district", "rounded_time"])
-        group["deviation"] = (group["temperature"] - group["district_median"]).abs()
-        group["is_anomalous"] = group["deviation"] > threshold
+    district_medians = df.groupby(["district", "rounded_time"])["temperature"].median().reset_index(name="district_median")
+    df = pd.merge(df, district_medians, on=["district", "rounded_time"], how="left")
 
-        ratios = group.groupby("device_id")["is_anomalous"].mean()
-        flagged = ratios[ratios > min_ratio]
+    df["deviation"] = (df["temperature"] - df["district_median"]).abs()
+    df["is_anomalous"] = df["deviation"] > threshold
+    
+    anomalies = df.groupby(["week", "device_id"])["is_anomalous"].mean().reset_index()
+    anomalies = anomalies[anomalies["is_anomalous"] > min_ratio]
+    
+    result = anomalies.groupby("week")["device_id"].apply(list).to_dict()
 
-        if not flagged.empty:
-            result[week] = flagged.index.tolist()
-            print(f"\nWeek {week} — {len(flagged)} sensors with median deviation:")
-            for device_id in flagged.index:
-                district = group[group["device_id"] == device_id]["district"].iloc[0]
-                percent = flagged[device_id] * 100
-                print(f"  {device_id} ({district}): {percent:.1f}% anomalous readings")
+    for week, devices in result.items():
+        print(f"\nWeek {week} — {len(devices)} sensors with median deviation:")
+        for device in devices:
+            print(f"  {device}")
+
     return result
-
-def detect_sensors_with_flatlines(
-    df,
-    flat_max_range=1.0,
-    flat_min_days=2
-):
-    print("[INFO] Detecting sensors with flatline temperature behavior...")
-    df = df.copy()
-    df["week"] = df["time"].dt.tz_localize(None).dt.to_period("W").astype(str)
-    df["date"] = df["time"].dt.date
-
-    result = {}
-    for week, group in df.groupby("week"):
-        daily_ranges = (
-            group.groupby(["device_id", "date"])["temperature"]
-            .agg(["min", "max"])
-            .assign(range=lambda x: x["max"] - x["min"])
-        )
-        flat_days = daily_ranges[daily_ranges["range"] <= flat_max_range]
-        flat_counts = flat_days.groupby("device_id").size()
-        flagged = flat_counts[flat_counts >= flat_min_days]
-
-        if not flagged.empty:
-            result[week] = flagged.index.tolist()
-            print(f"\nWeek {week} — {len(flagged)} sensors with flatline behavior:")
-            for sensor_id in flagged.index:
-                district = group[group["device_id"] == sensor_id]["district"].iloc[0]
-                print(f"  {sensor_id} ({district}): {flat_counts[sensor_id]} flat days")
-    return result
-
-def merge_anomaly_dicts(dict1, dict2):
-    merged = {}
-    all_weeks = set(dict1.keys()).union(dict2.keys())
-    for week in all_weeks:
-        merged[week] = sorted(set(dict1.get(week, [])).union(dict2.get(week, [])))
-    return merged
 
 def plot_anomalous_temperature_by_area(df, anomalies):
+    """
+    Plots the temperature data for sensors with anomalies.
+    """
     print("[INFO] Generating anomaly plots...")
 
     sensor_weeks = {}
@@ -85,7 +45,6 @@ def plot_anomalous_temperature_by_area(df, anomalies):
         district = df[df["device_id"] == sensor_id]["district"].iloc[0]
         district_sensors.setdefault(district, []).append(sensor_id)
 
-    # Alueet käyttäjän pyytämässä järjestyksessä
     district_order = df["district"].drop_duplicates().tolist()
 
     for district in district_order:
@@ -141,6 +100,4 @@ if __name__ == "__main__":
 
     df = prepare_data("2024-01-01", "2024-10-30", ["Vallila", "Koivukylä", "Laajasalo"])
     anomalies_median = detect_sensors_with_median_deviation(df)
-    anomalies_flat = detect_sensors_with_flatlines(df)
-    all_anomalies = merge_anomaly_dicts(anomalies_median, anomalies_flat)
-    plot_anomalous_temperature_by_area(df, all_anomalies)
+    plot_anomalous_temperature_by_area(df, anomalies_median)
