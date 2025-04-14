@@ -1,14 +1,12 @@
-import asyncio
 import os
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import utils
-from database import get_db
-from models import Sensor, SensorTag
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+
+# from database import get_db
+from models import get_sensors
 
 # from utils import filter_daytime_data
 
@@ -54,18 +52,22 @@ def create_graph(df, location_sensors):
     plt.show()
 
 
-async def tag_data(tag="harmaa-alue"):
+def tag_data(tag="harmaa-alue"):
     sensors = []
+    test = get_sensors()
+    print(test)
+
+    return
 
     # Query database for sensors with the specified tag
-    async for db in get_db():
-        if isinstance(db, AsyncSession):
-            result = await db.execute(
-                select(Sensor)
-                .join(SensorTag, Sensor.id == SensorTag.sensor_id)
-                .where(SensorTag.tag_id == tag)
-            )
-            sensors = result.scalars().all()
+    # async for db in get_db():
+    #     if isinstance(db, AsyncSession):
+    #         result = await db.execute(
+    #             select(Sensor)
+    #             .join(SensorTag, Sensor.id == SensorTag.sensor_id)
+    #             .where(SensorTag.tag_id == tag)
+    #         )
+    #         sensors = result.scalars().all()
 
     # Group sensors by location
     location_sensors = group_by_location(sensors)
@@ -87,4 +89,4 @@ async def tag_data(tag="harmaa-alue"):
 
 
 if __name__ == "__main__":
-    asyncio.run(tag_data())
+    tag_data()
