@@ -6,13 +6,13 @@ from sqlmodel import select
 
 
 # Fetch and filter makelankatu data
-async def get_makelankatu():
+async def get_vallila():
     df = pd.read_csv(
         "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
         parse_dates=["time"],
     )
 
-    df = await filter_install_date(df, "Mäkelänkatu")
+    df = await filter_install_date(df, "Vallila")
 
     return df
 
@@ -42,7 +42,7 @@ async def get_koivukyla():
 
 
 async def get_all_locations():
-    dfM = await get_makelankatu()
+    dfM = await get_vallila()
     dfK = await get_koivukyla()
     dfL = await get_laajasalo()
 

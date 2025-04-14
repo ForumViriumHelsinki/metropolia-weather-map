@@ -3,7 +3,7 @@ from database import get_db
 from models import Sensor, SensorTag
 from sqlmodel import select
 
-from .get_data_util import get_koivukyla, get_laajasalo, get_makelankatu
+from .get_data_util import get_koivukyla, get_laajasalo, get_vallila
 
 # Get ids with the specified tag
 # async def sensors_with_tag(tag):
@@ -39,8 +39,8 @@ async def filter_location_with_tag(location, tag):
     match location:
         case "Koivukylä":
             df = await get_koivukyla()
-        case "Mäkelänkatu":
-            df = await get_makelankatu()
+        case "Vallila":
+            df = await get_vallila()
         case "Laajasalo":
             df = await get_laajasalo()
         case _:
