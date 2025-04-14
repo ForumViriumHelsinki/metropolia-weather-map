@@ -7,11 +7,16 @@ from sqlmodel import select
 
 # Fetch and filter makelankatu data
 async def get_vallila():
-    df = pd.read_csv(
+    df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
         parse_dates=["time"],
     )
-
+    df25 = pd.read_csv(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.csv.gz",
+        parse_dates=["time"],
+    )
+    df = pd.concat([df24, df25])
+    df["location"] = "Vallila"
     df = await filter_install_date(df, "Vallila")
 
     return df
@@ -23,7 +28,7 @@ async def get_laajasalo():
     # get Laajasalo sensors
     sensor_ids = await get_ids_by_location("Laajasalo")
     df = df[df["dev-id"].isin(sensor_ids)]
-
+    df["location"] = "Laajasalo"
     df = await filter_install_date(df, "Laajasalo")
 
     return df
@@ -35,18 +40,17 @@ async def get_koivukyla():
     # get Koivukylä sensors
     sensor_ids = await get_ids_by_location("Koivukylä")
     df = df[df["dev-id"].isin(sensor_ids)]
-
+    df["location"] = "Koivukylä"
     df = await filter_install_date(df, "Koivukylä")
 
     return df
 
 
 async def get_all_locations():
-    dfM = await get_vallila()
+    dfV = await get_vallila()
     dfK = await get_koivukyla()
     dfL = await get_laajasalo()
-
-    df_merged = pd.concat([dfM, dfK, dfL])
+    df_merged = pd.concat([dfV, dfK, dfL])
 
     return df_merged
 
@@ -75,10 +79,14 @@ async def filter_install_date(df, location):
 
 
 def get_rest():
-    df = pd.read_csv(
+    df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
     )
-
+    df25 = pd.read_csv(
+        "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.csv.gz", parse_dates=["time"]
+    )
+    df = pd.concat([df24, df25])
+    
     return df
 
 
