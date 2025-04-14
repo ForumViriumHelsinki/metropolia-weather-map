@@ -1,5 +1,5 @@
 UPDATE weather.sensors 
-SET install_date = '2024-06-26'
+SET install_date = '2024-06-25'
 WHERE id IN (
 	'24E124136E140283',
 	'24E124136E146069',
