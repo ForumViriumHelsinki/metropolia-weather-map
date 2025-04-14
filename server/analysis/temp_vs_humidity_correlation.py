@@ -1,17 +1,26 @@
+from matplotlib.widgets import CheckButtons
 import utils
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 def load_data():
-    df = utils.get_csv()
-    print(f"Found {len(df)} CSV files.")  # Debugging output
     data_frames = []
+    year = input("Enter year for source data or 'all' for all available: ")
+    try:    
+        year = int(year)
+    except ValueError:
+        if(year == "" or year == "all"):
+            year = None
+        else:
+            print("Please enter a valid year.")
+    data_frames.append(utils.get_csv(year=year))
+    data_frames.append(utils.get_r4c_csv(year=year))
+    df = pd.concat(data_frames, ignore_index=True)
     df.columns = df.columns.str.strip()  # Remove leading/trailing spaces
     df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%S.%f%z', errors='coerce')
     df.rename(columns={'dev-id': 'sensor'}, inplace=True)  # Rename sensor column
-    data_frames.append(df)
-    return pd.concat(data_frames, ignore_index=True)
+    return df
 
 def compute_monthly_avgs(df):
     df["month"] = pd.to_datetime(df["time"]).dt.to_period("M")
@@ -19,15 +28,60 @@ def compute_monthly_avgs(df):
     return monthly_avgs
 
 def plot_humidity_trends(monthly_avgs):
-    pivot_df = monthly_avgs.pivot(index='month', columns='sensor', values='humidity')
-    pivot_df.plot(kind='bar', figsize=(20, 6), width=0.8)
+    fig = plt.figure(figsize=(14, 6))
+    gs = plt.GridSpec(1, 2, width_ratios=[4, 1])
+    ax = fig.add_subplot(gs[0])
+    ax_cb = fig.add_subplot(gs[1])
+
+    sensor_lines = {}
+
+    for sensor_id, sensor_data in monthly_avgs.groupby('sensor'):
+        line, = ax.plot(sensor_data['month'].dt.to_timestamp(), sensor_data['humidity'], label=sensor_id, alpha=0.7)
+        sensor_lines[sensor_id] = line
     
-    plt.xlabel('Month')
-    plt.ylabel('Average Humidity (%)')
-    plt.title('Monthly Average Humidity Trends')
-    plt.xticks(rotation=45)
-    plt.legend(title='Sensor', loc='upper left', bbox_to_anchor=(1, 1))
-    plt.grid(axis='y')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Humidity (%)')
+    ax.set_title('Monthly Average Humidity Data Over Time')
+    ax.tick_params(axis='x', rotation=45)
+    ax.grid(True)
+    ax.legend(title="Sensors", bbox_to_anchor=(1, 1))
+
+    ax_cb.set_xticks([])
+    ax_cb.set_yticks([])
+    ax_cb.set_frame_on(False)
+
+    makela, laajasalo, koivukyla = utils.get_sensors_by_location()
+    location_map = {
+        'Makela': makela,
+        'Laajasalo': laajasalo,
+        'Koivukyla': koivukyla
+    }
+
+    all_sensor_ids = list(sensor_lines.keys())
+    location_labels = list(location_map.keys())
+    all_labels = location_labels + all_sensor_ids
+    visibility = [True] * len(all_labels)
+
+    check = CheckButtons(ax_cb, all_labels, visibility)
+    label_to_index = {label: i for i, label in enumerate(all_labels)}
+
+    def toggle(label):
+        status = check.get_status()
+        if label in sensor_lines:
+            sensor_lines[label].set_visible(status[label_to_index[label]])
+        elif label in location_map:
+            sensors = location_map[label]
+            new_state = status[label_to_index[label]]
+            for sid in sensors:
+                if sid in sensor_lines:
+                    sensor_lines[sid].set_visible(new_state)
+                    idx = label_to_index.get(sid)
+                    if idx is not None and check.get_status()[idx] != new_state:
+                        check.set_active(idx)
+        fig.canvas.draw_idle()
+
+    check.on_clicked(toggle)
+    plt.tight_layout()
     plt.show()
 
 def plot_temp_vs_humidity(df):

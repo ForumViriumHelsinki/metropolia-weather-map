@@ -1,7 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-from utils import get_day_data, SENSOR_SUN, SENSOR_SHADE, get_cloudiness_data, apply_date_range
+from utils import get_day_data, get_makela_sensors, get_cloudiness_data, apply_date_range
+
+SENSORS, SENSOR_SUN, SENSOR_SHADE = get_makela_sensors()
 
 DATE_RANGE = {"start_date": "2024-07-01", "end_date": "2024-12-30"}
 
