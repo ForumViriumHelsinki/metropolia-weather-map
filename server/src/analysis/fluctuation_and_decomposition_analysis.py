@@ -1,3 +1,4 @@
+import asyncio
 from matplotlib.pylab import ifft
 import numpy as np
 import utils
@@ -7,8 +8,11 @@ from numpy.fft import fft
 from statsmodels.tsa.seasonal import STL
 from matplotlib.widgets import CheckButtons
 import matplotlib.gridspec as gridspec
+from utils.get_data_util import get_all_locations
+from utils.utils import map_locations
 
-def load_data():
+
+'''def load_data():
     data_frames = []
     year = input("Enter year for source data or 'all' for all available: ")
     try:    
@@ -29,11 +33,11 @@ def load_data():
         return None  # Exit early if something is wrong
     
     df['time'] = pd.to_datetime(df['time'], errors='coerce')  # Ensure datetime format
-    df.rename(columns={'dev-id': 'sensor'}, inplace=True)
+    df.rename(columns={'sensor': 'sensor'}, inplace=True)
     print (f'{df.columns} load check')
     return df
-
-def plot_raw_humidity(df):
+'''
+async def plot_raw_humidity(df, map):
     fig = plt.figure(figsize=(14, 6))
     gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])
     ax = fig.add_subplot(gs[0])
@@ -56,15 +60,9 @@ def plot_raw_humidity(df):
     ax_cb.set_yticks([])
     ax_cb.set_frame_on(False)
 
-    makela, laajasalo, koivukyla = utils.get_sensors_by_location()
-    location_map = {
-        'Makela': makela,
-        'Laajasalo': laajasalo,
-        'Koivukyla': koivukyla,
-    }
 
     all_sensor_ids = list(sensor_lines.keys())
-    location_labels = list(location_map.keys())
+    location_labels = list(map.keys())
     all_labels = location_labels + all_sensor_ids
     visibility = [True] * len(all_labels)
 
@@ -75,8 +73,8 @@ def plot_raw_humidity(df):
         status = check.get_status()
         if label in sensor_lines:
             sensor_lines[label].set_visible(status[label_to_index[label]])
-        elif label in location_map:
-            sensors = location_map[label]
+        elif label in map:
+            sensors = map[label]
             new_state = status[label_to_index[label]]
             for sid in sensors:
                 if sid in sensor_lines:
@@ -91,10 +89,10 @@ def plot_raw_humidity(df):
     plt.show()
 
 
-def plot_fft_analysis(df):
+async def plot_fft_analysis(df, map):
     df_copy = df.copy()
     df_copy.set_index('time', inplace=True)
-    grouped = df_copy.groupby('sensor').resample('D').mean().reset_index(level='sensor')
+    grouped = df_copy[['sensor', 'humidity']].groupby('sensor').resample('D').mean().reset_index(level='sensor')
     grouped['humidity'] = grouped['humidity'].rolling(window=7, min_periods=1).mean()
 
     fig = plt.figure(figsize=(14, 6))
@@ -122,15 +120,8 @@ def plot_fft_analysis(df):
     ax_cb.set_yticks([])
     ax_cb.set_frame_on(False)
 
-    makela, laajasalo, koivukyla = utils.get_sensors_by_location()
-    location_map = {
-        'Makela': makela,
-        'Laajasalo': laajasalo,
-        'Koivukyla': koivukyla,
-    }
-
     all_sensor_ids = list(sensor_lines.keys())
-    location_labels = list(location_map.keys())
+    location_labels = list(map.keys())
     all_labels = location_labels + all_sensor_ids
     visibility = [True] * len(all_labels)
 
@@ -141,8 +132,8 @@ def plot_fft_analysis(df):
         status = check.get_status()
         if label in sensor_lines:
             sensor_lines[label].set_visible(status[label_to_index[label]])
-        elif label in location_map:
-            sensors = location_map[label]
+        elif label in map:
+            sensors =map[label]
             new_state = status[label_to_index[label]]
             for sid in sensors:
                 if sid in sensor_lines:
@@ -155,7 +146,7 @@ def plot_fft_analysis(df):
     check.on_clicked(toggle)
     plt.tight_layout()
     plt.show()
-
+'''
 def reconstruct_weekly_cycle(df):
     sensor_id = input("Enter sensor ID to analyze for weekly pattern: ")
     df_sensor = df[df['sensor'] == sensor_id].copy()
@@ -184,8 +175,8 @@ def reconstruct_weekly_cycle(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-
-def plot_seasonal_decomposition(df):
+'''
+async def plot_seasonal_decomposition(df):
     print("Columns at start of seasonal decomposition:", df.dtypes)
     
     if 'time' not in df.columns:
@@ -212,13 +203,17 @@ def plot_seasonal_decomposition(df):
     result.resid.plot(ax=axes[2], title='Residual')
     plt.show()
 
-def main():
-    df = load_data()
+async def main():
+    df = await get_all_locations()
+    print("Columns after loading data:", df.columns)
+    df['time'] = pd.to_datetime(df['time'], errors='coerce')
+    df.rename(columns={'dev-id': 'sensor'}, inplace=True)
+    map = await map_locations()
     if df is not None:
-        plot_raw_humidity(df)
-        plot_fft_analysis(df)
-        reconstruct_weekly_cycle(df)
-        plot_seasonal_decomposition(df)
+        await plot_raw_humidity(df, map)
+        await plot_fft_analysis(df, map)
+        #reconstruct_weekly_cycle(df)
+        await plot_seasonal_decomposition(df)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
