@@ -1,18 +1,17 @@
 import asyncio
-from matplotlib.pylab import ifft
-import numpy as np
-import utils
-import pandas as pd
-import matplotlib.pyplot as plt
-from numpy.fft import fft
-from statsmodels.tsa.seasonal import STL
-from matplotlib.widgets import CheckButtons
+
 import matplotlib.gridspec as gridspec
-from utils.get_data_util import get_all_locations
-from utils.utils import map_locations
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.widgets import CheckButtons
+from numpy.fft import fft
+from src.utils.get_data_util import get_all_locations
+from src.utils.save_graph import save_graph
+from src.utils.utils import map_locations
+from statsmodels.tsa.seasonal import STL
 
-
-'''def load_data():
+"""def load_data():
     data_frames = []
     year = input("Enter year for source data or 'all' for all available: ")
     try:    
@@ -36,8 +35,10 @@ from utils.utils import map_locations
     df.rename(columns={'sensor': 'sensor'}, inplace=True)
     print (f'{df.columns} load check')
     return df
-'''
-async def plot_raw_humidity(df, map):
+"""
+
+
+def plot_raw_humidity(df, map):
     fig = plt.figure(figsize=(14, 6))
     gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])
     ax = fig.add_subplot(gs[0])
@@ -45,21 +46,22 @@ async def plot_raw_humidity(df, map):
 
     sensor_lines = {}
 
-    for sensor_id, sensor_data in df.groupby('sensor'):
-        line, = ax.plot(sensor_data['time'], sensor_data['humidity'], label=sensor_id, alpha=0.7)
+    for sensor_id, sensor_data in df.groupby("sensor"):
+        (line,) = ax.plot(
+            sensor_data["time"], sensor_data["humidity"], label=sensor_id, alpha=0.7
+        )
         sensor_lines[sensor_id] = line
 
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Humidity (%)')
-    ax.set_title('Raw Humidity Data Over Time')
-    ax.tick_params(axis='x', rotation=45)
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Humidity (%)")
+    ax.set_title("Raw Humidity Data Over Time")
+    ax.tick_params(axis="x", rotation=45)
     ax.grid(True)
     ax.legend(title="Sensors", bbox_to_anchor=(1, 1))
 
     ax_cb.set_xticks([])
     ax_cb.set_yticks([])
     ax_cb.set_frame_on(False)
-
 
     all_sensor_ids = list(sensor_lines.keys())
     location_labels = list(map.keys())
@@ -89,11 +91,17 @@ async def plot_raw_humidity(df, map):
     plt.show()
 
 
-async def plot_fft_analysis(df, map):
+def plot_fft_analysis(df, map):
     df_copy = df.copy()
-    df_copy.set_index('time', inplace=True)
-    grouped = df_copy[['sensor', 'humidity']].groupby('sensor').resample('D').mean().reset_index(level='sensor')
-    grouped['humidity'] = grouped['humidity'].rolling(window=7, min_periods=1).mean()
+    df_copy.set_index("time", inplace=True)
+    grouped = (
+        df_copy[["sensor", "humidity"]]
+        .groupby("sensor")
+        .resample("D")
+        .mean()
+        .reset_index(level="sensor")
+    )
+    grouped["humidity"] = grouped["humidity"].rolling(window=7, min_periods=1).mean()
 
     fig = plt.figure(figsize=(14, 6))
     gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])
@@ -102,17 +110,22 @@ async def plot_fft_analysis(df, map):
 
     sensor_lines = {}
 
-    for sensor_id in grouped['sensor'].unique():
-        sensor_df = grouped[grouped['sensor'] == sensor_id]
-        humidity_fft = fft(sensor_df['humidity'].dropna())
+    for sensor_id in grouped["sensor"].unique():
+        sensor_df = grouped[grouped["sensor"] == sensor_id]
+        humidity_fft = fft(sensor_df["humidity"].dropna())
         freqs = np.fft.fftfreq(len(humidity_fft))
-        line, = ax.plot(freqs[:len(freqs)//2], np.abs(humidity_fft[:len(freqs)//2]), label=sensor_id, alpha=0.7)
+        (line,) = ax.plot(
+            freqs[: len(freqs) // 2],
+            np.abs(humidity_fft[: len(freqs) // 2]),
+            label=sensor_id,
+            alpha=0.7,
+        )
         sensor_lines[sensor_id] = line
 
-    ax.set_yscale('log')
-    ax.set_title('Fourier Transform of Humidity Data')
-    ax.set_xlabel('Frequency')
-    ax.set_ylabel('Magnitude')
+    ax.set_yscale("log")
+    ax.set_title("Fourier Transform of Humidity Data")
+    ax.set_xlabel("Frequency")
+    ax.set_ylabel("Magnitude")
     ax.grid(True)
     ax.legend(title="Sensors", bbox_to_anchor=(1, 1))
 
@@ -133,7 +146,7 @@ async def plot_fft_analysis(df, map):
         if label in sensor_lines:
             sensor_lines[label].set_visible(status[label_to_index[label]])
         elif label in map:
-            sensors =map[label]
+            sensors = map[label]
             new_state = status[label_to_index[label]]
             for sid in sensors:
                 if sid in sensor_lines:
@@ -146,7 +159,9 @@ async def plot_fft_analysis(df, map):
     check.on_clicked(toggle)
     plt.tight_layout()
     plt.show()
-'''
+
+
+"""
 def reconstruct_weekly_cycle(df):
     sensor_id = input("Enter sensor ID to analyze for weekly pattern: ")
     df_sensor = df[df['sensor'] == sensor_id].copy()
@@ -175,45 +190,50 @@ def reconstruct_weekly_cycle(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-'''
-async def plot_seasonal_decomposition(df):
+"""
+
+
+def plot_seasonal_decomposition(df):
     print("Columns at start of seasonal decomposition:", df.dtypes)
-    
-    if 'time' not in df.columns:
+
+    if "time" not in df.columns:
         print("Error: 'time' column missing before STL decomposition!")
         return
-    
+
     df = df.copy()
-    df.set_index('time', inplace=True)
-    df['humidity'] = pd.to_numeric(df['humidity'], errors='coerce')
-    df = df[['humidity']].resample('h').mean()
-    df['humidity'] = df['humidity'].interpolate(method='time')
+    df.set_index("time", inplace=True)
+    df["humidity"] = pd.to_numeric(df["humidity"], errors="coerce")
+    df = df[["humidity"]].resample("h").mean()
+    df["humidity"] = df["humidity"].interpolate(method="time")
     df = df.dropna()
-    
+
     if len(df) < 14:
         print("Error: Not enough data points for STL decomposition!")
         return
-    
-    stl = STL(df['humidity'], seasonal=143)
+
+    stl = STL(df["humidity"], seasonal=143)
     result = stl.fit()
-    
+
     fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
-    result.trend.plot(ax=axes[0], title='Trend')
-    result.seasonal.plot(ax=axes[1], title='Seasonality')
-    result.resid.plot(ax=axes[2], title='Residual')
+    result.trend.plot(ax=axes[0], title="Trend")
+    result.seasonal.plot(ax=axes[1], title="Seasonality")
+    result.resid.plot(ax=axes[2], title="Residual")
+    save_graph("fluc_test", plt, "test")
     plt.show()
 
-async def main():
-    df = await get_all_locations()
+
+def main():
+    df = get_all_locations()
     print("Columns after loading data:", df.columns)
-    df['time'] = pd.to_datetime(df['time'], errors='coerce')
-    df.rename(columns={'dev-id': 'sensor'}, inplace=True)
-    map = await map_locations()
+    df["time"] = pd.to_datetime(df["time"], errors="coerce")
+    df.rename(columns={"dev-id": "sensor"}, inplace=True)
+    map = map_locations()
     if df is not None:
-        await plot_raw_humidity(df, map)
-        await plot_fft_analysis(df, map)
-        #reconstruct_weekly_cycle(df)
-        await plot_seasonal_decomposition(df)
+        plot_raw_humidity(df, map)
+        plot_fft_analysis(df, map)
+        # reconstruct_weekly_cycle(df)
+        plot_seasonal_decomposition(df)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

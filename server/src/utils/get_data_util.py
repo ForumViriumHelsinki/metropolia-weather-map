@@ -197,3 +197,12 @@ def filter_daytime_data(df, nightime: bool = None):
     daylight_df = daylight_df.drop("sunset", axis=1)
 
     return daylight_df
+
+
+def get_ids_by_location(location: str):
+    sensor_ids = []
+    for db in get_session():
+        res = db.exec(select(Sensor.id).where(Sensor.location == location))
+        sensor_ids = res.all()
+
+    return sensor_ids
