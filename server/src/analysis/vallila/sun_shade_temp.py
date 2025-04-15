@@ -3,6 +3,7 @@ import asyncio
 import matplotlib.pyplot as plt
 from src.utils.analysis_utils import (
     daily_avg_temp,
+    filter_daytime_data,
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
 )
@@ -12,9 +13,11 @@ from src.utils.save_graph import save_graph
 
 def avg_daily_temps_sun_shade():
     dfA = filter_location_with_tag("Vallila", "aurinko")
+    dfA = filter_daytime_data(dfA)
     avg_sun = daily_avg_temp(dfA)
 
     dfV = filter_location_with_tag("Vallila", "varjo")
+    dfV = filter_daytime_data(dfV)
     avg_shade = daily_avg_temp(dfV)
 
     plt1 = plot_daily_temp_avg(

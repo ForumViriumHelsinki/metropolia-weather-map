@@ -1,10 +1,12 @@
+import os
+
 import matplotlib.pyplot as plt
+import pandas as pd
+from src.utils.get_data_util import filter_daytime_data
 from src.utils.utils import filter_daytime_data
 
 
 def daily_avg_temp(df):
-    df = filter_daytime_data(df).copy()
-
     df.loc[:, "date"] = df["time"].dt.date
 
     return df.groupby("date")["temperature"].mean()
