@@ -6,15 +6,22 @@ from src.api.models import Sensor
 
 
 # Fetch and filter makelankatu data
-def get_vallila():
+def get_vallila(get_2024: bool = None, get_2025: bool = None):
+
     df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
         parse_dates=["time"],
     )
+    if get_2024:
+        return df24
+
     df25 = pd.read_csv(
         "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.csv.gz",
         parse_dates=["time"],
     )
+    if get_2025:
+        return df25
+
     df = pd.concat([df24, df25])
     df["location"] = "Vallila"
     df = filter_install_date(df, "Vallila")
@@ -22,8 +29,13 @@ def get_vallila():
     return df
 
 
-def get_laajasalo():
-    df = get_rest()
+def get_laajasalo(get_2024: bool = None, get_2025: bool = None):
+    if get_2024:
+        df = get_rest(get_2024=True)
+    elif get_2025:
+        df = get_rest(get_2025=True)
+    else:
+        df = get_rest()
 
     # get Laajasalo sensors
     sensor_ids = get_ids_by_location("Laajasalo")
@@ -34,8 +46,13 @@ def get_laajasalo():
     return df
 
 
-def get_koivukyla():
-    df = get_rest()
+def get_koivukyla(get_2024: bool = None, get_2025: bool = None):
+    if get_2024:
+        df = get_rest(get_2024=True)
+    elif get_2025:
+        df = get_rest(get_2025=True)
+    else:
+        df = get_rest()
 
     # get Koivukylä sensors
     sensor_ids = get_ids_by_location("Koivukylä")
@@ -46,10 +63,20 @@ def get_koivukyla():
     return df
 
 
-def get_all_locations():
-    dfV = get_vallila()
-    dfK = get_koivukyla()
-    dfL = get_laajasalo()
+def get_all_locations(get_2024: bool = None, get_2025: bool = None):
+    if get_2024:
+        dfV = get_vallila(get_2024=True)
+        dfK = get_koivukyla(get_2024=True)
+        dfL = get_laajasalo(get_2024=True)
+    elif get_2025:
+        dfV = get_vallila(get_2025=True)
+        dfK = get_koivukyla(get_2025=True)
+        dfL = get_laajasalo(get_2025=True)
+    else:
+        dfV = get_vallila()
+        dfK = get_koivukyla()
+        dfL = get_laajasalo()
+
     df_merged = pd.concat([dfV, dfK, dfL])
 
     return df_merged
@@ -72,13 +99,19 @@ def filter_install_date(df, location):
     return df
 
 
-def get_rest():
+def get_rest(get_2024: bool = None, get_2025: bool = None):
     df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
     )
+    if get_2024:
+        return df24
+
     df25 = pd.read_csv(
         "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.csv.gz", parse_dates=["time"]
     )
+    if get_2025:
+        return df25
+
     df = pd.concat([df24, df25])
 
     return df
