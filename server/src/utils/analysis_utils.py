@@ -3,8 +3,9 @@ from src.utils.utils import filter_daytime_data
 
 
 def daily_avg_temp(df):
-    df = filter_daytime_data(df)
-    df["date"] = df["time"].dt.date
+    df = filter_daytime_data(df).copy()
+
+    df.loc[:, "date"] = df["time"].dt.date
 
     return df.groupby("date")["temperature"].mean()
 
@@ -22,8 +23,12 @@ def plot_daily_temp_avg(
 ):
     plt.clf()
 
-    df1.plot(kind="line", label=df1_label, color=line1_color)
-    df2.plot(kind="line", label=df2_label, color=line2_color)
+    df1.plot(
+        kind="line", label=df1_label, color=line1_color if line1_color else "orange"
+    )
+    df2.plot(
+        kind="line", label=df2_label, color=line2_color if line2_color else "royalblue"
+    )
 
     avg_diff = df1 - df2
     avg_diff.plot(kind="line", label="Lämpötilaero", color="red", figsize=(10, 5))
@@ -40,8 +45,11 @@ def plot_daily_temp_avg(
 def plot_monthly_temp_diff(df1, df2, title, ylim=None):
     plt.clf()
 
-    df1["month"] = df1["time"].dt.month
-    df2["month"] = df2["time"].dt.month
+    df1 = df1.copy()
+    df2 = df2.copy()
+
+    df1.loc[:, "month"] = df1["time"].dt.month
+    df2.loc[:, "month"] = df2["time"].dt.month
 
     mean1 = df1.groupby("month")["temperature"].mean()
     mean2 = df2.groupby("month")["temperature"].mean()
