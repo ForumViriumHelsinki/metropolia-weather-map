@@ -1,7 +1,7 @@
 import pandas as pd
-from database import get_db
-from models import Sensor, SensorTag
 from sqlmodel import select
+from src.api.database import get_session
+from src.api.models import Sensor, SensorTag
 
 from .get_data_util import get_koivukyla, get_laajasalo, get_vallila
 
@@ -19,42 +19,42 @@ from .get_data_util import get_koivukyla, get_laajasalo, get_vallila
 #     return sensor_with_tag_id
 
 
-async def filter_df_by_tag(df, tag):
+def filter_df_by_tag(df, tag):
     print("filter_df_by_tag()")
-    async for db in get_db():
-        res = await db.execute(
+    for db in get_session():
+        res = db.exec(
             select(Sensor.id)
             .join(SensorTag, Sensor.id == SensorTag.sensor_id)
             .where(SensorTag.tag_id == tag)
         )
-        ids = res.scalars().all()
+        ids = res.all()
 
     print(ids)
     return df[df["dev-id"].isin(ids)]
 
 
-async def filter_location_with_tag(location, tag):
+def filter_location_with_tag(location, tag):
     print("filter_location_with_tag()")
 
     match location:
         case "Koivukylä":
-            df = await get_koivukyla()
+            df = get_koivukyla()
         case "Vallila":
-            df = await get_vallila()
+            df = get_vallila()
         case "Laajasalo":
-            df = await get_laajasalo()
+            df = get_laajasalo()
         case _:
             raise Exception("Invalid location")
 
     location_with_tag_ids = []
-    async for db in get_db():
-        res = await db.execute(
+    for db in get_session():
+        res = db.exec(
             select(SensorTag.sensor_id)
             .join(Sensor, Sensor.id == SensorTag.sensor_id)
             .where(SensorTag.tag_id == tag)
             .where(Sensor.location == location)
         )
-        location_with_tag_ids = res.scalars().all()
+        location_with_tag_ids = res.all()
 
     print(location_with_tag_ids)
 

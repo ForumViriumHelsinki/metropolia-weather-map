@@ -1,13 +1,12 @@
 import matplotlib.pyplot as plt
-
-# from utils.save_graph import save_graph
 from src.utils.filter_tag import filter_location_with_tag
+from src.utils.save_graph import save_graph
 from src.utils.utils import filter_daytime_data
 
 
-async def area_daily_temp_diff():
-    dfGreen = await filter_location_with_tag("Vallila", "viheralue")
-    dfGray = await filter_location_with_tag("Vallila", "harmaa-alue")
+def area_daily_temp_diff():
+    dfGreen = filter_location_with_tag("Vallila", "viheralue")
+    dfGray = filter_location_with_tag("Vallila", "harmaa-alue")
 
     avg_green = get_avg_temp(dfGreen)
     avg_gray = get_avg_temp(dfGray)
@@ -21,12 +20,12 @@ async def area_daily_temp_diff():
         "Päivämäärä",
         "°C",
     )
-    plt1.show()
-    # save_graph("Harmaa- ja viheralueiden lämpötila", plt1)
+    # plt1.show()
+    save_graph("green and gray space avg temp diff", plt1, folder="vallila")
 
-    # plt2 = plot_area_diff_bar(dfGreen, dfGray, "Harmaa- ja viheralueiden lämpötilaero")
-    # save_graph("Harmaa- ja viheralueiden lämpötilaero", plt2)
-    # # plt2.show()
+    plt2 = plot_area_diff_bar(dfGreen, dfGray, "Harmaa- ja viheralueiden lämpötilaero")
+    save_graph("green and grayspace avg monthly temp diff", plt2, folder="vallila")
+    # plt2.show()
 
     return
 
@@ -55,10 +54,6 @@ def get_avg_temp(df):
     return df.groupby("date")["temperature"].mean()
 
 
-if __name__ == "__main__":
-    area_daily_temp_diff()
-
-
 def plot_area_diff_bar(df1, df2, title):
     df1["month"] = df1["time"].dt.month
     df2["month"] = df2["time"].dt.month
@@ -73,3 +68,7 @@ def plot_area_diff_bar(df1, df2, title):
     plt.xlabel("Kuukausi")
     plt.ylabel("Erotus °C")
     return plt
+
+
+if __name__ == "__main__":
+    area_daily_temp_diff()
