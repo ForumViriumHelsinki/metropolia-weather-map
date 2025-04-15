@@ -1,10 +1,13 @@
+import asyncio
 from matplotlib.widgets import CheckButtons
 import utils
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def load_data():
+from utils import get_data_util
+
+'''def load_data():
     data_frames = []
     year = input("Enter year for source data or 'all' for all available: ")
     try:    
@@ -21,21 +24,21 @@ def load_data():
     df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%S.%f%z', errors='coerce')
     df.rename(columns={'dev-id': 'sensor'}, inplace=True)  # Rename sensor column
     return df
-
-def compute_monthly_avgs(df):
+'''
+async def compute_monthly_avgs(df):
     df["month"] = pd.to_datetime(df["time"]).dt.to_period("M")
-    monthly_avgs = df.groupby(['month', 'sensor'])[["temperature", "humidity"]].mean().reset_index()
+    monthly_avgs = df.groupby(['month', 'dev-id'])[["temperature", "humidity"]].mean().reset_index()
     return monthly_avgs
 
-def plot_humidity_trends(monthly_avgs):
-    fig = plt.figure(figsize=(14, 6))
+async def plot_humidity_trends(monthly_avgs):
+    fig = plt.figure(figsize=(10, 5))
     gs = plt.GridSpec(1, 2, width_ratios=[4, 1])
     ax = fig.add_subplot(gs[0])
     ax_cb = fig.add_subplot(gs[1])
 
     sensor_lines = {}
 
-    for sensor_id, sensor_data in monthly_avgs.groupby('sensor'):
+    for sensor_id, sensor_data in monthly_avgs.groupby('dev-id'):
         line, = ax.plot(sensor_data['month'].dt.to_timestamp(), sensor_data['humidity'], label=sensor_id, alpha=0.7)
         sensor_lines[sensor_id] = line
     
@@ -50,11 +53,13 @@ def plot_humidity_trends(monthly_avgs):
     ax_cb.set_yticks([])
     ax_cb.set_frame_on(False)
 
-    makela, laajasalo, koivukyla = utils.get_sensors_by_location()
+    vallila = await get_data_util.get_ids_by_location("Vallila")
+    laajasalo = await get_data_util.get_ids_by_location("Laajasalo")
+    koivukyla = await get_data_util.get_ids_by_location("Koivukylä")
     location_map = {
-        'Makela': makela,
+        'Vallila': vallila,
+        'Koivukylä': koivukyla,
         'Laajasalo': laajasalo,
-        'Koivukyla': koivukyla
     }
 
     all_sensor_ids = list(sensor_lines.keys())
@@ -84,7 +89,7 @@ def plot_humidity_trends(monthly_avgs):
     plt.tight_layout()
     plt.show()
 
-def plot_temp_vs_humidity(df):
+async def plot_temp_vs_humidity(df):
     plt.figure(figsize=(12, 6))
     sns.scatterplot(x=df['temperature'], y=df['humidity'], alpha=0.5)
     
@@ -98,12 +103,13 @@ def plot_temp_vs_humidity(df):
 
     print(f"correlation coefficient: {correlation:}")
 
-def main():
-    df = load_data()
-    monthly_avgs = compute_monthly_avgs(df)
-    plot_humidity_trends(monthly_avgs)
-    plot_temp_vs_humidity(monthly_avgs)
+async def main():
+    df = await get_data_util.get_all_locations()
+    df.columns = df.columns.str.strip()  # Remove leading/trailing spaces
+    monthly_avgs = await compute_monthly_avgs(df)
+    await plot_humidity_trends(monthly_avgs)
+    await plot_temp_vs_humidity(monthly_avgs)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
     

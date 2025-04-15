@@ -2,6 +2,8 @@ import os
 
 import pandas as pd
 
+from utils.get_data_util import get_ids_by_location
+
 
 def filter_daytime_data(df):
     # daylight csv location
@@ -27,3 +29,17 @@ def filter_daytime_data(df):
     daylight_df = daylight_df.drop("sunrise", axis=1)
     daylight_df = daylight_df.drop("sunset", axis=1)
     return daylight_df
+
+async def map_locations():
+    """Map sensor IDs to their respective locations."""
+    vallila = await get_ids_by_location("Vallila")
+    laajasalo = await get_ids_by_location("Laajasalo")
+    koivukyla = await get_ids_by_location("Koivukylä")
+
+    location_map = {
+        "Vallila": vallila,
+        "Koivukylä": koivukyla,
+        "Laajasalo": laajasalo,
+    }
+
+    return location_map
