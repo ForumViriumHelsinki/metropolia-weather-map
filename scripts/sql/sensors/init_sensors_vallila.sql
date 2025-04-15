@@ -1,5 +1,3 @@
-DELETE FROM weather.sensors;
-
 INSERT INTO weather.sensors(id, coordinates, location, install_date, csv_link)
   VALUES ('24E124136E106616', '(24.953944343215543, 60.19628790558516)', 'Vallila', '2024-06-17', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106616.geojson'),
 ('24E124136E106617', '(24.949683705063027, 60.19858337673502)', 'Vallila', '2024-06-17', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106617.geojson'),
@@ -13,3 +11,4 @@ INSERT INTO weather.sensors(id, coordinates, location, install_date, csv_link)
 ('24E124136E106661', '(24.95566158371556, 60.19641839065333)', 'Vallila', '2024-06-17', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106661.geojson'),
 ('24E124136E106674', '(24.949697722407258, 60.19760495885829)', 'Vallila', '2024-06-17', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106674.geojson'),
 ('24E124136E106686', '(24.954281110891024, 60.19476461138742)', 'Vallila', '2024-06-17', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106686.geojson');
+
