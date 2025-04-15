@@ -38,9 +38,8 @@ def get_laajasalo(get_2024: bool = None, get_2025: bool = None):
         df = get_rest()
 
     # get Laajasalo sensors
-    sensor_ids = get_ids_by_location("Laajasalo")
-    df = df[df["dev-id"].isin(sensor_ids)]
     df["location"] = "Laajasalo"
+    df = df.loc[df["location"] == "Laajasalo"]
     df = filter_install_date(df, "Laajasalo")
 
     return df
@@ -54,10 +53,8 @@ def get_koivukyla(get_2024: bool = None, get_2025: bool = None):
     else:
         df = get_rest()
 
-    # get Koivukylä sensors
-    sensor_ids = get_ids_by_location("Koivukylä")
-    df = df[df["dev-id"].isin(sensor_ids)]
     df["location"] = "Koivukylä"
+    df = df.loc[df["location"] == "Koivukylä"]
     df = filter_install_date(df, "Koivukylä")
 
     return df
@@ -115,15 +112,6 @@ def get_rest(get_2024: bool = None, get_2025: bool = None):
     df = pd.concat([df24, df25])
 
     return df
-
-
-def get_ids_by_location(location: str):
-    sensor_ids = []
-    for db in get_session():
-        res = db.exec(select(Sensor.id).where(Sensor.location == location))
-        sensor_ids = res.all()
-
-    return sensor_ids
 
 
 def set_df_date_range(df, start_date, end_date):
