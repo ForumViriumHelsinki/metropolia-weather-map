@@ -1,4 +1,3 @@
--- Laajasalo sensors
 INSERT INTO weather.sensors(id, lon, lat, location, install_date, csv_link)
     VALUES ('24E124136E140271', 25.038138954219203, 60.17019884666942, 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E140271.geojson'),
 ('24E124136E140287', 25.033164118825763, 60.17820925308568, 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E140287.geojson'),
@@ -11,7 +10,6 @@ INSERT INTO weather.sensors(id, lon, lat, location, install_date, csv_link)
 ('24E124136E146235', 25.054461721547142, 60.17791332910831, 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146235.geojson'),
 ('24E124136E146237', 25.068313113651286, 60.16354863794643, 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146237.geojson');
 
--- Koivukylä sensors
 INSERT INTO weather.sensors(id, lon, lat, location, install_date, csv_link)
     VALUES ('24E124136E140283', 25.08559466020529, 60.31902912814716, 'Koivukylä', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E140283.geojson'),
 ('24E124136E146069', 25.05280813096903, 60.32773642005459, 'Koivukylä', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146069.geojson'),
