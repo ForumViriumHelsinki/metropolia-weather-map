@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 
 class Sensor(SQLModel, table=True):
@@ -9,7 +9,8 @@ class Sensor(SQLModel, table=True):
     __table_args__ = {"schema": "weather"}
 
     id: str = Field(default=None, primary_key=True)
-    coordinates: Optional[str] = Field(default=None)  # Use string to represent 'point'
+    lat: Optional[float] = None
+    lon: Optional[float] = None
     location: Optional[str] = None
     install_date: Optional[date] = None
     csv_link: Optional[str] = None
@@ -17,6 +18,20 @@ class Sensor(SQLModel, table=True):
     tags: List["SensorTag"] = Relationship(
         back_populates="sensor"
     )  # Define relationship
+
+    @property
+    def coordinates_list(self) -> List[float]:
+        if self.coordinates:
+            lat, lon = self.coordinates.strip("()").split(",")
+            return [float(lat), float(lon)]
+        return []  # Always return a list
+
+    def dict(self, *args, **kwargs):
+        sensor_dict = super().dict(*args, **kwargs)
+        sensor_dict["coordinates"] = (
+            self.coordinates_list
+        )  # Replace raw coordinates with the list
+        return sensor_dict
 
 
 class Tag(SQLModel, table=True):

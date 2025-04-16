@@ -1,27 +1,33 @@
 import GraphDisplay from "@/components/GraphDisplay/";
 import MapWrapper from "@/components/Map/MapWrapper";
 import SensorCard from "@/components/SensorCard/SensorCard";
+import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
-export type LatestData = {
+export type VallilaLatestData = {
   id: string;
   properties: {
     measurement: {
       humidity: number;
       temperature: number;
-      time: string;
+      time: Date;
     };
   };
 };
 
+export interface LatestData {
+  humidity: number;
+  temperature: number;
+  time: Date;
+}
+
 export default async function Home() {
   const res = await apiFetch("/sensors");
-  const json = await res.json();
-  const sensors: Sensor[] = json.data;
+  const sensors: Sensor[] = await res.json();
 
   // Get latest data
-  let latestData: LatestData[] = [];
+  let latestData: VallilaLatestData[] = [];
   try {
     const resLatest = await fetch(
       "https://bri3.fvh.io/opendata/makelankatu/makelankatu_latest.geojson",
@@ -34,6 +40,10 @@ export default async function Home() {
   } catch (error) {
     if (error instanceof Error) console.log(error.message);
   }
+
+  const vallila = sensors.filter((s) => s.location === "Vallila");
+  const koivukyla = sensors.filter((s) => s.location === "Koivukylä");
+  const laajasalo = sensors.filter((s) => s.location === "Laajasalo");
 
   return (
     <main className="flex flex-col gap-6">
@@ -52,9 +62,9 @@ export default async function Home() {
         </div>
       )}
       <div className="grid-scaling">
-        {sensors.map((sensor) => {
+        {vallila.map((sensor) => {
           return (
-            <SensorCard
+            <VallilaCard
               key={sensor.id}
               sensor={sensor}
               latestData={
@@ -63,6 +73,20 @@ export default async function Home() {
             />
           );
         })}
+        {koivukyla.map((sensor) => (
+          <SensorCard
+            key={sensor.id}
+            sensor={sensor}
+            markerColor={"var(--color-shade)"}
+          />
+        ))}
+        {laajasalo.map((sensor) => (
+          <SensorCard
+            key={sensor.id}
+            sensor={sensor}
+            markerColor={"var(--color-sun)"}
+          />
+        ))}
       </div>
 
       <GraphDisplay />

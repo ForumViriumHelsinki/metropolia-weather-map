@@ -1,7 +1,8 @@
 export type Sensor = {
   id: string;
-  coordinates: [number, number];
-  location: string;
+  lat: number;
+  lon: number;
+  location: "Vallila" | "Koivukylä" | "Laajasalo";
   install_date: Date;
   csv_link: string;
 };

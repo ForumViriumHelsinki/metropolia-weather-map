@@ -1,54 +1,39 @@
 import { LatestData } from "@/app/page";
 import { Sensor } from "@/types";
-import { fixLocation } from "@/utils/fixLocation";
+import { formatDate } from "@/utils/formatDate";
 
-const SensorCard = ({
+const SensorCard = async ({
   sensor,
-  latestData,
+  markerColor,
 }: {
   sensor: Sensor;
-  latestData: LatestData;
+  markerColor: string;
 }) => {
-  let idColor =
-    sensor.location === "Koivukylä" ? "var(--color-shade)" : "var(--color-sun)";
-
-  if (sensor.location === "makelankatu") idColor = "var(--color-green-leaf)";
-
-  const formatDate = (str: string) => {
-    const date = str.slice(0, 10);
-    const time = str.slice(11, 16);
-    return `${time} - ${date}`;
-  };
-  const valid = !!latestData;
+  const res = await fetch(sensor.csv_link);
+  const rawData = await res.json();
+  const measurements = rawData.properties.data.raw;
+  const latestData: LatestData = measurements[measurements.length - 1];
 
   return (
     <div className="card-padding-border bg-off-white">
       <span
         className="font-heavy inline-block w-full rounded-xl px-3 py-[2px]"
-        style={{ backgroundColor: idColor }}
+        style={{ backgroundColor: markerColor }}
       >
         {sensor.id.slice(-4)}
       </span>
       <div>
-        <h2 className="text-3xl">{fixLocation(sensor.location)}</h2>
+        <h2 className="text-3xl">{sensor.location}</h2>
 
         <div className="flex flex-col">
-          <span>
-            Lämpötila:{" "}
-            {valid ? latestData.properties.measurement.temperature : "-"}°C
-          </span>
-          <span>
-            Ilmankosteus:{" "}
-            {valid ? latestData.properties.measurement.temperature : "-"}%
-          </span>
+          <span>Lämpötila: {latestData.temperature}°C</span>
+          <span>Ilmankosteus: {latestData.humidity}%</span>
         </div>
       </div>
 
       <div>
         <h3>Viimeisin mittaus</h3>
-        <span>
-          {valid ? formatDate(latestData.properties.measurement.time) : "-"}
-        </span>
+        <span>{formatDate(latestData.time)}</span>
       </div>
 
       <div>
