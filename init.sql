@@ -7,7 +7,8 @@ SET search_path TO weather;
 
 CREATE TABLE IF NOT EXISTS weather.sensors(
     id text PRIMARY KEY,
-    coordinates point,
+    lat float,
+    lon float,
     location text,
     install_date date,
     csv_link text
@@ -36,7 +37,6 @@ CREATE TABLE IF NOT EXISTS weather.sensor_tags(
 -- ('24E124136E106661', '(24.95566158371556, 60.19641839065333)', 'Vallila', '2024-06-16', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106661.geojson'),
 -- ('24E124136E106674', '(24.949697722407258, 60.19760495885829)', 'Vallila', '2024-05-30', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106674.geojson'),
 -- ('24E124136E106686', '(24.954281110891024, 60.19476461138742)', 'Vallila', '2024-05-27', 'https://bri3.fvh.io/opendata/makelankatu/24E124136E106686.geojson');
-
 -- INSERT INTO weather.sensors(id, coordinates, location, install_date, csv_link)
 --     VALUES ('24E124136E140271', '(25.038138954219203, 60.17019884666942)', 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E140271.geojson'),
 -- ('24E124136E140283', '(25.08559466020529, 60.31902912814716)', 'Koivukylä', '2024-06-26', 'https://bri3.fvh.io/opendata/r4c/24E124136E140283.geojson'),
@@ -58,4 +58,3 @@ CREATE TABLE IF NOT EXISTS weather.sensor_tags(
 -- ('24E124136E146224', '(25.051803506562962, 60.16760355134523)', 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146224.geojson'),
 -- ('24E124136E146235', '(25.054461721547142, 60.17791332910831)', 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146235.geojson'),
 -- ('24E124136E146237', '(25.068313113651286, 60.16354863794643)', 'Laajasalo', '2024-06-25', 'https://bri3.fvh.io/opendata/r4c/24E124136E146237.geojson');
-
