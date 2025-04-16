@@ -15,8 +15,8 @@ const Map = () => {
       const res = await apiFetch("/sensors");
 
       if (res.status === 200) {
-        const json = await res.json();
-        setSensors(json.data);
+        const data = await res.json();
+        setSensors(data);
       }
     };
     getSensors();
@@ -56,7 +56,7 @@ const Map = () => {
           return (
             <Marker
               key={sensor.id}
-              position={[sensor.coordinates[1], sensor.coordinates[0]]}
+              position={[sensor.lat, sensor.lon]}
               icon={icon}
             >
               <Popup>

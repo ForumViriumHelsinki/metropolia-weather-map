@@ -1,8 +1,9 @@
-import datetime
-from astral.sun import sun
 import csv
+import datetime
+import os
 
 from astral import LocationInfo
+from astral.sun import sun
 
 city = LocationInfo(
     "Helsinki", "Finland", "Europe/Helsinki", 60.19628790558516, 24.953944343215543
@@ -15,7 +16,7 @@ print(
     )
 )
 
-year = 2024
+year = 2025
 data = []
 
 for m in range(1, 13):
@@ -39,8 +40,9 @@ for m in range(1, 13):
 # line = data[0]["sunrise"]
 # print(line.)
 # print(replace(" ", "T"))
+filepath = os.path.join(os.path.dirname(__file__), "..", "..", "data", "daylight25.csv")
 
-with open("../../data/daylight.csv", "w", newline="") as csvfile:
+with open(filepath, "w", newline="") as csvfile:
     fieldNames = ["sunrise", "sunset"]
     writer = csv.DictWriter(csvfile, fieldnames=fieldNames)
     writer.writeheader()

@@ -1,0 +1,56 @@
+from datetime import date
+from typing import List, Optional
+
+from sqlmodel import JSON, Field, Relationship, SQLModel
+
+
+class Sensor(SQLModel, table=True):
+    __tablename__ = "sensors"
+    __table_args__ = {"schema": "weather"}
+
+    id: str = Field(default=None, primary_key=True)
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    location: Optional[str] = None
+    install_date: Optional[date] = None
+    csv_link: Optional[str] = None
+
+    tags: List["SensorTag"] = Relationship(
+        back_populates="sensor"
+    )  # Define relationship
+
+    @property
+    def coordinates_list(self) -> List[float]:
+        if self.coordinates:
+            lat, lon = self.coordinates.strip("()").split(",")
+            return [float(lat), float(lon)]
+        return []  # Always return a list
+
+    def dict(self, *args, **kwargs):
+        sensor_dict = super().dict(*args, **kwargs)
+        sensor_dict["coordinates"] = (
+            self.coordinates_list
+        )  # Replace raw coordinates with the list
+        return sensor_dict
+
+
+class Tag(SQLModel, table=True):
+    __tablename__ = "tags"
+    __table_args__ = {"schema": "weather"}
+
+    id: str = Field(primary_key=True)
+
+    sensors: List["SensorTag"] = Relationship(
+        back_populates="tag"
+    )  # Define relationship
+
+
+class SensorTag(SQLModel, table=True):
+    __tablename__ = "sensor_tags"
+    __table_args__ = {"schema": "weather"}
+
+    sensor_id: str = Field(foreign_key="weather.sensors.id", primary_key=True)
+    tag_id: str = Field(foreign_key="weather.tags.id", primary_key=True)
+
+    sensor: "Sensor" = Relationship(back_populates="tags")  # Define relationship
+    tag: "Tag" = Relationship(back_populates="sensors")  # Define relationship
