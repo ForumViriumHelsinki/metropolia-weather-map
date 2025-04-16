@@ -8,7 +8,7 @@ from src.utils.get_data_util import (
 # df = get_laajasalo()
 # print(df.head())
 
-df = get_koivukyla(nightime=True)
+df = get_vallila()
 print(df.head())
 
 # df = get_koivukyla()
