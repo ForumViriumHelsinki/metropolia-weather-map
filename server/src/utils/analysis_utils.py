@@ -22,7 +22,6 @@ def plot_daily_temp_avg(
     ylabel,
     line1_color=None,
     line2_color=None,
-    label=None,
 ):
     plt.clf()
 
@@ -34,12 +33,7 @@ def plot_daily_temp_avg(
     )
 
     avg_diff = df1 - df2
-    avg_diff.plot(
-        kind="line",
-        label=label if label else "Lämpötilaero",
-        color="red",
-        figsize=(10, 5),
-    )
+    avg_diff.plot(kind="line", label="Lämpötilaero", color="red", figsize=(10, 5))
 
     plt.title(title)
     plt.axhline(y=0, color="black", linestyle="--", linewidth=1)
