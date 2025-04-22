@@ -1,12 +1,24 @@
+"use client";
+
 import { apiFetch } from "@/utils/apiFetch";
+import { useEffect, useState } from "react";
 
 interface Tag {
   id: string;
 }
 
-const Home = async () => {
-  const res = await apiFetch("/tags");
-  const tags: Tag[] = await res.json();
+const Home = () => {
+  const [tags, setTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      const res = await apiFetch("/tags");
+      const tags: Tag[] = await res.json();
+      setTags(tags);
+    };
+    fetchTags();
+  }, []);
+
   console.log(tags);
 
   return (
