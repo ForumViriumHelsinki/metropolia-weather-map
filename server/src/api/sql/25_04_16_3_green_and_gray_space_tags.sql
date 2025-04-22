@@ -1,10 +1,11 @@
-INSERT into weather.tags VALUES('viheralue');
-INSERT into weather.tags VALUES('harmaa-alue');
+INSERT INTO weather.tags
+  VALUES ('viheralue');
 
--- Mäkelänkatu
-INSERT into weather.sensor_tags (sensor_id, tag_id)
-VALUES 
-('24E124136E106616', 'viheralue'),
+INSERT INTO weather.tags
+  VALUES ('harmaa-alue');
+
+INSERT INTO weather.sensor_tags(sensor_id, tag_id)
+  VALUES ('24E124136E106616', 'viheralue'),
 ('24E124136E106617', 'viheralue'),
 ('24E124136E106618', 'harmaa-alue'),
 ('24E124136E106619', 'harmaa-alue'),
@@ -17,9 +18,8 @@ VALUES
 ('24E124136E106674', 'viheralue'),
 ('24E124136E106686', 'viheralue');
 
--- Koivukylä & Laajasalo
-INSERT into weather.sensor_tags (sensor_id, tag_id)
-VALUES ('24E124136E140271', 'harmaa-alue'),
+INSERT INTO weather.sensor_tags(sensor_id, tag_id)
+  VALUES ('24E124136E140271', 'harmaa-alue'),
 ('24E124136E140283', 'viheralue'),
 ('24E124136E140287', 'viheralue'),
 ('24E124136E146069', 'harmaa-alue'),
@@ -39,3 +39,4 @@ VALUES ('24E124136E140271', 'harmaa-alue'),
 ('24E124136E146224', 'viheralue'),
 ('24E124136E146235', 'harmaa-alue'),
 ('24E124136E146237', 'harmaa-alue');
+
