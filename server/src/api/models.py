@@ -19,20 +19,6 @@ class Sensor(SQLModel, table=True):
         back_populates="sensor"
     )  # Define relationship
 
-    @property
-    def coordinates_list(self) -> List[float]:
-        if self.coordinates:
-            lat, lon = self.coordinates.strip("()").split(",")
-            return [float(lat), float(lon)]
-        return []  # Always return a list
-
-    def dict(self, *args, **kwargs):
-        sensor_dict = super().dict(*args, **kwargs)
-        sensor_dict["coordinates"] = (
-            self.coordinates_list
-        )  # Replace raw coordinates with the list
-        return sensor_dict
-
 
 class Tag(SQLModel, table=True):
     __tablename__ = "tags"

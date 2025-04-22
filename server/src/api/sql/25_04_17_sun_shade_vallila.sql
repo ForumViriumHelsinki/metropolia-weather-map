@@ -1,9 +1,9 @@
-INSERT INTO weather.tags 
-VALUES ('aurinko'), ('varjo');
+INSERT INTO weather.tags
+  VALUES ('aurinko'),
+('varjo');
 
-INSERT into weather.sensor_tags (sensor_id, tag_id)
-VALUES 
-('24E124136E106616', 'varjo'),
+INSERT INTO weather.sensor_tags(sensor_id, tag_id)
+  VALUES ('24E124136E106616', 'varjo'),
 ('24E124136E106617', 'varjo'),
 ('24E124136E106618', 'varjo'),
 ('24E124136E106619', 'aurinko'),
