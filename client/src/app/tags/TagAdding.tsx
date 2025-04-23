@@ -2,14 +2,15 @@
 
 import { Sensor } from "@/types";
 import { useState } from "react";
+import { Tag } from "./page";
 
-interface Tag {
-  id: string;
-}
-
-const TagAdding = () => {
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedSensors, setSelectedSensors] = useState<Sensor[]>([]);
+const TagAdding = ({
+  tags,
+  selectedSensors,
+}: {
+  tags: Tag[];
+  selectedSensors: Sensor[];
+}) => {
   const [selectedTag, setSelectedTag] = useState<string>("All");
 
   return (

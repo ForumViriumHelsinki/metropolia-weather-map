@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import TagAdding from "./TagAdding";
 import TagMap from "./TagMap";
 
-interface Tag {
+export interface Tag {
   id: string;
 }
 
@@ -89,44 +89,15 @@ const Tags = () => {
           </div>
         </div>
 
-        <TagAdding />
-
-        {/* <div className="bg-off-white grid grid-cols-2">
-          <div>
-            <h2>Add tag to sensor</h2>
-            <select
-              value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
-            >
-              <option>All</option>
-              {tags.map((t) => (
-                <option key={t.id}>{t.id}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <div className="flex flex-col">
-              <label>New tag</label>
-              <input
-                type="text"
-                placeholder="New tag"
-              />
-            </div>
-          </div>
-
-          <div className="h-56 overflow-y-scroll">
-            <select size={11}>
-              {selectedSensors.map((s) => (
-                <option key={s.id}>{s.id}</option>
-              ))}
-            </select>
-          </div>
-        </div> */}
+        <TagAdding
+          tags={tags}
+          selectedSensors={selectedSensors}
+        />
 
         <div className="aspect-4/2 w-full">
           <TagMap
             sensors={sensorsWithTag.length === 0 ? allSensors : sensorsWithTag}
+            selectedSensors={selectedSensors}
             handleSelectedSensors={handleSelectedSensors}
           />
         </div>

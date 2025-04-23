@@ -7,9 +7,11 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
 const TagMap = ({
   sensors,
+  selectedSensors,
   handleSelectedSensors,
 }: {
   sensors: Sensor[];
+  selectedSensors: Sensor[];
   handleSelectedSensors: (sensor: Sensor) => void;
 }) => {
   const iconMakelankatu = new Icon({
@@ -27,7 +29,10 @@ const TagMap = ({
     iconSize: [38, 38],
   });
 
-  let icon = iconMakelankatu;
+  const iconSelected = new Icon({
+    iconUrl: "icon_selected.png",
+    iconSize: [38, 38],
+  });
 
   return (
     <MapContainer
@@ -40,8 +45,11 @@ const TagMap = ({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {sensors.map((sensor) => {
+        let icon = iconMakelankatu;
         if (sensor.location === "Koivukylä") icon = iconKoivukyla;
         if (sensor.location === "Laajasalo") icon = iconLaajasalo;
+        if (selectedSensors.includes(sensor)) icon = iconSelected;
+
         return (
           <Marker
             key={sensor.id}
