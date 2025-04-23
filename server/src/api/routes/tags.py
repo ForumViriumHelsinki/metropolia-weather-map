@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlmodel import Session, select
 from src.api.database import get_session
 from src.api.models import Tag
 
-router = APIRouter()
+tag_router = APIRouter()
 
 
-@router.get("/api/tags")
+@tag_router.get("/api/tags")
 def get_tags(session: Session = Depends(get_session)):
     try:
         tags = session.exec(select(Tag)).all()
@@ -15,11 +16,14 @@ def get_tags(session: Session = Depends(get_session)):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.post("/api/tags")
-def new_tag(new_tag: str, session: Session = Depends(get_session)):
-    print(new_tag)
+class TagPost(BaseModel):
+    tag: str
+
+
+@tag_router.post("/api/tags")
+def new_tag(body: TagPost, session: Session = Depends(get_session)):
     try:
-        tag_to_create = Tag(id=new_tag)
+        tag_to_create = Tag(id=body.tag)
         ret = tag_to_create.model_copy()
 
         session.add(tag_to_create)
