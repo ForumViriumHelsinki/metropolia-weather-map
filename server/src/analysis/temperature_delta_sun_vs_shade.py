@@ -1,9 +1,10 @@
-import utils
 import pandas as pd
 import matplotlib.pyplot as plt
 
-SENSORS, SENSOR_SUN, SENSOR_SHADE = utils.get_makela_sensors()
+from src.utils.get_data_util import get_vallila
+from src.utils.filter_tag import filter_df_by_tag
 
+"""
 def load_data(year):
     df = utils.get_csv(year)
     data = utils.separate_sensors(df)
@@ -27,6 +28,7 @@ def ask_user_for_year():
         print("Please enter a valid year.")
         return ask_user_for_year()
     return year
+"""
 
 def compute_tempdeltas(sensor_data, resample_period):
     """
@@ -53,12 +55,16 @@ def compute_tempdeltas(sensor_data, resample_period):
     merged_df = pd.concat(temperature_deltas).groupby('time').mean()
     return merged_df
 
+def group_data(data):
+    grouped_data = {sensor_id: group for sensor_id, group in data.groupby('dev-id')}
+    return grouped_data
+
 def main():
-    data = load_data(ask_user_for_year())
+    data = get_vallila()
 
     # Filter data using existing functions
-    data_sun = filter_sundata(data)
-    data_shade = filter_shadedata(data)
+    data_sun = group_data(filter_df_by_tag(data, "aurinko"))
+    data_shade = group_data(filter_df_by_tag(data, "varjo"))
 
     # Compute hourly and daily temperature changes for sun and shade sensors
     sun_tempdelta_hourly = compute_tempdeltas(data_sun, 'h')
