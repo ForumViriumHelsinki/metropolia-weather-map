@@ -57,8 +57,6 @@ const Tags = () => {
     setSelectedSensors((prev) => [...prev, sensor]);
   };
 
-  console.log(tags);
-
   return (
     <div>
       <h1>Tag analysis</h1>
@@ -94,6 +92,7 @@ const Tags = () => {
 
         <TagAdding
           tags={tags}
+          setTags={setTags}
           selectedSensors={selectedSensors}
         />
 

@@ -1,17 +1,39 @@
 "use client";
 
 import { Sensor } from "@/types";
-import { useState } from "react";
+import { apiFetch } from "@/utils/apiFetch";
+import React, { useState } from "react";
 import { Tag } from "./page";
 
 const TagAdding = ({
   tags,
+  setTags,
   selectedSensors,
 }: {
   tags: Tag[];
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
   selectedSensors: Sensor[];
 }) => {
   const [selectedTag, setSelectedTag] = useState<string>("All");
+  const [newTag, setNewTag] = useState<string>("");
+
+  const handleNewTag = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!newTag) return;
+
+    console.log(JSON.stringify({ tag: newTag }));
+    const res = await apiFetch("/tags", {
+      method: "POST",
+      body: JSON.stringify({ tag: newTag }),
+      headers: { "Content-Type": "application/json" }, // Ensure proper headers
+    });
+    if (res.ok) {
+      setTags((prev) => [...prev, { id: newTag }]);
+    }
+
+    setNewTag("");
+  };
 
   return (
     <div className="bg-off-white grid grid-cols-2">
@@ -27,15 +49,22 @@ const TagAdding = ({
           ))}
         </select>
       </div>
-      {/* Tag input */}
+
+      {/* Add tag to db */}
       <div>
-        <div className="flex flex-col">
+        <form
+          className="flex flex-col"
+          onSubmit={handleNewTag}
+        >
           <label>New tag</label>
           <input
+            value={newTag}
+            onChange={(e) => setNewTag(e.currentTarget.value)}
             type="text"
             placeholder="New tag"
           />
-        </div>
+          <button className="btn-primary">Add new tag</button>
+        </form>
       </div>
 
       {/* List of selected sensors */}
