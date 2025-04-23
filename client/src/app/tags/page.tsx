@@ -2,9 +2,12 @@
 
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import TagAdding from "./TagAdding";
-import TagMap from "./TagMap";
+
+// Fixes error 500
+const TagMap = dynamic(() => import("./TagMap"), { ssr: false });
 
 export interface Tag {
   id: string;
