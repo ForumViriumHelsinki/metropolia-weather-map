@@ -21,6 +21,7 @@ async def run_sql_files_in_folder(connection_string, folder_path):
     """
     try:
         sql_files = sorted([f for f in os.listdir(folder_path) if f.endswith(".sql")])
+        print(sql_files)
         async with asyncpg.create_pool(connection_string) as pool:
             for sql_file in sql_files:
                 sql_file_path = os.path.join(folder_path, sql_file)

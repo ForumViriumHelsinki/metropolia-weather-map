@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.routes import router as routes
+from src.api.routes.sensor_tags import sensor_tag_router
+from src.api.routes.sensors import sensor_router
+from src.api.routes.tags import tag_router
 
 app = FastAPI()
 
@@ -25,4 +27,6 @@ def home():
     return {"This is the api home"}
 
 
-app.include_router(routes)
+app.include_router(sensor_router)
+app.include_router(sensor_tag_router)
+app.include_router(tag_router)
