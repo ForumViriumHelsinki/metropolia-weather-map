@@ -10,31 +10,34 @@ sensor_tag_router = APIRouter()
 
 
 class DeleteTag(BaseModel):
-    sensor_id: str
+    ids: List[str]
     tag: str
 
 
 @sensor_tag_router.delete("/api/sensor-tags")
 def delete_tag_from_sensor(body: DeleteTag, session: Session = Depends(get_session)):
     print(body)
-    try:
-        statement = (
-            select(SensorTag)
-            .where(SensorTag.sensor_id == body.sensor_id)
-            .where(SensorTag.tag_id == body.tag)
-        )
-        result = session.exec(statement)
-        sensor_tag = result.one()
-        print(sensor_tag)
 
-        session.delete(sensor_tag)
+    try:
+        for sensor_id in body.ids:
+            statement = (
+                select(SensorTag)
+                .where(SensorTag.sensor_id == sensor_id)
+                .where(SensorTag.tag_id == body.tag)
+            )
+            result = session.exec(statement)
+            valid_sensor_tag = result.first()
+
+            if valid_sensor_tag:
+                session.delete(valid_sensor_tag)
+
         session.commit()
+        return "Sensor tags removed"
+
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Error deleting sensor tag: {str(e)}"
         )
-
-    return "not done"
 
 
 class AddTag(BaseModel):
