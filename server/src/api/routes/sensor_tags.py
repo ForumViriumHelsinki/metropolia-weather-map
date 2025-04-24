@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from src.api.database import get_session
-from src.api.models import SensorTag
+from src.api.models import Sensor, SensorTag
 
 sensor_tag_router = APIRouter()
 
@@ -12,6 +12,19 @@ sensor_tag_router = APIRouter()
 class DeleteTag(BaseModel):
     ids: List[str]
     tag: str
+
+
+@sensor_tag_router.get("/api/sensor-tags")
+def get_sensor_tags(session: Session = Depends(get_session)):
+    try:
+        statement = select(SensorTag)
+        results = session.exec(statement)
+        return results.all()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching sensor tags: {str(e)}"
+        )
 
 
 @sensor_tag_router.delete("/api/sensor-tags")
