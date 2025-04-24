@@ -1,9 +1,9 @@
 "use client";
 
 import { Sensor } from "@/types";
-import { apiFetch } from "@/utils/apiFetch";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import React, { useState } from "react";
+import { addTagService } from "../services/addTagsService";
 import { createTagService } from "../services/createTagService";
 import { Tag } from "./page";
 
@@ -39,23 +39,33 @@ const TagAdding = ({
   };
 
   const handleTagAdding = async () => {
-    console.log(selectedSensors);
-    console.log(selectedTag);
+    try {
+      await addTagService(selectedSensors, selectedTag);
+      setMessage("Tags added succesfully");
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      }
+      console.error(error);
+    }
 
-    const body = JSON.stringify({
-      ids: selectedSensors.map((s) => s.id),
-      tag: selectedTag,
-    });
+    // console.log(selectedSensors);
+    // console.log(selectedTag);
 
-    console.log(body);
-    const res = await apiFetch("/sensor-tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
+    // const body = JSON.stringify({
+    //   ids: selectedSensors.map((s) => s.id),
+    //   tag: selectedTag,
+    // });
 
-    const data = await res.json();
-    console.log(data);
+    // console.log(body);
+    // const res = await apiFetch("/sensor-tags", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body,
+    // });
+
+    // const data = await res.json();
+    // console.log(data);
   };
 
   return (

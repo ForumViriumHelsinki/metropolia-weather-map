@@ -46,8 +46,16 @@ class AddTag(BaseModel):
 def add_tag_to_sensor(body: AddTag, session: Session = Depends(get_session)):
     try:
         for sensor in body.ids:
-            stmt = SensorTag(sensor_id=sensor, tag_id=body.tag)
-            session.add(stmt)
+            existing_tag = session.exec(
+                select(SensorTag).where(
+                    (SensorTag.sensor_id == sensor) & (SensorTag.tag_id == body.tag)
+                )
+            ).first()
+
+            if not existing_tag:
+                stmt = SensorTag(sensor_id=sensor, tag_id=body.tag)
+                session.add(stmt)
+
         session.commit()
         return "Tags added"
 
