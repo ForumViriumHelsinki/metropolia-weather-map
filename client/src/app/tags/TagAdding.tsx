@@ -1,8 +1,9 @@
 "use client";
 
 import { Sensor } from "@/types";
-import { apiFetch } from "@/utils/apiFetch";
+import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import React, { useState } from "react";
+import { createTagService } from "../services/createTagService";
 import { Tag } from "./page";
 
 const TagAdding = ({
@@ -16,23 +17,24 @@ const TagAdding = ({
 }) => {
   const [selectedTag, setSelectedTag] = useState<string>("All");
   const [newTag, setNewTag] = useState<string>("");
+  const [message, setMessage] = useMessageDisplay();
 
   const handleNewTag = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!newTag) return;
 
-    console.log(JSON.stringify({ tag: newTag }));
-    const res = await apiFetch("/tags", {
-      method: "POST",
-      body: JSON.stringify({ tag: newTag }),
-      headers: { "Content-Type": "application/json" }, // Ensure proper headers
-    });
-    if (res.ok) {
+    try {
+      await createTagService(newTag);
       setTags((prev) => [...prev, { id: newTag }]);
+      setMessage("Tag created successfully");
+      setNewTag("");
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      }
+      console.error(error);
     }
-
-    setNewTag("");
   };
 
   return (
@@ -65,6 +67,7 @@ const TagAdding = ({
           />
           <button className="btn-primary">Add new tag</button>
         </form>
+        <div>{message}</div>
       </div>
 
       {/* List of selected sensors */}
