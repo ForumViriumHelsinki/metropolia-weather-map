@@ -2,8 +2,10 @@
 
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { removeTagService } from "../services/removeTagService";
 import TagAdding from "./TagAdding";
 
 // Fixes error 500
@@ -19,6 +21,8 @@ const Tags = () => {
   const [sensorsWithTag, setSensorsWithTag] = useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useState<Sensor[]>([]);
   const [allSensors, setAllSensors] = useState<Sensor[]>([]);
+
+  const [message, setMessage] = useMessageDisplay();
 
   useEffect(() => {
     const fetchAllSensors = async () => {
@@ -57,18 +61,38 @@ const Tags = () => {
     setSelectedSensors((prev) => [...prev, sensor]);
   };
 
+  const handleTagRemoval = async () => {
+    try {
+      await removeTagService(selectedSensors, selectedTag);
+
+      // Refetch sensors with tag to update map
+      const updateRes = await apiFetch(`/sensors?tag=${selectedTag}`);
+      const data = await updateRes.json();
+      setSensorsWithTag(data);
+
+      setMessage("Tag removed successfully");
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage(`Error removig tag ${error.message}`);
+      }
+      console.error(error);
+    }
+  };
+
   return (
-    <div>
-      <h1>Tag analysis</h1>
-      <div className="flex flex-col gap-2">
-        <div className="bg-off-white grid grid-cols-2">
-          {/* List of tags */}
+    <div className="flex flex-col gap-2">
+      <TagAdding
+        tags={tags}
+        setTags={setTags}
+        selectedSensors={selectedSensors}
+        setSelectedSensors={setSelectedSensors}
+      />
+
+      <div className="box-basic grid grid-cols-2">
+        <div className="flex flex-col gap-3">
           <div>
-            <h2>Tags</h2>
-            <select
-              value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
-            >
+            <div>Filter map by tag</div>
+            <select onChange={(e) => setSelectedTag(e.currentTarget.value)}>
               <option>All</option>
               {tags.map((t) => (
                 <option key={t.id}>{t.id}</option>
@@ -76,33 +100,29 @@ const Tags = () => {
             </select>
           </div>
 
-          {/* Sensors with tag */}
-          <div className="h-56 overflow-y-scroll">
-            {sensorsWithTag.map((s) => (
-              <div
-                key={s.id}
-                className="grid grid-cols-2"
-              >
-                <div>{s.id}</div>
-                <div>{s.location}</div>
-              </div>
-            ))}
-          </div>
+          <button
+            className="btn-primary w-fit"
+            onClick={handleTagRemoval}
+          >
+            Remove tag
+          </button>
+          <div>{message}</div>
         </div>
 
-        <TagAdding
-          tags={tags}
-          setTags={setTags}
+        <div>
+          <h2 className="text-2xl">Selected sensors</h2>
+          {selectedSensors.map((s) => (
+            <div key={s.id}>{s.id}</div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-off-white aspect-4/2 w-full rounded-lg border">
+        <TagMap
+          sensors={selectedTag === "All" ? allSensors : sensorsWithTag}
           selectedSensors={selectedSensors}
+          handleSelectedSensors={handleSelectedSensors}
         />
-
-        <div className="aspect-4/2 w-full">
-          <TagMap
-            sensors={sensorsWithTag.length === 0 ? allSensors : sensorsWithTag}
-            selectedSensors={selectedSensors}
-            handleSelectedSensors={handleSelectedSensors}
-          />
-        </div>
       </div>
     </div>
   );
