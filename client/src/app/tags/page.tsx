@@ -63,35 +63,18 @@ const Tags = () => {
         tags={tags}
         setTags={setTags}
         selectedSensors={selectedSensors}
+        setSelectedSensors={setSelectedSensors}
       />
 
-      {/* <h1>Tag analysis</h1>
-        <div className="bg-off-white grid grid-cols-2">
-          <div>
-            <h2>Tags</h2>
-            <select
-              value={selectedTag}
-              onChange={(e) => setSelectedTag(e.target.value)}
-            >
-              <option>All</option>
-              {tags.map((t) => (
-                <option key={t.id}>{t.id}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="h-56 overflow-y-scroll">
-            {sensorsWithTag.map((s) => (
-              <div
-                key={s.id}
-                className="grid grid-cols-2"
-              >
-                <div>{s.id}</div>
-                <div>{s.location}</div>
-              </div>
-            ))}
-            </div>
-            </div> */}
+      <div className="box-basic">
+        <div>Filter map by tag</div>
+        <select onChange={(e) => setSelectedTag(e.currentTarget.value)}>
+          <option>All</option>
+          {tags.map((t) => (
+            <option key={t.id}>{t.id}</option>
+          ))}
+        </select>
+      </div>
 
       <div className="border-off-white aspect-4/2 w-full rounded-lg border">
         <TagMap

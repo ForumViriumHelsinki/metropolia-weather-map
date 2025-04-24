@@ -11,10 +11,12 @@ const TagAdding = ({
   tags,
   setTags,
   selectedSensors,
+  setSelectedSensors,
 }: {
   tags: Tag[];
   setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
   selectedSensors: Sensor[];
+  setSelectedSensors: React.Dispatch<React.SetStateAction<Sensor[]>>;
 }) => {
   const [selectedTag, setSelectedTag] = useState<string>("All");
   const [newTag, setNewTag] = useState<string>("");
@@ -48,24 +50,6 @@ const TagAdding = ({
       }
       console.error(error);
     }
-
-    // console.log(selectedSensors);
-    // console.log(selectedTag);
-
-    // const body = JSON.stringify({
-    //   ids: selectedSensors.map((s) => s.id),
-    //   tag: selectedTag,
-    // });
-
-    // console.log(body);
-    // const res = await apiFetch("/sensor-tags", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body,
-    // });
-
-    // const data = await res.json();
-    // console.log(data);
   };
 
   return (
@@ -115,12 +99,23 @@ const TagAdding = ({
       </div>
 
       {/* List of selected sensors */}
-      <div>
-        <h2 className="text-2xl">Selected sensors</h2>
+      <div className="flex flex-col justify-between">
         <div>
-          {selectedSensors.map((s) => (
-            <option key={s.id}>{s.id}</option>
-          ))}
+          <h2 className="text-2xl">Selected sensors</h2>
+          <div>
+            {selectedSensors.map((s) => (
+              <option key={s.id}>{s.id}</option>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <button
+            onClick={() => setSelectedSensors([])}
+            className="btn-primary w-1/2"
+          >
+            Clear
+          </button>
         </div>
       </div>
     </div>
