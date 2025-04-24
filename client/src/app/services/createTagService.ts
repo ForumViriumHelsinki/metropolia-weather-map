@@ -5,7 +5,7 @@ export const createTagService = async (newTag: string) => {
     const res = await apiFetch("/tags", {
       method: "POST",
       body: JSON.stringify({ tag: newTag }),
-      headers: { "Content-Type": "application/json" }, // Ensure proper headers
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) {

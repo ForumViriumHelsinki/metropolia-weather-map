@@ -58,11 +58,15 @@ const Tags = () => {
   };
 
   return (
-    <div>
-      <h1>Tag analysis</h1>
-      <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
+      <TagAdding
+        tags={tags}
+        setTags={setTags}
+        selectedSensors={selectedSensors}
+      />
+
+      {/* <h1>Tag analysis</h1>
         <div className="bg-off-white grid grid-cols-2">
-          {/* List of tags */}
           <div>
             <h2>Tags</h2>
             <select
@@ -76,7 +80,6 @@ const Tags = () => {
             </select>
           </div>
 
-          {/* Sensors with tag */}
           <div className="h-56 overflow-y-scroll">
             {sensorsWithTag.map((s) => (
               <div
@@ -87,22 +90,15 @@ const Tags = () => {
                 <div>{s.location}</div>
               </div>
             ))}
-          </div>
-        </div>
+            </div>
+            </div> */}
 
-        <TagAdding
-          tags={tags}
-          setTags={setTags}
+      <div className="border-off-white aspect-4/2 w-full rounded-lg border">
+        <TagMap
+          sensors={sensorsWithTag.length === 0 ? allSensors : sensorsWithTag}
           selectedSensors={selectedSensors}
+          handleSelectedSensors={handleSelectedSensors}
         />
-
-        <div className="aspect-4/2 w-full">
-          <TagMap
-            sensors={sensorsWithTag.length === 0 ? allSensors : sensorsWithTag}
-            selectedSensors={selectedSensors}
-            handleSelectedSensors={handleSelectedSensors}
-          />
-        </div>
       </div>
     </div>
   );
