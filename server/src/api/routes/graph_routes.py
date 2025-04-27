@@ -40,8 +40,7 @@ async def plot_humidity_trends():
     img_buffer = temp_vs_humidity_correlation.plot_humidity_trends()
     return Response(content=img_buffer.read(), media_type="image/png")
 
-@graph_router.get("/api/plot/tempvshumiditytest")
+@graph_router.get("/api/plot/temp_vs_humidity_correlation")
 async def plot_temp_vs_humidity_test():
     img_buffer = temp_vs_humidity_correlation.plot_temp_vs_humidity()
     return Response(content=img_buffer.read(), media_type="image/png")
-    
