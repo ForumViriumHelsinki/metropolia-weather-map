@@ -1,4 +1,7 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlmodel import Session, select
 from src.api.database import get_session
 from src.api.models import Sensor, SensorTag
@@ -22,3 +25,17 @@ def get_sensors(session: Session = Depends(get_session), tag: str | None = None)
         return sensors
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+class NewSensor(BaseModel):
+    id: str
+    lat: float
+    lon: float
+    location: str
+    install_date: date
+    csv_link: str
+
+
+@sensor_router.post("/api/sensors")
+def add_sensor(session: Session = Depends(get_session)):
+    return "Not implemented"
