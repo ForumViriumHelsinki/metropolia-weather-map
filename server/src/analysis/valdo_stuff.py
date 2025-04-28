@@ -1,11 +1,8 @@
-import asyncio
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from utils.get_data_util import get_all_locations
-from analysis.save_graph import save_graph
-
-plt.style.use("seaborn-v0_8")
+from src.utils.get_data_util import get_all_locations
+from src.utils.save_graph import save_graph
 
 # --------------------------
 # TEMP FUNCTIONS
@@ -180,7 +177,7 @@ def plot_monthly_night_temperature_difference(df, reference_location="Laajasalo"
         plt.plot(diff_df.index, diff_df[loc], marker='o', label=f"{loc} - {reference_location}")
 
     plt.axhline(0, color="gray", linestyle="--", linewidth=1)
-    plt.title(f"Kuukausittainen yölämpötilaero verrattuna alueeseen {reference_location}")
+    plt.title(f"Kuukausittainen yölämpötilaero verrattuna Laajasaloon")
     plt.xlabel("Kuukausi")
     plt.ylabel("Lämpötilaero (°C)")
     plt.grid(axis="y")
@@ -301,8 +298,8 @@ def plot_monthly_night_humidity(df):
 # MAIN
 # --------------------------
 
-async def main():
-    df = await get_all_locations()
+def main():
+    df = get_all_locations()
 
     # Temperature
     plot_daily_temperature_range(df)
@@ -319,4 +316,4 @@ async def main():
     plot_monthly_night_humidity(df)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
