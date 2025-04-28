@@ -42,11 +42,9 @@ def temperature_by_tag(
         nighttime=nighttime,
     )
 
-    print(df1.head())
-    return
-
-    df2 = get_by_location(
+    df2 = filter_location_with_tag(
         location,
+        tag2,
         get_2024=is_year_2024,
         get_2025=is_year_2025,
         daytime=daytime,
@@ -63,8 +61,8 @@ def temperature_by_tag(
     match graph_type:
         case "plot":
             graph = plot_daily_temp_avg(
-                df1=df1,
-                df2=df2,
+                df1=avg1,
+                df2=avg2,
                 title=f"Päivittäinen lämpötila vaihtelu {location}ssa",
                 df1_label=tag1,
                 df2_label=tag2,
@@ -89,6 +87,4 @@ if __name__ == "__main__":
         daytime=False,
         nighttime=False,
     )
-    exit()
     save_graph(file_name="tag_general", plt=graph, folder="test")
-    graph.show()

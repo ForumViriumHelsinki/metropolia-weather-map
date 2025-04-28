@@ -33,7 +33,9 @@ def filter_df_by_tag(df, tag):
     return df[df["dev-id"].isin(ids)]
 
 
-def filter_location_with_tag(location, tag, get_2024, get_2025, daytime, nighttime):
+def filter_location_with_tag(
+    location, tag, get_2024=False, get_2025=False, daytime=None, nighttime=None
+):
     print("filter_location_with_tag()")
 
     df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
