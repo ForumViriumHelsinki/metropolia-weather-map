@@ -33,6 +33,7 @@ SQLAlchemy==2.0.39
 sqlmodel==0.0.24
 starlette==0.46.1
 statsmodels==0.14.4
+seaborn==0.13.2
 typing_extensions==4.12.2
 tzdata==2025.2
 urllib3==2.3.0

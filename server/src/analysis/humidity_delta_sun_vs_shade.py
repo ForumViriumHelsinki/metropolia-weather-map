@@ -1,3 +1,4 @@
+import io
 import pandas as pd
 import matplotlib.pyplot as plt
 from src.utils.get_data_util import get_vallila
@@ -57,6 +58,8 @@ def group_data(data):
     return grouped_data
 
 def main():
+    buf = io.BytesIO()
+
     data = get_vallila()
     # CURRENTLY FILTER DF BY TAG DOESNT WORK BECAUSE THE DATABASE IS EMPTY FOR weather.sensor_tag
     data_sun = group_data(filter_df_by_tag(data, "aurinko"))
@@ -84,9 +87,16 @@ def main():
         plt.title("Hourly Average Humidity Change (Sun vs Shade)")
         plt.legend()
         plt.grid()
-        plt.show()
+        #plt.show()
+        plt.savefig(buf, format='png')
+        plt.close()
+        buf.seek(0)
 
-    if sun_humidity_change_daily is not None and shade_humidity_change_daily is not None:
+    else:
+        print("Not enough data to compute daily humidity changes.")
+
+    '''
+        if sun_humidity_change_daily is not None and shade_humidity_change_daily is not None:
         combined_daily = sun_humidity_change_daily.join(shade_humidity_change_daily, lsuffix='_sun', rsuffix='_shade', how='inner')
 
         # Plot daily humidity change
@@ -99,9 +109,14 @@ def main():
         plt.title("Daily Average Humidity Change (Sun vs Shade)")
         plt.legend()
         plt.grid()
-        plt.show()
-    else:
-        print("Not enough data to compute daily humidity changes.")
+        #plt.show()
+        plt.savefig(buf2, format='png')
+        plt.close()
+        buf2.seek(0)
+    '''
+    
+
+    return buf
 
 
 
