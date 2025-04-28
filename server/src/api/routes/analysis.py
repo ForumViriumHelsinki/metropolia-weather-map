@@ -1,3 +1,4 @@
+import io
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,13 +7,14 @@ from sqlmodel import Session, select
 from src.analysis.scripts.temperature_by_tag import temperature_by_tag
 from src.api.database import get_session
 from src.api.models import Sensor, SensorTag
+from starlette.responses import StreamingResponse
 
 analysis_router = APIRouter()
 
 
 @analysis_router.get("/api/analysis/temperature")
 def get_temperature_graph():
-    result = temperature_by_tag(
+    graph = temperature_by_tag(
         tag1="aurinko",
         tag2="varjo",
         location="Vallila",
@@ -23,5 +25,8 @@ def get_temperature_graph():
         nighttime=False,
     )
 
-    return type(result)
-    return "not implemented"
+    buf = io.BytesIO()
+    graph.savefig(buf, format="svg")
+    buf.seek(0)
+
+    return StreamingResponse(buf, media_type="image/svg+xml")
