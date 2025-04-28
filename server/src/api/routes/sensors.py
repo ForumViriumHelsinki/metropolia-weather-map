@@ -9,7 +9,7 @@ from src.api.models import Sensor, SensorTag
 sensor_router = APIRouter()
 
 
-@sensor_router.get("/api/sensors/")
+@sensor_router.get("/api/sensors")
 def get_sensors(session: Session = Depends(get_session), tag: str | None = None):
     if tag:
         stmt = (
