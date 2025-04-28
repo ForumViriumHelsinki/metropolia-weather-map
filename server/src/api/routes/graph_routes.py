@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query, Response
 
 from ...utils.utils import map_locations
+from ...analysis import location_analysis
 
 from ...analysis import fluctuation_and_decomposition_analysis
 from ...analysis import humidity_delta_sun_vs_shade
@@ -44,3 +45,49 @@ async def plot_humidity_trends():
 async def plot_temp_vs_humidity_test():
     img_buffer = temp_vs_humidity_correlation.plot_temp_vs_humidity()
     return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/daily_temperature_range")
+async def plot_daily_temperature_range():
+    img_buffer = location_analysis.plot_daily_temperature_range()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/daily_median_temperature")
+async def plot_daily_median_temperature():
+    img_buffer = location_analysis.plot_daily_median_temperature()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/monthly_night_temperature")
+async def plot_monthly_night_temperature():
+    img_buffer = location_analysis.plot_monthly_night_temperature()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/monthly_night_min_temperature")
+async def plot_monthly_night_min_temperature():
+    img_buffer = location_analysis.plot_monthly_night_min_temperature()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/monthly_night_temperature_difference")
+async def plot_monthly_night_temperature_difference():
+    img_buffer = location_analysis.plot_monthly_night_temperature_difference()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/daily_median_humidity")
+async def plot_daily_median_humidity():
+    img_buffer = location_analysis.plot_daily_median_humidity()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/daily_humidity_range")
+async def plot_daily_humidity_range():
+    img_buffer = location_analysis.plot_daily_humidity_range()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/day_night_humidity_difference")
+async def plot_day_night_humidity_difference():
+    img_buffer = location_analysis.plot_day_night_humidity_difference()
+    return Response(content=img_buffer.read(), media_type="image/png")
+
+@graph_router.get("/api/plot/monthly_night_humidity")
+async def plot_monthly_night_humidity():
+    img_buffer = location_analysis.plot_monthly_night_humidity()
+    return Response(content=img_buffer.read(), media_type="image/png")
+

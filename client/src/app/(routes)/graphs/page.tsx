@@ -15,7 +15,16 @@ export default function Home() {
         "/plot/humidity_delta",
         "/plot/temperature_delta",
         "/plot/humidity_trends",
-        "/plot/temp_vs_humidity_correlation"
+        "/plot/temp_vs_humidity_correlation",
+        "/plot/daily_temperature_range",
+        "/plot/daily_median_temperature",
+        "/plot/monthly_night_temperature",
+        "/plot/monthly_night_min_temperature",
+        "/plot/monthly_night_temperature_difference",
+        "/plot/daily_median_humidity",
+        "/plot/daily_humidity_range",
+        "/plot/day_night_humidity_difference",
+        "/plot/monthly_night_humidity"
     ];
 
     const LoadAllImages = async () => {
