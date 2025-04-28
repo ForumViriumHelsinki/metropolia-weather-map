@@ -54,14 +54,19 @@ def compute_humidity_change(sensor_data, resample_period):
     return merged_df
 
 def group_data(data):
+    """
+    groups data by 'dev-id'
+    """
     grouped_data = {sensor_id: group for sensor_id, group in data.groupby('dev-id')}
     return grouped_data
 
 def main():
+    """
+    Main function to compute and plot humidity changes for sun and shade sensors.
+    """
     buf = io.BytesIO()
-
     data = get_vallila()
-    # CURRENTLY FILTER DF BY TAG DOESNT WORK BECAUSE THE DATABASE IS EMPTY FOR weather.sensor_tag
+
     data_sun = group_data(filter_df_by_tag(data, "aurinko"))
     data_shade= group_data(filter_df_by_tag(data, "varjo"))
 
@@ -79,12 +84,12 @@ def main():
 
         # Plot hourly humidity change
         plt.figure(figsize=(12, 6))
-        plt.plot(combined_hourly.index, combined_hourly['humidity_change_sun'], label="Sun Sensors (Hourly)", color='orange')
-        plt.plot(combined_hourly.index, combined_hourly['humidity_change_shade'], label="Shade Sensors (Hourly)", color='blue')
+        plt.plot(combined_hourly.index, combined_hourly['humidity_change_sun'], label="Auringossa olevat sensorit (tunnittainen)", color='orange')
+        plt.plot(combined_hourly.index, combined_hourly['humidity_change_shade'], label="Varjossa olevat sensorit (tunnittainen)", color='blue')
         plt.axhline(y=0, color='black', linestyle='--', linewidth=0.8)
         plt.xlabel("Time")
-        plt.ylabel("Avg Hourly Humidity Change (Δ Humidity)")
-        plt.title("Hourly Average Humidity Change (Sun vs Shade)")
+        plt.ylabel("Keskiarvo kosteuden muutos (Δ%)")
+        plt.title("Keskiarvo kosteuden muutos (Auringossa vs Varjossa)")
         plt.legend()
         plt.grid()
         #plt.show()
@@ -96,7 +101,8 @@ def main():
         print("Not enough data to compute daily humidity changes.")
 
     '''
-        if sun_humidity_change_daily is not None and shade_humidity_change_daily is not None:
+    ## Plot daily humidity change
+    if sun_humidity_change_daily is not None and shade_humidity_change_daily is not None:
         combined_daily = sun_humidity_change_daily.join(shade_humidity_change_daily, lsuffix='_sun', rsuffix='_shade', how='inner')
 
         # Plot daily humidity change
@@ -114,8 +120,8 @@ def main():
         plt.close()
         buf2.seek(0)
     '''
-    
 
+    # return the buffer, typically used for sending the image in a web response
     return buf
 
 

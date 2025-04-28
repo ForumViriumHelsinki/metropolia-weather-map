@@ -5,32 +5,6 @@ import matplotlib.pyplot as plt
 from src.utils.get_data_util import get_vallila
 from src.utils.filter_tag import filter_df_by_tag
 
-"""
-def load_data(year):
-    df = utils.get_csv(year)
-    data = utils.separate_sensors(df)
-    return data
-
-def filter_sundata(data):
-    data_sun = {sensor_id: data[sensor_id] for sensor_id in SENSOR_SUN if sensor_id in data}
-    return data_sun
-
-def filter_shadedata(data):
-    data_shade = {sensor_id: data[sensor_id] for sensor_id in SENSOR_SHADE if sensor_id in data}
-    return data_shade
-
-def ask_user_for_year():
-    year = input("Enter year for source data or 'all' for all available: ")
-    try:
-        year = int(year)
-    except ValueError:
-        if(year == "" or year == "all"):
-            return None
-        print("Please enter a valid year.")
-        return ask_user_for_year()
-    return year
-"""
-
 def compute_tempdeltas(sensor_data, resample_period):
     """
     Computes the average temperature change for a given set of sensors,
@@ -56,12 +30,22 @@ def compute_tempdeltas(sensor_data, resample_period):
     merged_df = pd.concat(temperature_deltas).groupby('time').mean()
     return merged_df
 
+
 def group_data(data):
+    """
+    groups data by 'dev-id'
+    """
     grouped_data = {sensor_id: group for sensor_id, group in data.groupby('dev-id')}
     return grouped_data
 
+
 def main():
+    """
+    Main function to compute and plot temperature changes for sun and shade sensors.
+    """
+    # buffer for data stream
     buf = io.BytesIO()
+    # Get Vallila data
     data = get_vallila()
 
     # Filter data using existing functions
@@ -82,15 +66,16 @@ def main():
 
         # Plot hourly temperature changes for sun and shade sensors
         plt.figure(figsize=(12, 6))
-        plt.plot(combined_delta_hourly.index, combined_delta_hourly['temperature_change_sun'], label="Sun Sensors (Hourly)", color='orange')
-        plt.plot(combined_delta_hourly.index, combined_delta_hourly['temperature_change_shade'], label="Shade Sensors (Hourly", color='blue')
+        plt.plot(combined_delta_hourly.index, combined_delta_hourly['temperature_change_sun'], label="Auringossa olevat sensorit (tunnittainen)", color='orange')
+        plt.plot(combined_delta_hourly.index, combined_delta_hourly['temperature_change_shade'], label="Varjossa olevat sensorit (tunnittainen)", color='blue')
         plt.axhline(y=0, color='black', linestyle='--', linewidth=0.8)
-        plt.xlabel('Time')
-        plt.ylabel('Avg Hourly Temperature Change (°C)')
-        plt.title('Hourly Average Temperature Change (Sun vs Shade)')
+        plt.xlabel('Aika')
+        plt.ylabel('Keskiarvo lämpotilan muutos(°C)')
+        plt.title('Keskiarvo lämpotilan muutos (°C) (Auringossa vs Varjossa)')
         plt.legend()
         plt.grid()
-        #plt.show()
+
+        # Save the plot to a buffer
         plt.savefig(buf, format='png')
         plt.close()
         buf.seek(0)
@@ -98,6 +83,7 @@ def main():
     else:
         print("Not enough data to compute temperature changes.")
     '''
+    # Plot daily temperature changes for sun and shade sensors
     if sun_tempdelta_daily is not None and shade_tempdelta_daily is not None:
 
         combined_delta_daily = sun_tempdelta_daily.join(shade_tempdelta_daily, lsuffix='_sun', rsuffix='_shade', how='inner')
@@ -113,8 +99,8 @@ def main():
         plt.legend()
         plt.grid()
         plt.show()
-        '''
-    
+    '''
+    # return the buffer, typically used for sending the image in a web response
     return buf
 
 if __name__ == "__main__":
