@@ -1,3 +1,4 @@
+import io
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -60,6 +61,7 @@ def group_data(data):
     return grouped_data
 
 def main():
+    buf = io.BytesIO()
     data = get_vallila()
 
     # Filter data using existing functions
@@ -88,8 +90,14 @@ def main():
         plt.title('Hourly Average Temperature Change (Sun vs Shade)')
         plt.legend()
         plt.grid()
-        plt.show()
+        #plt.show()
+        plt.savefig(buf, format='png')
+        plt.close()
+        buf.seek(0)
 
+    else:
+        print("Not enough data to compute temperature changes.")
+    '''
     if sun_tempdelta_daily is not None and shade_tempdelta_daily is not None:
 
         combined_delta_daily = sun_tempdelta_daily.join(shade_tempdelta_daily, lsuffix='_sun', rsuffix='_shade', how='inner')
@@ -105,8 +113,9 @@ def main():
         plt.legend()
         plt.grid()
         plt.show()
-    else:
-        print("Not enough data to compute temperature changes.")
+        '''
+    
+    return buf
 
 if __name__ == "__main__":
     main()
