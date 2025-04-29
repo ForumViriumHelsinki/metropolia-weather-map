@@ -4,6 +4,7 @@ import {
   getTagGraphService,
   TagGraphParams,
 } from "@/app/services/tags/getTagGraphService";
+import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import { useState } from "react";
 
 const Analysis = () => {
@@ -11,21 +12,22 @@ const Analysis = () => {
   const [graphParams, setGraphParams] = useState<TagGraphParams>({
     tag1: "",
     tag2: "",
-    location: "",
-    graph_type: "",
+    graph_type: "plot",
   });
 
+  const [loadingMessage, setLoadingMessage] = useMessageDisplay();
+
   const getGraph = async () => {
+    console.log("getGraph()");
+
     try {
-      const blob = await getTagGraphService({
-        tag1: "meri",
-        tag2: "manner",
-        location: "Vallila",
-        graph_type: "plot",
-      });
+      setLoadingMessage("Crunching numbers");
+      const blob = await getTagGraphService(graphParams);
       setGraphUrl(URL.createObjectURL(blob));
+      setLoadingMessage("");
     } catch (error) {
       if (error instanceof Error) {
+        setLoadingMessage(`Error creating graph: ${error.message}`);
         console.error(error);
       }
     }
@@ -83,7 +85,7 @@ const Analysis = () => {
         />
       </form>
 
-      {graphUrl && (
+      {loadingMessage && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={graphUrl}

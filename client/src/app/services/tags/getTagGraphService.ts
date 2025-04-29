@@ -3,8 +3,8 @@ import { apiFetch } from "@/utils/apiFetch";
 export interface TagGraphParams {
   tag1: string;
   tag2: string;
-  location: string;
-  graph_type: string;
+  graph_type: "plot" | "bar";
+  location?: string | null;
   start_date?: string | null;
   end_date?: string | null;
   daytime?: boolean;

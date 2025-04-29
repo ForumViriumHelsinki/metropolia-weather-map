@@ -9,8 +9,8 @@ from src.utils.save_graph import save_graph
 def temperature_by_tag(
     tag1: str,
     tag2: str,
-    location: str,
     graph_type: str,
+    location: str = None,
     start_date: date = None,
     end_date: date = None,
     daytime: bool = False,
@@ -73,14 +73,11 @@ def temperature_by_tag(
         case _:
             raise ValueError("Invalid or undefined graph type")
 
-    return avg1, avg2
-
 
 if __name__ == "__main__":
     graph = temperature_by_tag(
         tag1="aurinko",
         tag2="varjo",
-        location="Vallila",
         graph_type="plot",
         start_date=None,
         end_date=None,
