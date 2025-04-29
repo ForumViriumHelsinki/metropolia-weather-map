@@ -63,7 +63,7 @@ def temperature_by_tag(
             graph = plot_daily_temp_avg(
                 df1=avg1,
                 df2=avg2,
-                title=f"Päivittäinen lämpötila vaihtelu {location}ssa",
+                title=f"Päivittäinen lämpötila vaihtelu {f"{location}ssa" if location else "" }",
                 df1_label=tag1,
                 df2_label=tag2,
             )

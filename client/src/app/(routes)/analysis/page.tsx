@@ -4,30 +4,29 @@ import {
   getTagGraphService,
   TagGraphParams,
 } from "@/app/services/tags/getTagGraphService";
-import { useMessageDisplay } from "@/utils/useMessageDisplay";
+import { GraphTypes, Locations } from "@/types";
 import { useState } from "react";
 
 const Analysis = () => {
-  const [graphUrl, setGraphUrl] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [graphUrl, setGraphUrl] = useState<string | null>(null);
   const [graphParams, setGraphParams] = useState<TagGraphParams>({
     tag1: "",
     tag2: "",
-    graph_type: "plot",
+    graph_type: GraphTypes.plot,
   });
-
-  const [loadingMessage, setLoadingMessage] = useMessageDisplay();
 
   const getGraph = async () => {
     console.log("getGraph()");
 
     try {
-      setLoadingMessage("Crunching numbers");
+      setGraphUrl(null);
+      setMessage("Crunching numbers");
       const blob = await getTagGraphService(graphParams);
       setGraphUrl(URL.createObjectURL(blob));
-      setLoadingMessage("");
     } catch (error) {
       if (error instanceof Error) {
-        setLoadingMessage(`Error creating graph: ${error.message}`);
+        setMessage(`Error creating graph: ${error.message}`);
         console.error(error);
       }
     }
@@ -36,14 +35,12 @@ const Analysis = () => {
   return (
     <div className="flex flex-col gap-4">
       <h1>Analysis</h1>
-
       <button
         className="box-basic"
         onClick={getGraph}
       >
         Get graph
       </button>
-
       <form className="box-basic flex flex-col">
         <label>Tag1</label>
         <input
@@ -64,33 +61,56 @@ const Analysis = () => {
         />
 
         <label>Location</label>
-        <input
-          type="text"
-          value={graphParams.location}
-          onChange={(e) =>
-            setGraphParams({ ...graphParams, location: e.currentTarget.value })
-          }
-        />
-
-        <label>Graph type</label>
-        <input
-          type="text"
-          value={graphParams.graph_type}
+        <select
           onChange={(e) =>
             setGraphParams({
               ...graphParams,
-              graph_type: e.currentTarget.value,
+              location: e.currentTarget.value as Locations,
             })
           }
-        />
-      </form>
+        >
+          <option value={""}>All</option>
+          {Object.values(Locations).map((loc) => (
+            <option
+              key={loc}
+              value={loc}
+            >
+              {loc}
+            </option>
+          ))}
+        </select>
 
-      {loadingMessage && (
+        <label>Graph type</label>
+        <select
+          onChange={(e) =>
+            setGraphParams({
+              ...graphParams,
+              graph_type: e.currentTarget.value as GraphTypes,
+            })
+          }
+        >
+          {Object.values(GraphTypes).map((gt) => (
+            <option
+              key={gt}
+              // value={gt}
+            >
+              {gt}
+            </option>
+          ))}
+        </select>
+      </form>
+      {graphUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={graphUrl}
           alt="Temperature Analysis Graph"
+          onLoad={() => {
+            console.log("hello");
+            setMessage("");
+          }}
         />
+      ) : (
+        <div>{message}</div>
       )}
     </div>
   );

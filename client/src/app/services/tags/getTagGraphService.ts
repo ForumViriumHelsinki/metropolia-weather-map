@@ -1,10 +1,11 @@
+import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
 export interface TagGraphParams {
   tag1: string;
   tag2: string;
-  graph_type: "plot" | "bar";
-  location?: string | null;
+  graph_type: GraphTypes;
+  location?: Locations | null;
   start_date?: string | null;
   end_date?: string | null;
   daytime?: boolean;
