@@ -4,6 +4,7 @@ from src.api.routes.analysis import analysis_router
 from src.api.routes.sensor_tags import sensor_tag_router
 from src.api.routes.sensors import sensor_router
 from src.api.routes.tags import tag_router
+from src.api.routes.graph_routes import graph_router
 
 app = FastAPI()
 
@@ -32,3 +33,4 @@ app.include_router(sensor_router)
 app.include_router(sensor_tag_router)
 app.include_router(tag_router)
 app.include_router(analysis_router)
+app.include_router(graph_router)
