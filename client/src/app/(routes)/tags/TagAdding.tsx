@@ -3,8 +3,8 @@
 import { Sensor } from "@/types";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import React, { useState } from "react";
-import { addTagService } from "../services/addTagsService";
-import { createTagService } from "../services/createTagService";
+import { addTagService } from "../../services/addTagsService";
+import { createTagService } from "../../services/createTagService";
 import { Tag } from "./page";
 
 const TagAdding = ({

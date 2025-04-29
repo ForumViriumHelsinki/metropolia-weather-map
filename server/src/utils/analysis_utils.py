@@ -18,12 +18,11 @@ def plot_daily_temp_avg(
     title,
     df1_label,
     df2_label,
-    xlabel,
-    ylabel,
     line1_color=None,
     line2_color=None,
 ):
     plt.clf()
+    print(df1.head())
 
     df1.plot(
         kind="line", label=df1_label, color=line1_color if line1_color else "orange"
@@ -37,8 +36,8 @@ def plot_daily_temp_avg(
 
     plt.title(title)
     plt.axhline(y=0, color="black", linestyle="--", linewidth=1)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    plt.xlabel("Päivämäärä")
+    plt.ylabel("Lämpötila (°C)")
     plt.legend()
     plt.grid(True)
     return plt
