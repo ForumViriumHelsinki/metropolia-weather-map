@@ -10,7 +10,7 @@ export const createTagService = async (newTag: string) => {
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error("Error creating new tag", errorData);
+      throw new Error("Error creating new tag", errorData.detail);
     }
 
     return await res.json();
