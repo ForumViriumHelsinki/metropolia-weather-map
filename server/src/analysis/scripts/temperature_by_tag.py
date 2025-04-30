@@ -59,11 +59,8 @@ def temperature_by_tag(
     df1 = filter_df_by_tag(df1, tag1)
     avg1 = daily_avg_temp(df1)
 
-    df2 = filter_location_with_tag(location, tag2)
+    df2 = filter_df_by_tag(df2, tag2)
     avg2 = daily_avg_temp(df2)
-
-    print(df1.head())
-    print(df1.tail())
 
     match graph_type:
         case "plot":

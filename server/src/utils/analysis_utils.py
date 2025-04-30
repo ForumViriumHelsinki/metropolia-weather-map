@@ -7,8 +7,8 @@ from src.utils.utils import filter_daytime_data
 
 
 def daily_avg_temp(df):
+    df = df.copy()
     df.loc[:, "date"] = df["time"].dt.date
-
     return df.groupby("date")["temperature"].mean()
 
 
@@ -22,7 +22,6 @@ def plot_daily_temp_avg(
     line2_color=None,
 ):
     plt.clf()
-    print(df1.head())
 
     df1.plot(
         kind="line", label=df1_label, color=line1_color if line1_color else "orange"
