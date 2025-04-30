@@ -2,7 +2,7 @@ from datetime import date
 
 from src.utils.analysis_utils import daily_avg_temp, plot_daily_temp_avg
 from src.utils.filter_tag import filter_df_by_tag, filter_location_with_tag
-from src.utils.get_data_util import get_by_location
+from src.utils.get_data_util import filter_date_range
 from src.utils.save_graph import save_graph
 
 
@@ -40,6 +40,8 @@ def temperature_by_tag(
         get_2025=is_year_2025,
         daytime=daytime,
         nighttime=nighttime,
+        start_date=start_date,
+        end_date=end_date,
     )
 
     df2 = filter_location_with_tag(
@@ -49,6 +51,8 @@ def temperature_by_tag(
         get_2025=is_year_2025,
         daytime=daytime,
         nighttime=nighttime,
+        start_date=start_date,
+        end_date=end_date,
     )
 
     # Location of analysis Vallila | Laajasalo | Koivukylä | All
@@ -57,6 +61,9 @@ def temperature_by_tag(
 
     df2 = filter_location_with_tag(location, tag2)
     avg2 = daily_avg_temp(df2)
+
+    print(df1.head())
+    print(df1.tail())
 
     match graph_type:
         case "plot":

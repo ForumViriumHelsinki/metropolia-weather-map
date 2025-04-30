@@ -21,11 +21,20 @@ def filter_df_by_tag(df, tag):
 
 
 def filter_location_with_tag(
-    location, tag, get_2024=False, get_2025=False, daytime=None, nighttime=None
+    location,
+    tag,
+    get_2024=False,
+    get_2025=False,
+    daytime=None,
+    nighttime=None,
+    start_date=None,
+    end_date=None,
 ):
     print("filter_location_with_tag()")
 
-    df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
+    df = get_by_location(
+        location, get_2024, get_2025, daytime, nighttime, start_date, end_date
+    )
 
     location_with_tag_ids = []
     for db in get_session():
@@ -36,8 +45,6 @@ def filter_location_with_tag(
             # .where(Sensor.location == location)
         )
         location_with_tag_ids = res.all()
-
-    print(location_with_tag_ids)
 
     df = df[df["dev-id"].isin(location_with_tag_ids)]
     return df

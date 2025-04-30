@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 import pandas as pd
 from sqlmodel import select
@@ -12,10 +13,21 @@ def get_by_location(
     get_2025: bool = False,
     daytime: bool = False,
     nighttime: bool = False,
+    start_date: date = None,
+    end_date: date = None,
 ):
+
     match location:
         case "Vallila":
-            return get_vallila(get_2024, get_2025, daytime, nighttime)
+            dfV = get_vallila(
+                get_2024,
+                get_2025,
+                daytime,
+                nighttime,
+            )
+
+            dfV = filter_date_range(dfV, start_date, end_date)
+            return dfV
         case "Koivukylä":
             return get_koivukyla(get_2024, get_2025, daytime, nighttime)
         case "Laajasalo":
@@ -33,7 +45,6 @@ def get_vallila(
     daytime: bool = False,
     nightime: bool = False,
 ):
-
     df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
         parse_dates=["time"],
@@ -182,8 +193,21 @@ def get_rest(
     return df
 
 
-def set_df_date_range(df, start_date, end_date):
-    mask = (df["time"] >= start_date) & (end_date <= df["time"])
+def filter_date_range(df, start_date, end_date):
+    if start_date:
+        start_date = pd.to_datetime(start_date).tz_localize("UTC")
+    if end_date:
+        end_date = pd.to_datetime(end_date).tz_localize("UTC")
+
+    if start_date and end_date:
+        mask = (df["time"] >= start_date) & (df["time"] <= end_date)
+    elif start_date:
+        mask = df["time"] >= start_date
+    elif end_date:
+        mask = df["time"] <= end_date
+    else:
+        return df
+
     return df[mask]
 
 

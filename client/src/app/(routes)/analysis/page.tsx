@@ -80,6 +80,28 @@ const Analysis = () => {
           ))}
         </select>
 
+        <label>Start date</label>
+        <input
+          type="date"
+          onChange={(e) =>
+            setGraphParams({
+              ...graphParams,
+              start_date: e.currentTarget.value,
+            })
+          }
+        />
+
+        <label>End date</label>
+        <input
+          type="date"
+          onChange={(e) =>
+            setGraphParams({
+              ...graphParams,
+              end_date: e.currentTarget.value,
+            })
+          }
+        />
+
         <label>Graph type</label>
         <select
           onChange={(e) =>
