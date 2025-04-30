@@ -27,14 +27,10 @@ def filter_location_with_tag(
     get_2025=False,
     daytime=None,
     nighttime=None,
-    start_date=None,
-    end_date=None,
 ):
     print("filter_location_with_tag()")
 
-    df = get_by_location(
-        location, get_2024, get_2025, daytime, nighttime, start_date, end_date
-    )
+    df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
 
     location_with_tag_ids = []
     for db in get_session():

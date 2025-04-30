@@ -13,21 +13,11 @@ def get_by_location(
     get_2025: bool = False,
     daytime: bool = False,
     nighttime: bool = False,
-    start_date: date = None,
-    end_date: date = None,
 ):
 
     match location:
         case "Vallila":
-            dfV = get_vallila(
-                get_2024,
-                get_2025,
-                daytime,
-                nighttime,
-            )
-
-            dfV = filter_date_range(dfV, start_date, end_date)
-            return dfV
+            return get_vallila(get_2024, get_2025, daytime, nighttime)
         case "Koivukylä":
             return get_koivukyla(get_2024, get_2025, daytime, nighttime)
         case "Laajasalo":

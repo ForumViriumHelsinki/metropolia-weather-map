@@ -40,9 +40,9 @@ def temperature_by_tag(
         get_2025=is_year_2025,
         daytime=daytime,
         nighttime=nighttime,
-        start_date=start_date,
-        end_date=end_date,
     )
+
+    df1 = filter_date_range(df1, start_date, end_date)
 
     df2 = filter_location_with_tag(
         location,
@@ -51,9 +51,9 @@ def temperature_by_tag(
         get_2025=is_year_2025,
         daytime=daytime,
         nighttime=nighttime,
-        start_date=start_date,
-        end_date=end_date,
     )
+
+    df2 = filter_date_range(df2, start_date, end_date)
 
     # Location of analysis Vallila | Laajasalo | Koivukylä | All
     df1 = filter_df_by_tag(df1, tag1)
