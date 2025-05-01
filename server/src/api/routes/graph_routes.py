@@ -16,8 +16,8 @@ async def plot_raw_humidity():
     return Response(content=img_buffer.read(), media_type="image/png")
 
 @graph_router.get("/api/plot/fft")
-async def plot_fft():
-    img_buffer = fluctuation_and_decomposition_analysis.plot_fft_analysis()
+async def plot_fft(area: str = Query(None, description="Area to filter by (Vallila, Laajasalo, Koivukylä)")):
+    img_buffer = fluctuation_and_decomposition_analysis.plot_fft_analysis(area=area)
     return Response(content=img_buffer.read(), media_type="image/png")
 
 @graph_router.get("/api/plot/seasonal_decomposition")
