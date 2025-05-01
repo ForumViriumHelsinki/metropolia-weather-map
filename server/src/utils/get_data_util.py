@@ -6,12 +6,32 @@ from src.api.database import get_session
 from src.api.models import Sensor
 
 
+def get_by_location(
+    location: str = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
+    daytime: bool = False,
+    nighttime: bool = False,
+):
+    match location:
+        case "Vallila":
+            return get_vallila(get_2024, get_2025, daytime, nighttime)
+        case "Koivukylä":
+            return get_koivukyla(get_2024, get_2025, daytime, nighttime)
+        case "Laajasalo":
+            return get_laajasalo(get_2024, get_2025, daytime, nighttime)
+        case _:
+            return get_all_locations(get_2024, get_2025, daytime, nighttime)
+
+    return
+
+
 # Fetch and filter makelankatu data
 def get_vallila(
-    get_2024: bool = None,
-    get_2025: bool = None,
-    daytime: bool = None,
-    nightime: bool = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
+    daytime: bool = False,
+    nightime: bool = False,
 ):
 
     df24 = pd.read_csv(
@@ -42,10 +62,10 @@ def get_vallila(
 
 
 def get_laajasalo(
-    get_2024: bool = None,
-    get_2025: bool = None,
-    daytime: bool = None,
-    nightime: bool = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
+    daytime: bool = False,
+    nightime: bool = False,
 ):
     if get_2024:
         df = get_rest(get_2024=True)
@@ -69,10 +89,10 @@ def get_laajasalo(
 
 
 def get_koivukyla(
-    get_2024: bool = None,
-    get_2025: bool = None,
-    daytime: bool = None,
-    nightime: bool = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
+    daytime: bool = False,
+    nightime: bool = False,
 ):
     if get_2024:
         df = get_rest(get_2024=True)
@@ -95,10 +115,10 @@ def get_koivukyla(
 
 
 def get_all_locations(
-    get_2024: bool = None,
-    get_2025: bool = None,
-    daytime: bool = None,
-    nightime: bool = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
+    daytime: bool = False,
+    nightime: bool = False,
 ):
     if get_2024:
         dfV = get_vallila(get_2024=True)
@@ -142,8 +162,8 @@ def filter_install_date(df, location):
 
 
 def get_rest(
-    get_2024: bool = None,
-    get_2025: bool = None,
+    get_2024: bool = False,
+    get_2025: bool = False,
 ):
     df24 = pd.read_csv(
         "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]

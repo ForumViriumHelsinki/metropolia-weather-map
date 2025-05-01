@@ -7,21 +7,33 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
-  const endpoints = [
-    "/plot/raw_humidity",
-    "/plot/fft",
-    "/plot/fft?area=Vallila",
-    "/plot/fft?area=Laajasalo",
-    "/plot/fft?area=Koivukyl%C3%A4",
-    "/plot/seasonal_decomposition",
-    "/plot/humidity_delta",
-    "/plot/temperature_delta",
-    "/plot/humidity_trends",
-    "/plot/temp_vs_humidity_correlation",
-  ];
+
 
   const LoadAllImages = async () => {
     setLoading(true);
+
+    const endpoints = [
+        "/plot/raw_humidity",
+        "/plot/fft",
+        "/plot/fft?area=Vallila",
+        "/plot/fft?area=Laajasalo",
+        "/plot/fft?area=Koivukyl%C3%A4",
+        "/plot/seasonal_decomposition",
+        "/plot/humidity_delta",
+        "/plot/temperature_delta",
+        "/plot/humidity_trends",
+        "/plot/temp_vs_humidity_correlation",
+        "/plot/daily_temperature_range",
+        "/plot/daily_median_temperature",
+        "/plot/monthly_night_temperature",
+        "/plot/monthly_night_min_temperature",
+        "/plot/monthly_night_temperature_difference",
+        "/plot/daily_median_humidity",
+        "/plot/daily_humidity_range",
+        "/plot/day_night_humidity_difference",
+        "/plot/monthly_night_humidity"
+    ];
+
 
     try {
       const endpointsToFetch = endpoints.filter(

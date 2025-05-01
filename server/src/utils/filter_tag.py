@@ -3,7 +3,7 @@ from sqlmodel import select
 from src.api.database import get_session
 from src.api.models import Sensor, SensorTag
 
-from .get_data_util import get_koivukyla, get_laajasalo, get_vallila
+from .get_data_util import get_by_location
 
 # Get ids with the specified tag
 # async def sensors_with_tag(tag):
@@ -33,18 +33,12 @@ def filter_df_by_tag(df, tag):
     return df[df["dev-id"].isin(ids)]
 
 
-def filter_location_with_tag(location, tag):
+def filter_location_with_tag(
+    location, tag, get_2024=False, get_2025=False, daytime=None, nighttime=None
+):
     print("filter_location_with_tag()")
 
-    match location:
-        case "Koivukylä":
-            df = get_koivukyla()
-        case "Vallila":
-            df = get_vallila()
-        case "Laajasalo":
-            df = get_laajasalo()
-        case _:
-            raise Exception("Invalid location")
+    df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
 
     location_with_tag_ids = []
     for db in get_session():

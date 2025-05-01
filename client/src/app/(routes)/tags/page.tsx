@@ -5,7 +5,8 @@ import { apiFetch } from "@/utils/apiFetch";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { removeTagService } from "../services/removeTagService";
+import { removeTagService } from "../../services/removeTagService";
+import AddSensor from "./AddSensor";
 import TagAdding from "./TagAdding";
 
 // Fixes error 500
@@ -124,6 +125,8 @@ const Tags = () => {
           handleSelectedSensors={handleSelectedSensors}
         />
       </div>
+
+      <AddSensor />
     </div>
   );
 };
