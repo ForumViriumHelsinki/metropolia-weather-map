@@ -75,7 +75,7 @@ def plot_fft_analysis(area=None):
 
     ax.set_yscale('log')
     ax.set_title('Ilmankosteuden FFT-analyysi')
-    ax.set_xlabel('Taajuus (x*1)')
+    ax.set_xlabel('Taajuus (x/1)')
     ax.set_ylabel('Voimakkuus')
     ax.grid(True)
     ax.legend(title="Sensors", bbox_to_anchor=(1, 1))
