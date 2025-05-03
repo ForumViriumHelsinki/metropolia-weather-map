@@ -1,3 +1,4 @@
+import DropMenu from "@/components/DropMenu";
 import GraphDisplay from "@/components/GraphDisplay/";
 import MapWrapper from "@/components/Map/MapWrapper";
 import SensorCard from "@/components/SensorCard/SensorCard";
@@ -61,7 +62,8 @@ export default async function Home() {
           Error fetching latest data from server
         </div>
       )}
-      <div className="grid-scaling">
+
+      <DropMenu title="Vallila">
         {vallila.map((sensor) => {
           return (
             <VallilaCard
@@ -73,6 +75,9 @@ export default async function Home() {
             />
           );
         })}
+      </DropMenu>
+
+      <DropMenu title="Koivukylä">
         {koivukyla.map((sensor) => (
           <SensorCard
             key={sensor.id}
@@ -80,6 +85,9 @@ export default async function Home() {
             markerColor={"var(--color-shade)"}
           />
         ))}
+      </DropMenu>
+
+      <DropMenu title="Laajasalo">
         {laajasalo.map((sensor) => (
           <SensorCard
             key={sensor.id}
@@ -87,7 +95,7 @@ export default async function Home() {
             markerColor={"var(--color-sun)"}
           />
         ))}
-      </div>
+      </DropMenu>
 
       <GraphDisplay />
     </main>
