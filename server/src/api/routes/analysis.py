@@ -55,35 +55,3 @@ def get_temperature_graph(
         return StreamingResponse(buf, media_type="image/svg+xml")
     except Exception as e:
         print(e)
-
-
-def parse_date(date_str: str, is_end_date: bool = False) -> date:
-    """
-    Parse a date string in 'dd-mm-yyyy', 'mm-yyyy', or 'yyyy-mm' format into a date object.
-    If is_end_date is True, set the date to the last day of the month for 'mm-yyyy' or 'yyyy-mm'.
-    """
-    if not date_str:
-        return None
-
-    try:
-        # Try parsing 'dd-mm-yyyy'
-        return datetime.strptime(date_str, "%d-%m-%Y").date()
-    except ValueError:
-        pass
-
-    try:
-        # Try parsing 'mm-yyyy' or 'yyyy-mm'
-        parsed_date = (
-            datetime.strptime(date_str, "%m-%y").date()
-            if "-" in date_str[2:]
-            else datetime.strptime(date_str, "%y-%m").date()
-        )
-        if is_end_date:
-            # Set to the last day of the month
-            last_day = calendar.monthrange(parsed_date.year, parsed_date.month)[1]
-            return parsed_date.replace(day=last_day)
-        return parsed_date
-    except ValueError:
-        raise ValueError(
-            f"Invalid date format: {date_str}. Use 'dd-mm-yyyy', 'mm-yyyy', or 'yyyy-mm'."
-        )
