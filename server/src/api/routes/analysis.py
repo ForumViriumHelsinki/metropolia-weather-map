@@ -26,12 +26,12 @@ def get_temperature_graph(
         f"start_date: {start_date}, end_date: {end_date}, daytime: {daytime}, nighttime: {nighttime}"
     )
 
-    if graph_type == "bar":
+    if graph_type == "bar" and start_date and end_date:
         # Parse start date
         year, month = start_date.split("-")
         start_date = date(year=int(year), month=int(month), day=1)
 
-        # Parse end day
+        # Parse end date
         year, month = map(int, end_date.split("-"))
         last_day = calendar.monthrange(year, month)[1]
         end_date = date(year=year, month=month, day=last_day)

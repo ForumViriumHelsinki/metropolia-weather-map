@@ -61,6 +61,8 @@ months = [
 def plot_monthly_temp_diff(df1, df2, title, df1_label, df2_label, ylim=None):
     plt.clf()
 
+    plt.figure(figsize=(10, 5))
+
     df1 = df1.copy()
     df2 = df2.copy()
 
@@ -102,5 +104,7 @@ def plot_monthly_temp_diff(df1, df2, title, df1_label, df2_label, ylim=None):
     plt.legend()
     plt.xlabel("Kuukausi")
     plt.ylabel("Lämpötila (°C)")
-    plt.xticks(months_indices, [months[m - 1] for m in available_months], rotation=0)
+    plt.xticks(months_indices, [months[m - 1] for m in available_months], rotation=45)
+    plt.subplots_adjust(bottom=0.2)
+
     return plt
