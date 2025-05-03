@@ -18,6 +18,8 @@ export const getTagGraphService = async (
   try {
     const searchParams = new URLSearchParams();
     for (const [key, val] of Object.entries(params)) {
+      if (!val) continue;
+
       searchParams.set(key, val);
     }
 

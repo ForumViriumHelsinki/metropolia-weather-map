@@ -42,7 +42,23 @@ def plot_daily_temp_avg(
     return plt
 
 
-def plot_monthly_temp_diff(df1, df2, title, ylim=None):
+months = [
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
+]
+
+
+def plot_monthly_temp_diff(df1, df2, title, df1_label, df2_label, ylim=None):
     plt.clf()
 
     df1 = df1.copy()
@@ -54,12 +70,37 @@ def plot_monthly_temp_diff(df1, df2, title, ylim=None):
     mean1 = df1.groupby("month")["temperature"].mean()
     mean2 = df2.groupby("month")["temperature"].mean()
 
-    diff = mean1 - mean2
+    # Get the union of months present in both datasets
+    available_months = sorted(set(mean1.index).union(mean2.index))
 
-    diff.plot(kind="bar", ylim=ylim, figsize=(10, 5), zorder=3)
+    # Align the means to the available months
+    mean1 = mean1.reindex(available_months, fill_value=0)
+    mean2 = mean2.reindex(available_months, fill_value=0)
+
+    bar_width = 0.4
+    months_indices = range(len(available_months))
+
+    plt.bar(
+        [x - bar_width / 2 for x in months_indices],
+        mean1,
+        width=bar_width,
+        label=df1_label,
+        color="orange",
+        zorder=3,
+    )
+    plt.bar(
+        [x + bar_width / 2 for x in months_indices],
+        mean2,
+        width=bar_width,
+        label=df2_label,
+        color="royalblue",
+        zorder=3,
+    )
+
     plt.grid(True, zorder=0)
     plt.title(title)
     plt.legend()
     plt.xlabel("Kuukausi")
-    plt.ylabel("Ero °C")
+    plt.ylabel("Lämpötila (°C)")
+    plt.xticks(months_indices, [months[m - 1] for m in available_months], rotation=0)
     return plt

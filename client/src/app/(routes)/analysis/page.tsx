@@ -86,7 +86,7 @@ const Analysis = () => {
           {graphParams.graph_type === GraphTypes.plot ? "Start date" : "Date"}
         </label>
         <input
-          type="date"
+          type={graphParams.graph_type === "plot" ? "date" : "month"}
           onChange={(e) =>
             setGraphParams({
               ...graphParams,
@@ -97,8 +97,8 @@ const Analysis = () => {
 
         <label>End date</label>
         <input
-          type="date"
-          disabled={graphParams.graph_type === GraphTypes.bar}
+          type={graphParams.graph_type === "plot" ? "date" : "month"}
+          // disabled={graphParams.graph_type === GraphTypes.bar}
           onChange={(e) =>
             setGraphParams({
               ...graphParams,

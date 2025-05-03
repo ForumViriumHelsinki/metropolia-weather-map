@@ -7,7 +7,6 @@ from .get_data_util import get_by_location
 
 
 def filter_df_by_tag(df, tag):
-    print("filter_df_by_tag()")
     for db in get_session():
         res = db.exec(
             select(Sensor.id)
@@ -28,7 +27,6 @@ def filter_location_with_tag(
     daytime=None,
     nighttime=None,
 ):
-    print("filter_location_with_tag()")
 
     df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
 
