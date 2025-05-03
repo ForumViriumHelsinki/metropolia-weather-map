@@ -44,7 +44,7 @@ export default async function Home() {
   }
 
   const vallila = sensors.filter((s) => s.location === "Vallila");
-  const koivukyla = sensors.filter((s) => s.location === "Koivukylä");
+  const koivukyla = sensors.filter((s) => s.location === "KoivukylÃ¤");
   const laajasalo = sensors.filter((s) => s.location === "Laajasalo");
 
   return (
