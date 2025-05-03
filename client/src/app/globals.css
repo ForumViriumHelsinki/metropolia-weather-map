@@ -27,11 +27,29 @@
 
   --sun: var(--color-sun);
   --shade: var(--color-shade);
+
   h2 {
     @apply font-heavy;
   }
+
   h3 {
     @apply font-heavy text-xl;
+  }
+
+  input {
+    @apply form-input;
+
+    &:disabled {
+      @apply cursor-not-allowed bg-gray-200 text-gray-500;
+    }
+  }
+
+  select {
+    @apply form-input;
+
+    &:disabled {
+      @apply cursor-not-allowed bg-gray-200 text-gray-500;
+    }
   }
 }
 
@@ -41,14 +59,8 @@ body {
   font-family: var(--font-avenir), Arial, Helvetica, sans-serif;
 }
 
-/* Leaflet */
-
-.leaflet-container {
-  @apply h-full w-full;
-}
-
-.leaflet-popup-content-wrapper {
-  background-color: red;
+@utility form-input {
+  @apply rounded-md border border-gray-300 bg-white p-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none;
 }
 
 .graph-selection {
@@ -89,7 +101,7 @@ body {
 }
 
 .card-padding-border {
-  @apply bg-off-white flex flex-col gap-1 rounded-lg px-4 py-3;
+  @apply flex flex-col gap-1 rounded-lg bg-white px-4 py-3 shadow;
 }
 
 @utility box-basic {
@@ -98,4 +110,14 @@ body {
 
 @utility flex-col-4 {
   @apply flex flex-col gap-4;
+}
+
+/* Leaflet */
+
+.leaflet-container {
+  @apply h-full w-full;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: red;
 }

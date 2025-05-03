@@ -16,7 +16,7 @@ export const addTagService = async (sensors: Sensor[], tag: string) => {
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error("Error adding tag to sensor", errorData);
+      throw new Error("Error adding tag to sensor", errorData.detail);
     }
 
     return await res.json();

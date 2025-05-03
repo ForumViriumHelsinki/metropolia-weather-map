@@ -42,3 +42,14 @@ export interface SensorDataParams {
   temperature_from?: number;
   temperature_to?: number;
 }
+
+export enum Locations {
+  vallilla = "Vallila",
+  laajasalo = "Laajasalo",
+  koivukyla = "Koivukylä",
+}
+
+export enum GraphTypes {
+  plot = "plot",
+  bar = "bar",
+}

@@ -1,11 +1,11 @@
 "use client";
 
+import { removeTagService } from "@/services/tags/removeTagService";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { removeTagService } from "../../services/removeTagService";
 import AddSensor from "./AddSensor";
 import TagAdding from "./TagAdding";
 

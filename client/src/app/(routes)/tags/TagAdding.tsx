@@ -1,10 +1,10 @@
 "use client";
 
+import { createTagService } from "@/app/services/tags/createTagService";
+import { addTagService } from "@/services/tags/addTagsService";
 import { Sensor } from "@/types";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import React, { useState } from "react";
-import { addTagService } from "../../services/addTagsService";
-import { createTagService } from "../../services/createTagService";
 import { Tag } from "./page";
 
 const TagAdding = ({

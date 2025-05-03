@@ -1,21 +1,29 @@
-from datetime import date
+from datetime import date, datetime
 
-from src.utils.analysis_utils import daily_avg_temp, plot_daily_temp_avg
+from src.utils.analysis_utils import (
+    daily_avg_temp,
+    plot_daily_temp_avg,
+    plot_monthly_temp_diff,
+)
 from src.utils.filter_tag import filter_df_by_tag, filter_location_with_tag
-from src.utils.get_data_util import get_by_location
+from src.utils.get_data_util import filter_date_range
 from src.utils.save_graph import save_graph
 
 
 def temperature_by_tag(
     tag1: str,
     tag2: str,
-    location: str,
     graph_type: str,
-    start_date: date = None,
-    end_date: date = None,
+    location: str = None,
+    start_date: str = date,
+    end_date: str = date,
     daytime: bool = False,
     nighttime: bool = False,
 ):
+    # Parse date strings into date objects
+
+    print("START DATE")
+    print(start_date)
     # Data does not exist before year 2024
     if start_date and start_date.year < 2024:
         raise ValueError("Start date must be in 2024 or later.")
@@ -42,6 +50,8 @@ def temperature_by_tag(
         nighttime=nighttime,
     )
 
+    df1 = filter_date_range(df1, start_date, end_date)
+
     df2 = filter_location_with_tag(
         location,
         tag2,
@@ -51,11 +61,14 @@ def temperature_by_tag(
         nighttime=nighttime,
     )
 
+    df2 = filter_date_range(df2, start_date, end_date)
+    print(df2.head())
+
     # Location of analysis Vallila | Laajasalo | Koivukylä | All
     df1 = filter_df_by_tag(df1, tag1)
     avg1 = daily_avg_temp(df1)
 
-    df2 = filter_location_with_tag(location, tag2)
+    df2 = filter_df_by_tag(df2, tag2)
     avg2 = daily_avg_temp(df2)
 
     match graph_type:
@@ -63,24 +76,29 @@ def temperature_by_tag(
             graph = plot_daily_temp_avg(
                 df1=avg1,
                 df2=avg2,
-                title=f"Päivittäinen lämpötila vaihtelu {location}ssa",
+                title=f"Päivittäinen lämpötila vaihtelu {f"{location}ssa" if location else "" }",
                 df1_label=tag1,
                 df2_label=tag2,
             )
             return graph
+
         case "bar":
-            return
+            graph = plot_monthly_temp_diff(
+                df1=df1,
+                df2=df2,
+                title=f"Kuukausittainen lämpötila vaihtelu {f"{location}ssa" if location else "" }",
+                df1_label=tag1,
+                df2_label=tag2,
+            )
+            return graph
         case _:
             raise ValueError("Invalid or undefined graph type")
-
-    return avg1, avg2
 
 
 if __name__ == "__main__":
     graph = temperature_by_tag(
         tag1="aurinko",
         tag2="varjo",
-        location="Vallila",
         graph_type="plot",
         start_date=None,
         end_date=None,

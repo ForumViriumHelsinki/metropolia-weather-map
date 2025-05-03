@@ -14,7 +14,7 @@ export const removeTagService = async (sensors: Sensor[], tag: string) => {
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error("Error removing tag", errorData);
+      throw new Error("Error removing tag", errorData.detail);
     }
 
     return await res.json();
