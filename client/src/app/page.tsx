@@ -1,10 +1,10 @@
 import DropMenu from "@/components/DropMenu";
-import GraphDisplay from "@/components/GraphDisplay/";
 import MapWrapper from "@/components/Map/MapWrapper";
 import SensorCard from "@/components/SensorCard/SensorCard";
 import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import Analysis from "./(routes)/analysis/page";
 
 export type VallilaLatestData = {
   id: string;
@@ -97,7 +97,7 @@ export default async function Home() {
         ))}
       </DropMenu>
 
-      <GraphDisplay />
+      <Analysis />
     </main>
   );
 }
