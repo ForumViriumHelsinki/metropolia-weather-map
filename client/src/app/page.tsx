@@ -5,6 +5,7 @@ import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import Analysis from "./(routes)/analysis/page";
+import GraphsLoader from "@/components/GraphsLoader";
 
 export type VallilaLatestData = {
   id: string;
@@ -98,6 +99,7 @@ export default async function Home() {
       </DropMenu>
 
       <Analysis />
+        <GraphsLoader/>
     </main>
   );
 }
