@@ -23,8 +23,7 @@ const SensorCard = async ({
         {sensor.id.slice(-4)}
       </span>
       <div>
-        <h2 className="text-3xl">{sensor.location}</h2>
-
+        <h2 className="text-3xl">{sensor.location.replaceAll("Ã¤", "ä")}</h2>
         <div className="flex flex-col">
           <span>Lämpötila: {latestData.temperature}°C</span>
           <span>Ilmankosteus: {latestData.humidity}%</span>

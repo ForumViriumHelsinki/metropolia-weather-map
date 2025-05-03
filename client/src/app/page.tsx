@@ -5,6 +5,8 @@ import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import Analysis from "./(routes)/analysis/page";
+import GraphsLoader from "@/components/GraphsLoader";
+import { Toaster } from 'react-hot-toast';
 
 export type VallilaLatestData = {
   id: string;
@@ -43,11 +45,12 @@ export default async function Home() {
   }
 
   const vallila = sensors.filter((s) => s.location === "Vallila");
-  const koivukyla = sensors.filter((s) => s.location === "Koivukylä");
+  const koivukyla = sensors.filter((s) => s.location === "KoivukylÃ¤");
   const laajasalo = sensors.filter((s) => s.location === "Laajasalo");
 
   return (
     <main className="flex flex-col gap-6">
+        <Toaster position="top-center" reverseOrder={false} />
       {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
         <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
@@ -98,6 +101,7 @@ export default async function Home() {
       </DropMenu>
 
       <Analysis />
+        <GraphsLoader/>
     </main>
   );
 }
