@@ -49,6 +49,7 @@ const Analysis = () => {
           onChange={(e) =>
             setGraphParams({ ...graphParams, tag1: e.currentTarget.value })
           }
+          placeholder="Tag"
         />
 
         <label>Tag2</label>
@@ -58,6 +59,7 @@ const Analysis = () => {
           onChange={(e) =>
             setGraphParams({ ...graphParams, tag2: e.currentTarget.value })
           }
+          placeholder="Tag to compare"
         />
 
         <label>Location</label>
@@ -80,7 +82,9 @@ const Analysis = () => {
           ))}
         </select>
 
-        <label>Start date</label>
+        <label>
+          {graphParams.graph_type === GraphTypes.plot ? "Start date" : "Date"}
+        </label>
         <input
           type="date"
           onChange={(e) =>
@@ -94,6 +98,7 @@ const Analysis = () => {
         <label>End date</label>
         <input
           type="date"
+          disabled={graphParams.graph_type === GraphTypes.bar}
           onChange={(e) =>
             setGraphParams({
               ...graphParams,
@@ -112,12 +117,7 @@ const Analysis = () => {
           }
         >
           {Object.values(GraphTypes).map((gt) => (
-            <option
-              key={gt}
-              // value={gt}
-            >
-              {gt}
-            </option>
+            <option key={gt}>{gt}</option>
           ))}
         </select>
       </form>
