@@ -102,9 +102,9 @@ def get_koivukyla(
     else:
         df = get_rest()
 
-    df["location"] = "Koivukylä"
-    df = df.loc[df["location"] == "Koivukylä"]
-    df = filter_install_date(df, "Koivukylä")
+    df["location"] = "KoivukylÃ¤"
+    df = df.loc[df["location"] == "KoivukylÃ¤"]
+    df = filter_install_date(df, "KoivukylÃ¤")
 
     if daytime:
         return filter_daytime_data(df)
