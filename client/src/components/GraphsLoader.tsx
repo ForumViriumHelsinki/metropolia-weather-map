@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { apiFetch } from "@/utils/apiFetch";
+import toast from 'react-hot-toast';
 
 export default function GraphsLoader() {
     const [images, setImages] = useState([]);
@@ -8,27 +9,26 @@ export default function GraphsLoader() {
     const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
 
-
     const endpoints = [
-        "/plot/raw_humidity",
-        "/plot/fft",
-        "/plot/fft?area=Vallila",
-        "/plot/fft?area=Laajasalo",
-        "/plot/fft?area=Koivukyl%C3%A4",
-        "/plot/seasonal_decomposition",
-        "/plot/humidity_delta",
-        "/plot/temperature_delta",
-        "/plot/humidity_trends",
-        "/plot/temp_vs_humidity_correlation",
-        "/plot/daily_temperature_range",
-        "/plot/daily_median_temperature",
-        "/plot/monthly_night_temperature",
-        "/plot/monthly_night_min_temperature",
-        "/plot/monthly_night_temperature_difference",
-        "/plot/daily_median_humidity",
-        "/plot/daily_humidity_range",
-        "/plot/day_night_humidity_difference",
-        "/plot/monthly_night_humidity"
+        ["/plot/raw_humidity", "Raaka kosteusdata"],
+        ["/plot/fft", "FFT"],
+        ["/plot/fft?area=Vallila", "FFT Vallilasta"],
+        ["/plot/fft?area=Laajasalo", "FFT Laajasalosta"],
+        ["/plot/fft?area=Koivukyl%C3%A4", "FFT Koivukylästä"],
+        ["/plot/seasonal_decomposition", "Kausivaihtelun purku"],
+        ["/plot/humidity_delta", "Kosteuden muutos"],
+        ["/plot/temperature_delta", "Lämpötilan muutos"],
+        ["/plot/humidity_trends", "Kosteuden trendit"],
+        ["/plot/temp_vs_humidity_correlation", "Lämpötilan ja kosteuden korrelaatio"],
+        ["/plot/daily_temperature_range", "Päivittäinen lämpötilaero"],
+        ["/plot/daily_median_temperature", "Päivittäinen keskilämpötila"],
+        ["/plot/monthly_night_temperature", "Kuukausittainen yö lämpötila"],
+        ["/plot/monthly_night_min_temperature", "Kuukausittainen minimilämpötila"],
+        ["/plot/monthly_night_temperature_difference", "Kuukausittainen yö lämpötilaero"],
+        ["/plot/daily_median_humidity", "Päivittäinen keski kosteus"],
+        ["/plot/daily_humidity_range", "Päivittäinen kosteus ero"],
+        ["/plot/day_night_humidity_difference", "Päivä-yö kosteus ero"],
+        ["/plot/monthly_night_humidity", "Kuukausittainen yö kosteus"],
     ];
 
     const LoadAllImages = async () => {
@@ -40,7 +40,7 @@ export default function GraphsLoader() {
                 (endpoint) => !fetchedEndpoints.has(endpoint),
             );
             const fetches = endpointsToFetch.map((endpoint) =>
-                apiFetch(endpoint).then((res) => res.blob()),
+                apiFetch(endpoint[0]).then((res) => res.blob()),
             );
             const blobs = await Promise.all(fetches);
 
@@ -49,7 +49,7 @@ export default function GraphsLoader() {
             setImages((prevImages) => [...prevImages, ...imageObjectUrls]);
             setFetchedEndpoints((prev) => {
                 const updated = new Set(prev);
-                endpointsToFetch.forEach((endpoint) => updated.add(endpoint));
+                endpointsToFetch.forEach((endpoint) => updated.add(endpoint[0]));
                 return updated;
             });
         } catch (error) {
@@ -62,6 +62,7 @@ export default function GraphsLoader() {
     const LoadImage = async (endpoint) => {
         if (fetchedEndpoints.has(endpoint)) {
             console.log(`Already fetched: ${endpoint}`);
+            toast("Kaavio on jo ladattu");
             return; // Don't fetch again
         }
 
@@ -87,22 +88,22 @@ export default function GraphsLoader() {
 
     return (
         <div className="p-4">
-            <h1 className="mb-4 text-4xl font-semibold">{loading ? "Graphs (Loading Graphs...)" : "Graphs"}</h1>
+            <h1 className="mb-4 text-4xl font-semibold">{loading ? "Kaaviot (Ladataan Kaaviota...)" : "Kaaviot"}</h1>
 
             <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 <button
                     onClick={LoadAllImages}
                     className="rounded-md bg-blue-500 px-3 py-1.5 text-sm text-white shadow-sm hover:bg-blue-600 transition"
                 >
-                    Load All Graphs (Slow)
+                    Lataa kaikkia kaaviot (Hidas)
                 </button>
                 {endpoints.map((endpoint) => (
                     <button
-                        key={endpoint}
-                        onClick={() => LoadImage(endpoint)}
+                        key={endpoint[0]}
+                        onClick={() => LoadImage(endpoint[0])}
                         className="rounded-md bg-blue-500 px-3 py-1.5 text-sm text-white shadow-sm hover:bg-blue-600 transition"
                     >
-                        Load {endpoint}
+                        {endpoint[1]}
                     </button>
                 ))}
             </div>
