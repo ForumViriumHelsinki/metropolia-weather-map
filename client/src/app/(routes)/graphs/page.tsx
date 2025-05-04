@@ -1,20 +1,18 @@
 "use client";
-import { useState } from "react";
 import { apiFetch } from "@/utils/apiFetch";
+import { useState } from "react";
 
 export default function Home() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
-
-
   const endpoints = [
     "/plot/raw_humidity",
     "/plot/fft",
     "/plot/fft?area=Vallila",
     "/plot/fft?area=Laajasalo",
-    "/plot/fft?area=Koivukyl%C3%A4",
+    "/plot/fft?area=Koivukyla",
     "/plot/seasonal_decomposition",
     "/plot/humidity_delta",
     "/plot/temperature_delta",
@@ -28,12 +26,11 @@ export default function Home() {
     "/plot/daily_median_humidity",
     "/plot/daily_humidity_range",
     "/plot/day_night_humidity_difference",
-    "/plot/monthly_night_humidity"
+    "/plot/monthly_night_humidity",
   ];
 
   const LoadAllImages = async () => {
     setLoading(true);
-
 
     try {
       const endpointsToFetch = endpoints.filter(
