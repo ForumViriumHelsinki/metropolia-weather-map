@@ -47,8 +47,7 @@ async def log_request_info(request: Request, call_next):
 		for k, v in request.query_params.items():
 			logger.info("%s - %s", k, v)
 
-	response = await call_next(request)
-	return response
+	return await call_next(request)
 
 
 @app.get("/api/test")

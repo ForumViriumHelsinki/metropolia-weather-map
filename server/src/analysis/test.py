@@ -1,3 +1,4 @@
+import sys
 import time
 
 import pandas as pd
@@ -8,7 +9,7 @@ start_time = time.time()
 big_data = get_all_locations()
 print("Fetch time --- %s seconds ---" % (time.time() - start_time))
 
-exit("Hello")
+sys.exit("Hello")
 # Save and read in different formats
 formats = {
 	"csv": "big_data.csv",

@@ -14,7 +14,7 @@ from utils.utils import map_locations
 
 def plot_raw_humidity():
 	df = get_all_locations()
-	map = map_locations()
+	map_locations()
 	fig = plt.figure(figsize=(20, 10))
 	gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])
 	ax = fig.add_subplot(gs[0])
@@ -113,7 +113,7 @@ def plot_seasonal_decomposition():
 
 	if "time" not in df.columns:
 		print("Error: 'time' column missing before STL decomposition!")
-		return
+		return None
 
 	df.set_index("time", inplace=True)
 	df["humidity"] = pd.to_numeric(df["humidity"], errors="coerce")
@@ -123,7 +123,7 @@ def plot_seasonal_decomposition():
 
 	if len(df) < 14:
 		print("Error: Not enough data points for STL decomposition!")
-		return
+		return None
 
 	stl = STL(df["humidity"], seasonal=143)
 	result = stl.fit()

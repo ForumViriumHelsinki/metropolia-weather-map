@@ -10,8 +10,7 @@ router = APIRouter()
 @router.get("/api/tags")
 def get_tags(session: Session = Depends(get_session)):
 	try:
-		tags = session.exec(select(Tag)).all()
-		return tags
+		return session.exec(select(Tag)).all()
 	except Exception as e:
 		raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 

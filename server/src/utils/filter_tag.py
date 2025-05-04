@@ -38,5 +38,4 @@ def filter_location_with_tag(
 		)
 		location_with_tag_ids = res.all()
 
-	df = df[df["dev-id"].isin(location_with_tag_ids)]
-	return df
+	return df[df["dev-id"].isin(location_with_tag_ids)]

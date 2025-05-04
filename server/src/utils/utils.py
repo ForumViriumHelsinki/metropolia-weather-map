@@ -27,8 +27,7 @@ def filter_daytime_data(df):
 	# Apply the mask to filter out timestamps after sunset
 	daylight_df = df[mask]
 	daylight_df = daylight_df.drop("sunrise", axis=1)
-	daylight_df = daylight_df.drop("sunset", axis=1)
-	return daylight_df
+	return daylight_df.drop("sunset", axis=1)
 
 
 def map_locations():
@@ -39,10 +38,9 @@ def map_locations():
 	koivukyla = get_ids_by_location("KoivukylÃ¤")
 	print(koivukyla)
 
-	location_map = {
+	return {
 		"Vallila": vallila,
 		"Koivukylä": koivukyla,
 		"Laajasalo": laajasalo,
 	}
 
-	return location_map

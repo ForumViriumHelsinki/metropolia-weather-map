@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -28,7 +27,6 @@ def avg_daily_temps_sun_moisture():
 	save_graph(
 		"vallila_sun_shade_monthly_moisture_diff", plt2, folder="vallila"
 	)
-
 
 
 def plot_hum_temp_avg(

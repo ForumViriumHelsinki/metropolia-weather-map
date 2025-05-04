@@ -39,6 +39,5 @@ def area_daily_temp_diff():
 	)
 
 
-
 if __name__ == "__main__":
 	area_daily_temp_diff()

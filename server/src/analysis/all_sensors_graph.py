@@ -28,6 +28,5 @@ def main():
 	save_graph("test plot", plt, "test")
 
 
-
 if __name__ == "__main__":
 	main()

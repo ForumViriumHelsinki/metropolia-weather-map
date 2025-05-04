@@ -10,12 +10,11 @@ from utils import get_data_util
 
 def compute_monthly_avgs(df):
 	df["month"] = pd.to_datetime(df["time"]).dt.to_period("M")
-	monthly_avgs = (
+	return (
 		df.groupby(["month", "dev-id"])[["temperature", "humidity"]]
 		.mean()
 		.reset_index()
 	)
-	return monthly_avgs
 
 
 def plot_humidity_trends():

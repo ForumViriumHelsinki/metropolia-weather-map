@@ -6,6 +6,5 @@ indent-style = "tab"
 docstring-code-format = true
 
 [lint]
-select = ["PL"]
-extend-select = ["I", "F", "PD"]
-ignore = ["PLW0603"]
+select = ["PL", "I", "F", "N", "RET"]
+ignore = ["N806", "PLR0913", "PLW0603"]

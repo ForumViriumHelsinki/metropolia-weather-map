@@ -31,18 +31,16 @@ def compute_tempdeltas(sensor_data, resample_period):
 		return None
 
 	# Merge all sensor data and compute the average humidity change
-	merged_df = pd.concat(temperature_deltas).groupby("time").mean()
-	return merged_df
+	return pd.concat(temperature_deltas).groupby("time").mean()
 
 
 def group_data(data):
 	"""
 	groups data by 'dev-id'
 	"""
-	grouped_data = {
+	return {
 		sensor_id: group for sensor_id, group in data.groupby("dev-id")
 	}
-	return grouped_data
 
 
 def main():
@@ -62,8 +60,8 @@ def main():
 	sun_tempdelta_hourly = compute_tempdeltas(data_sun, "h")
 	shade_tempdelta_hourly = compute_tempdeltas(data_shade, "h")
 
-	sun_tempdelta_daily = compute_tempdeltas(data_sun, "D")
-	shade_tempdelta_daily = compute_tempdeltas(data_shade, "D")
+	compute_tempdeltas(data_sun, "D")
+	compute_tempdeltas(data_shade, "D")
 
 	# Ensure both datasets have the same time range (inner join)
 	if sun_tempdelta_hourly is not None and shade_tempdelta_hourly is not None:

@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from src.utils.analysis_utils import daily_avg_temp
-from src.utils.get_data_util import *
+from src.utils.get_data_util import get_koivukyla, get_laajasalo, get_vallila
 from src.utils.save_graph import save_graph
 
 
@@ -12,7 +13,6 @@ def location_temps():
 
 	graph_plot(dfV, dfK, dfL)
 	graph_monthly_avg(dfV, dfK, dfL)
-
 
 
 def graph_plot(dfV, dfK, dfL):
@@ -32,7 +32,6 @@ def graph_plot(dfV, dfK, dfL):
 	plt.legend()
 
 	save_graph("all locations temp diffs", plt, "all_locations")
-
 
 
 def graph_monthly_avg(dfV, dfK, dfL):
@@ -67,6 +66,5 @@ def graph_monthly_avg(dfV, dfK, dfL):
 	save_graph("monthly_avg_temperature_grouped", plt, "all_locations")
 
 
-
-if __name__ == __name__:
+if __name__ == "__main__":
 	location_temps()

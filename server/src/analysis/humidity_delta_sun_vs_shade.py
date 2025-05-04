@@ -53,18 +53,16 @@ def compute_humidity_change(sensor_data, resample_period):
 		return None
 
 	# Merge all sensor data and compute the average humidity change
-	merged_df = pd.concat(humidity_deltas).groupby("time").mean()
-	return merged_df
+	return pd.concat(humidity_deltas).groupby("time").mean()
 
 
 def group_data(data):
 	"""
 	groups data by 'dev-id'
 	"""
-	grouped_data = {
+	return {
 		sensor_id: group for sensor_id, group in data.groupby("dev-id")
 	}
-	return grouped_data
 
 
 def main():
@@ -81,8 +79,8 @@ def main():
 	sun_humidity_change_hourly = compute_humidity_change(data_sun, "h")
 	shade_humidity_change_hourly = compute_humidity_change(data_shade, "h")
 
-	sun_humidity_change_daily = compute_humidity_change(data_sun, "D")
-	shade_humidity_change_daily = compute_humidity_change(data_shade, "D")
+	compute_humidity_change(data_sun, "D")
+	compute_humidity_change(data_shade, "D")
 
 	# Ensure both datasets have the same time range (inner join)
 	if (

@@ -1,3 +1,4 @@
+# ruff: noqa: PLR2004
 from datetime import date
 
 from src.utils.analysis_utils import (
@@ -68,24 +69,22 @@ def temperature_by_tag(
 
 	match graph_type:
 		case "plot":
-			graph = plot_daily_temp_avg(
+			return plot_daily_temp_avg(
 				df1=avg1,
 				df2=avg2,
 				title=f"Päivittäinen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
 				df1_label=tag1,
 				df2_label=tag2,
 			)
-			return graph
 
 		case "bar":
-			graph = plot_monthly_temp_diff(
+			return plot_monthly_temp_diff(
 				df1=df1,
 				df2=df2,
 				title=f"Kuukausittainen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
 				df1_label=tag1,
 				df2_label=tag2,
 			)
-			return graph
 		case _:
 			raise ValueError("Invalid or undefined graph type")
 

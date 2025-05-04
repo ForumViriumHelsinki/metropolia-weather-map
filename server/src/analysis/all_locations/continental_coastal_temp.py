@@ -35,6 +35,5 @@ def main():
 	plt2.clf()
 
 
-
 if __name__ == "__main__":
 	main()

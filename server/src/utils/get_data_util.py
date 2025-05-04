@@ -29,7 +29,7 @@ def get_by_location(
 
 			return get_all_locations(get_2024, get_2025, daytime, nighttime)
 
-	return
+	return None
 
 
 def read_and_clean_parquet(url):
@@ -47,16 +47,14 @@ def get_vallila(
 	nightime: bool = False,
 ):
 	if get_2024:
-		df = read_and_clean_parquet(
+		return read_and_clean_parquet(
 			"https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
 		)
-		return df
 
 	if get_2025:
-		df = read_and_clean_parquet(
+		return read_and_clean_parquet(
 			"https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
 		)
-		return df
 
 	df24 = read_and_clean_parquet(
 		"https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
@@ -174,8 +172,7 @@ def filter_install_date(df, location):
 		filtered_df = df[(df["dev-id"] == sensor_id) & mask]
 		dfs.append(filtered_df)
 
-	df = pd.concat(dfs)
-	return df
+	return pd.concat(dfs)
 
 
 def get_rest(
@@ -201,9 +198,8 @@ def get_rest(
 	df24 = fetch_2024()
 	df25 = fetch_2025()
 
-	df = pd.concat([df24, df25])
+	return pd.concat([df24, df25])
 
-	return df
 
 
 def filter_date_range(df, start_date, end_date):
@@ -251,9 +247,8 @@ def filter_daytime_data(df, nightime: bool = None):
 		daylight_df = df[mask]
 
 	daylight_df = daylight_df.drop("sunrise", axis=1)
-	daylight_df = daylight_df.drop("sunset", axis=1)
+	return daylight_df.drop("sunset", axis=1)
 
-	return daylight_df
 
 
 def get_ids_by_location(location: str):

@@ -24,8 +24,7 @@ def get_sensors(
 		stmt = select(Sensor)
 
 	try:
-		sensors = session.exec(stmt).all()
-		return sensors
+		return session.exec(stmt).all()
 	except Exception as e:
 		raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 

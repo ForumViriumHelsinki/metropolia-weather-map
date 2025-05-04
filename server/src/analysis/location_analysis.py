@@ -258,7 +258,7 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
 		print(
 			f"[WARNING] Reference location '{reference_location}' not found in data."
 		)
-		return
+		return None
 
 	diff_df = pivot.subtract(pivot[reference_location], axis=0).drop(
 		columns=[reference_location]

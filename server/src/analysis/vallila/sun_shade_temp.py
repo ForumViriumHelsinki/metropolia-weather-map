@@ -1,4 +1,3 @@
-
 from src.utils.analysis_utils import (
 	daily_avg_temp,
 	filter_daytime_data,
@@ -38,7 +37,6 @@ def avg_daily_temps_sun_shade():
 		ylim=(0, 1),
 	)
 	save_graph("vallila_sun_shade_monthly_temp_diff", plt2, folder="vallila")
-
 
 
 if __name__ == "__main__":
