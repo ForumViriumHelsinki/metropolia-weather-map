@@ -86,7 +86,7 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 - Raaka kosteusdata
 - Fast Fourier Transform
-- Kausivaihtelu
+- Kausiluonteisuus
 - Kosteuden muutos
 - Lämpötilan muutos
 - Kosteuden trendit
