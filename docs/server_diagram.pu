@@ -1,42 +1,42 @@
-@startuml Server
-!define RECTANGLE_COLOR #ADD8E6
+@startuml analysis sequence
 
-package "Weather Map Server" {
-    rectangle "API Layer" as api_layer RECTANGLE_COLOR {
-        [Routes: Sensors]
-        [Routes: Sensor Tags]
-        [Routes: Tags]
-        [Routes: Analysis]
-        [Routes: Graphs]
-    }
+participant "Server" as Server
+participant "Data API" as API
 
-    rectangle "Utilities" as utilities RECTANGLE_COLOR {
-        [get_data_util.py]
-        [filter_tag.py]
-    }
 
-    rectangle "Database" as database RECTANGLE_COLOR {
-        [Models: Sensor]
-        [Models: Tag]
-        [Models: SensorTag]
-        [SQL Scripts]
-    }
+alt optimize data fetching
+    Server -> Server: check location
+    alt Vallila
+        Server -> API: fetch /opendata/makelankatu/
+        API -> Server: return Vallila data
+    else Koivukylä or Laajasalo
+        Server -> API: fetch /opendata/r4c/
+        API -> Server: return Koivukylä or Laajasalo data
+        Server -> Server: filter chosen location
+    end
+else no location
+    Server -> API: fetch /opendata/makelankatu/
+    API -> Server: return Vallila data
+    Server -> API: fetch /opendata/r4c/
+    API -> Server: return Koivukylä and Laajasalo data
+    Server -> Server: combine datasets
+end
 
-    rectangle "Cache" as cache RECTANGLE_COLOR {
-        [DATA_CACHE]
-    }
+alt daytime
+    Server -> Server: filter data from sunrise to sunset
+else nighttime
+    Server -> Server: filter data from sunset to sunrise
+end
 
-    rectangle "Analysis" as analysis RECTANGLE_COLOR {
-        [test.py]
-        [temperature_delta_sun_vs_shade.py]
-    }
-}
+Server -> Server: filter data with tags
+Server -> Server: run analysis on filtered dataset
 
-api_layer --> utilities : Uses
-utilities --> database : Queries
-utilities --> cache : Reads/Writes
-analysis --> utilities : Fetches Data
-analysis --> cache : Reads
-database --> cache : Populates
+alt generate graph
+    Server -> Server: generate plot graph
+else
+    Server -> Server: generate bar graph
+end
+
+
 
 @enduml
