@@ -1,6 +1,7 @@
 import calendar
 import io
-from datetime import date, datetime
+import re
+from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from src.analysis.scripts.temperature_by_tag import temperature_by_tag
@@ -26,15 +27,11 @@ def get_temperature_graph(
         f"start_date: {start_date}, end_date: {end_date}, daytime: {daytime}, nighttime: {nighttime}"
     )
 
-    if graph_type == "bar" and start_date and end_date:
-        # Parse start date
-        year, month = start_date.split("-")
-        start_date = date(year=int(year), month=int(month), day=1)
+    if graph_type == "plot" and start_date and end_date:
+        start_date, end_date = parse_date(start_date, end_date)
 
-        # Parse end date
-        year, month = map(int, end_date.split("-"))
-        last_day = calendar.monthrange(year, month)[1]
-        end_date = date(year=year, month=month, day=last_day)
+    if graph_type == "bar" and start_date and end_date:
+        start_date, end_date = parse_date(start_date, end_date)
 
     try:
         graph = temperature_by_tag(
@@ -55,3 +52,42 @@ def get_temperature_graph(
         return StreamingResponse(buf, media_type="image/svg+xml")
     except Exception as e:
         print(e)
+
+
+def parse_date(start_date, end_date):
+    try:
+        # YYYY-MM-DD
+        if re.match(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", start_date) and re.match(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}", end_date
+        ):
+            year, month, day = map(int, start_date.split("-"))
+            parsed_start_date = date(year, month, day)
+
+            year, month, day = map(int, end_date.split("-"))
+            parsed_end_date = date(year, month, day)
+
+        # YYYY-MM
+        elif re.match(r"[0-9]{4}-[0-9]{2}", start_date) and re.match(
+            r"[0-9]{4}-[0-9]{2}", end_date
+        ):
+            year, month = map(int, start_date.split("-"))
+            parsed_start_date = date(year, month, 1)
+
+            year, month = map(int, end_date.split("-"))
+            a = date(year, month + 1, 1)
+            parsed_end_date = a - timedelta(days=1)
+
+        else:
+            raise ValueError("Invalid date format. Expected YYYY-MM-DD or YYYY-MM.")
+
+        return parsed_start_date, parsed_end_date
+
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {ve}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while parsing dates.",
+        )
