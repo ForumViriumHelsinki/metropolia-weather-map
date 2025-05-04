@@ -33,11 +33,11 @@ def plot_daily_temperature_range():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_daily_median_temperature():
@@ -63,11 +63,11 @@ def plot_daily_median_temperature():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 def plot_day_night_temperature_difference():
     print("[INFO] Plotting day-night temperature difference (monthly)...")
@@ -96,11 +96,11 @@ def plot_day_night_temperature_difference():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_monthly_night_temperature():
@@ -133,11 +133,11 @@ def plot_monthly_night_temperature():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_monthly_night_min_temperature():
@@ -174,11 +174,11 @@ def plot_monthly_night_min_temperature():
     print(summary.sort_values(ascending=False))
     print(f"\n[INFO] Warmest night minimums on average: {summary.idxmax()}")
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
@@ -215,11 +215,11 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 # --------------------------
@@ -248,11 +248,11 @@ def plot_daily_median_humidity():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_daily_humidity_range():
@@ -278,11 +278,11 @@ def plot_daily_humidity_range():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_day_night_humidity_difference():
@@ -311,11 +311,11 @@ def plot_day_night_humidity_difference():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 
 def plot_monthly_night_humidity():
@@ -348,13 +348,13 @@ def plot_monthly_night_humidity():
     plt.legend()
     plt.tight_layout()
     plt.show()
-    #buf = io.BytesIO()
-    #plt.savefig(buf, format='png')
-    #plt.close()
-    #buf.seek(0)
-    #return buf
- 
-    
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
+
+
 # --------------------------
 # DAYLIGHT HELPER FUNCTIONS
 # --------------------------
