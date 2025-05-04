@@ -18,14 +18,23 @@ def get_temperature_graph(
     location: str = None,
     start_date: str = None,
     end_date: str = None,
-    daytime: bool = False,
-    nighttime: bool = False,
+    time_of_day: str = "whole day",
 ):
     if graph_type == "plot" and start_date and end_date:
         start_date, end_date = parse_date(start_date, end_date)
 
     if graph_type == "bar" and start_date and end_date:
         start_date, end_date = parse_date(start_date, end_date)
+
+    print("TIME OF DAY", time_of_day)
+
+    daytime = False
+    nighttime = False
+
+    if time_of_day == "daytime":
+        daytime = True
+    elif time_of_day == "nighttime":
+        nighttime = True
 
     try:
         graph = temperature_by_tag(

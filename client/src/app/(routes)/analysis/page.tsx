@@ -85,7 +85,6 @@ const Analysis = () => {
               </option>
             ))}
           </select>
-
           <label>Graph type</label>
           <select
             onChange={(e) =>
@@ -106,7 +105,7 @@ const Analysis = () => {
             onChange={(e) =>
               setGraphParams({
                 ...graphParams,
-                start_date: e.currentTarget.value,
+                startDate: e.currentTarget.value,
               })
             }
           />
@@ -117,10 +116,24 @@ const Analysis = () => {
             onChange={(e) =>
               setGraphParams({
                 ...graphParams,
-                end_date: e.currentTarget.value,
+                endDate: e.currentTarget.value,
               })
             }
           />
+
+          <label>Time of day</label>
+          <select
+            onChange={(e) =>
+              setGraphParams({
+                ...graphParams,
+                timeOfDay: e.currentTarget.value,
+              })
+            }
+          >
+            {["whole day", "daytime", "nighttime"].map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
         </form>
       </div>
 

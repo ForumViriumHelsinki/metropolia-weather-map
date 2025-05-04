@@ -46,7 +46,7 @@ export interface SensorDataParams {
 export enum Locations {
   vallilla = "Vallila",
   laajasalo = "Laajasalo",
-  koivukyla = "Koivukylä",
+  koivukyla = "Koivukyla",
 }
 
 export enum GraphTypes {

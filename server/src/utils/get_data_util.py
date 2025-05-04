@@ -18,7 +18,7 @@ def get_by_location(
     match location:
         case "Vallila":
             return get_vallila(get_2024, get_2025, daytime, nighttime)
-        case "Koivukylä":
+        case "Koivukyla":
             return get_koivukyla(get_2024, get_2025, daytime, nighttime)
         case "Laajasalo":
             return get_laajasalo(get_2024, get_2025, daytime, nighttime)
@@ -102,9 +102,9 @@ def get_koivukyla(
     else:
         df = get_rest()
 
-    df["location"] = "KoivukylÃ¤"
-    df = df.loc[df["location"] == "KoivukylÃ¤"]
-    df = filter_install_date(df, "KoivukylÃ¤")
+    df["location"] = "Koivukyla"
+    df = df.loc[df["location"] == "Koivukyla"]
+    df = filter_install_date(df, "Koivukyla")
 
     if daytime:
         return filter_daytime_data(df)
