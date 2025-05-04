@@ -1,5 +1,4 @@
 import os
-from datetime import date
 
 import pandas as pd
 from sqlmodel import select
@@ -28,6 +27,13 @@ def get_by_location(
     return
 
 
+def read_and_clean_parquet(url):
+    df = pd.read_parquet(url)
+    df = df.rename_axis("time").reset_index()
+    df["time"] = pd.to_datetime(df["time"])
+    return df
+
+
 # Fetch and filter makelankatu data
 def get_vallila(
     get_2024: bool = False,
@@ -35,19 +41,24 @@ def get_vallila(
     daytime: bool = False,
     nightime: bool = False,
 ):
-    df24 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
-        parse_dates=["time"],
-    )
     if get_2024:
-        return df24
+        df = read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
+        )
+        return df
 
-    df25 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.csv.gz",
-        parse_dates=["time"],
-    )
     if get_2025:
-        return df25
+        df = read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
+        )
+        return df
+
+    df24 = read_and_clean_parquet(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
+    )
+    df25 = read_and_clean_parquet(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
+    )
 
     df = pd.concat([df24, df25])
     df["location"] = "Vallila"
@@ -75,9 +86,7 @@ def get_laajasalo(
     else:
         df = get_rest()
 
-    # get Laajasalo sensors
     df["location"] = "Laajasalo"
-    df = df.loc[df["location"] == "Laajasalo"]
     df = filter_install_date(df, "Laajasalo")
 
     if daytime:
@@ -166,17 +175,24 @@ def get_rest(
     get_2024: bool = False,
     get_2025: bool = False,
 ):
-    df24 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
-    )
-    if get_2024:
-        return df24
+    def fetch_2024():
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.parquet"
+        )
 
-    df25 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.csv.gz", parse_dates=["time"]
-    )
+    def fetch_2025():
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.parquet"
+        )
+
+    if get_2024:
+        return fetch_2024()
+
     if get_2025:
-        return df25
+        return fetch_2025()
+
+    df24 = fetch_2024()
+    df25 = fetch_2025()
 
     df = pd.concat([df24, df25])
 
