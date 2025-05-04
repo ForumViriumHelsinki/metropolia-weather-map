@@ -51,7 +51,7 @@ const Map = () => {
       />
       {sensors &&
         sensors.map((sensor) => {
-          if (sensor.location === "Koivukylä") icon = iconKoivukyla;
+          if (sensor.location === "Koivukyla") icon = iconKoivukyla;
           if (sensor.location === "Laajasalo") icon = iconLaajasalo;
           return (
             <Marker

@@ -46,7 +46,7 @@ const TagMap = ({
       />
       {sensors.map((sensor) => {
         let icon = iconMakelankatu;
-        if (sensor.location === "Koivukylä") icon = iconKoivukyla;
+        if (sensor.location === "Koivukyla") icon = iconKoivukyla;
         if (sensor.location === "Laajasalo") icon = iconLaajasalo;
         if (selectedSensors.includes(sensor)) icon = iconSelected;
 
