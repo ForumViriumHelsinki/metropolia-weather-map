@@ -1,7 +1,8 @@
 @startuml Weather
 entity "Sensors" {
     *id: string
-    *coordinates: point
+    *lat: string
+    *lon: string
     *location: string
     *install_date: date
     *csv_link: string
