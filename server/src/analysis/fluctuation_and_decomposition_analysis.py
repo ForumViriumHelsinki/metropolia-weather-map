@@ -11,7 +11,7 @@ from statsmodels.tsa.seasonal import STL
 from utils.get_data_util import get_all_locations
 from utils.utils import map_locations
 
-
+### This function is used to plot the raw humidity data from all sensors
 def plot_raw_humidity():
 	df = get_all_locations()
 	map_locations()
@@ -130,7 +130,7 @@ def plot_seasonal_decomposition():
 
 	fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
 	result.trend.plot(ax=axes[0], title="Trendi")
-	result.seasonal.plot(ax=axes[1], title="kausiluonteisuus")
+	result.seasonal.plot(ax=axes[1], title="Kausiluonteisuus")
 	result.resid.plot(ax=axes[2], title="Jäännös")
 	plt.show()
 	buf = io.BytesIO()
@@ -143,7 +143,6 @@ def plot_seasonal_decomposition():
 def main():
 	plot_raw_humidity()
 	plot_fft_analysis()
-	# reconstruct_weekly_cycle(df)
 	plot_seasonal_decomposition()
 
 
