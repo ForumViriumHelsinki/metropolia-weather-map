@@ -15,7 +15,6 @@ def filter_df_by_tag(df, tag):
         )
         ids = res.all()
 
-    print(ids)
     return df[df["dev-id"].isin(ids)]
 
 

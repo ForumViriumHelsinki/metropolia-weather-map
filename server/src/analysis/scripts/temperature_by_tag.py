@@ -20,10 +20,6 @@ def temperature_by_tag(
     daytime: bool = False,
     nighttime: bool = False,
 ):
-    # Parse date strings into date objects
-
-    print("START DATE")
-    print(start_date)
     # Data does not exist before year 2024
     if start_date and start_date.year < 2024:
         raise ValueError("Start date must be in 2024 or later.")
@@ -62,7 +58,6 @@ def temperature_by_tag(
     )
 
     df2 = filter_date_range(df2, start_date, end_date)
-    print(df2.head())
 
     # Location of analysis Vallila | Laajasalo | Koivukylä | All
     df1 = filter_df_by_tag(df1, tag1)
