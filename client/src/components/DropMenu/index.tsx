@@ -20,7 +20,9 @@ const DropMenu = ({
     if (contentRef.current) {
       const firstChild = contentRef.current.firstElementChild as HTMLElement;
       if (firstChild) {
-        setCollapsedHeight(firstChild.offsetHeight + 24);
+        setCollapsedHeight(
+          firstChild.offsetHeight + 24
+        );
       }
     }
   }, [children]);
@@ -66,7 +68,7 @@ const DropMenu = ({
             ? contentRef.current?.scrollHeight
             : collapsedHeight,
         }}
-        className="box-basic grid-scaling transform overflow-hidden rounded-tl-none transition-[max-height] duration-300 ease-in-out"
+        className="box-basic grid-scaling transform overflow-hidden rounded-tl-none transition-[max-height] duration-300 ease-in-out bg-off-white"
       >
         {children}
       </div>

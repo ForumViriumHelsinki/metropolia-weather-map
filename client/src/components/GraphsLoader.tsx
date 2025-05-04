@@ -4,7 +4,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function GraphsLoader() {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<
+    { url: string; endpoint: string; visible: boolean }[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
@@ -44,13 +46,18 @@ export default function GraphsLoader() {
         (endpoint) => !fetchedEndpoints.has(endpoint),
       );
       const fetches = endpointsToFetch.map((endpoint) =>
-        apiFetch(endpoint[0]).then((res) => res.blob()),
+        apiFetch(endpoint[0])
+          .then((res) => res.blob())
+          .then((blob) => ({
+            url: URL.createObjectURL(blob),
+            endpoint: endpoint[0],
+            visible: true,
+          })),
       );
-      const blobs = await Promise.all(fetches);
-
-      const imageObjectUrls = blobs.map((blob) => URL.createObjectURL(blob));
-
-      setImages((prevImages) => [...prevImages, ...imageObjectUrls]);
+      
+      const imageObjects = await Promise.all(fetches);
+      setImages((prevImages) => [...prevImages, ...imageObjects]);
+     
       setFetchedEndpoints((prev) => {
         const updated = new Set(prev);
         endpointsToFetch.forEach((endpoint) => updated.add(endpoint[0]));
@@ -63,11 +70,20 @@ export default function GraphsLoader() {
     }
   };
 
-  const LoadImage = async (endpoint) => {
-    if (fetchedEndpoints.has(endpoint)) {
-      console.log(`Already fetched: ${endpoint}`);
-      toast("Kaavio on jo ladattu");
-      return; // Don't fetch again
+  const LoadImage = async (endpoint: string) => {
+    const existing = images.find((img) => img.endpoint === endpoint);
+    if (existing) {
+      if (!existing.visible) {
+        setImages((prev) =>
+          prev.map((img) =>
+            img.endpoint === endpoint ? { ...img, visible: true } : img,
+          ),
+        );
+        toast("Kaavio palautettu näkyviin");
+      } else {
+        toast("Kaavio on jo ladattu");
+      }
+      return;
     }
 
     setLoading(true);
@@ -75,9 +91,16 @@ export default function GraphsLoader() {
     try {
       const res = await apiFetch(endpoint);
       const blob = await res.blob();
-      const imageObjectUrl = URL.createObjectURL(blob);
+     
 
-      setImages((prevImages) => [...prevImages, imageObjectUrl]);
+      const imageObject = {
+        url: URL.createObjectURL(blob),
+        endpoint,
+        visible: true,
+      };
+      setImages((prevImages) => [...prevImages, imageObject]);
+
+      
       setFetchedEndpoints((prev) => {
         const updated = new Set(prev);
         updated.add(endpoint);
@@ -97,12 +120,6 @@ export default function GraphsLoader() {
       </h1>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        <button
-          onClick={LoadAllImages}
-          className="rounded-md bg-blue-500 px-3 py-1.5 text-sm text-white shadow-sm transition hover:bg-blue-600"
-        >
-          Lataa kaikkia kaaviot (Hidas)
-        </button>
         {endpoints.map((endpoint) => (
           <button
             key={endpoint[0]}
@@ -115,14 +132,34 @@ export default function GraphsLoader() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {images.map((imgSrc, index) => (
-          <img
-            key={index}
-            src={imgSrc}
-            alt={`Image ${index}`}
-            className="max-w-full rounded-md shadow-md"
-          />
-        ))}
+        {images
+          .filter((img) => img.visible)
+          .map((img) => (
+            <div
+              key={img.endpoint}
+              className="relative"
+            >
+              <img
+                src={img.url}
+                alt={`Image from ${img.endpoint}`}
+                className="max-w-full rounded-md shadow-md"
+              />
+              <button
+                onClick={() =>
+                  setImages((prev) =>
+                    prev.map((i) =>
+                      i.endpoint === img.endpoint
+                        ? { ...i, visible: false }
+                        : i,
+                    ),
+                  )
+                }
+                className="absolute top-2 right-2 rounded bg-red-500 px-2 py-1 text-sm text-white hover:bg-red-600"
+              >
+                X
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );
