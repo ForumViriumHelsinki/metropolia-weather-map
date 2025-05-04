@@ -13,6 +13,7 @@ def get_by_location(
     daytime: bool = False,
     nighttime: bool = False,
 ):
+    print(DATA_CACHE)
 
     match location:
         case "Vallila":
@@ -22,6 +23,10 @@ def get_by_location(
         case "Laajasalo":
             return get_laajasalo(get_2024, get_2025, daytime, nighttime)
         case _:
+            print("Cache hit")
+            if DATA_CACHE is not None:
+                return DATA_CACHE
+
             return get_all_locations(get_2024, get_2025, daytime, nighttime)
 
     return
