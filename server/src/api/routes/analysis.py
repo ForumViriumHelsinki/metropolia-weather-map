@@ -21,12 +21,6 @@ def get_temperature_graph(
     daytime: bool = False,
     nighttime: bool = False,
 ):
-    print("/analysis/temperature GET")
-    print(
-        f"tag1: {tag1}, tag2: {tag2}, location: {location}, graph_type: {graph_type}, "
-        f"start_date: {start_date}, end_date: {end_date}, daytime: {daytime}, nighttime: {nighttime}"
-    )
-
     if graph_type == "plot" and start_date and end_date:
         start_date, end_date = parse_date(start_date, end_date)
 

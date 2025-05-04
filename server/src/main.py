@@ -1,10 +1,15 @@
-from fastapi import FastAPI
+import logging
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.routes.analysis import analysis_router
+from src.api.routes.graph_routes import graph_router
 from src.api.routes.sensor_tags import sensor_tag_router
 from src.api.routes.sensors import sensor_router
 from src.api.routes.tags import tag_router
-from src.api.routes.graph_routes import graph_router
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -17,6 +22,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_request_info(request: Request, call_next):
+    logger.info(f"GET {request.url.path}")
+    if request.query_params:
+        for k, v in request.query_params.items():
+            logger.info(f"{k} - {v}")
+
+    response = await call_next(request)
+    return response
 
 
 @app.get("/")
