@@ -33,10 +33,10 @@ def filter_daytime_data(df):
 def map_locations():
     """Map sensor IDs to their respective locations."""
     vallila = get_ids_by_location("Vallila")
-    print (vallila)
+    print(vallila)
     laajasalo = get_ids_by_location("Laajasalo")
-    koivukyla = get_ids_by_location("KoivukylÃ¤")
-    print (koivukyla)
+    koivukyla = get_ids_by_location("Koivukyla")
+    print(koivukyla)
 
     location_map = {
         "Vallila": vallila,
