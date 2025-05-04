@@ -60,24 +60,35 @@ Sovellus rakennetaan käyttäen Next.js ohjelmistokehystä. Sovelluksen laadun j
 
 ## Toiminnallisuudet
 
-- Sää-datan tallennus Google Cloudiin
-- Lämpötilan ja sen muutoksen visualisointi kartalle (Websovellus)
-- Lämpötilakartan ajankohdan dynaaminen liukusäädin
-- Versionhallinta (Github)
+- Verkkosovellus
+- Sensoreiden sijainnit kartalla
+- Sensoreiden Live-data
+- Kaavioiden generointi
 
 ## Back-end
 
 - PostgreSQL tietokanta
 - API tietojen hakemiseen
-- Testaus ja CI/CD (GitHub Actions / joku muu)
 
 ## Front-end
 
 - Next.js
-- Lämpötilan visualisointi kartan päälle
-- Eri sääasemien datan näyttämistä
 
 ## Analysointi
 
-- Analysointi selviää tavoitteiden määrittämisen jälkeen.
-- Knime tai joku muu soveltuva teknologia
+- Raaka kosteusdata
+- Fast Fourier Transform
+- Kausivaihtelu
+- Kosteuden muutos
+- Lämpötilan muutos
+- Kosteuden trendit
+- Lämpötilan ja kosteuden korrelaatio
+- Päivittäinen lämpötilaero
+- Päivittäinen keskilämpötila
+- Kuukausittainen yö-lämpötila
+- Kuukausittainen minimilämpötila
+- Kuukausittainen yö-lämpötilaero
+- Päivittäinen keski-kosteus
+- Päivittäinen kosteus ero
+- Päivä-yö kosteus ero
+- Kuukausittainen yö-kosteus
