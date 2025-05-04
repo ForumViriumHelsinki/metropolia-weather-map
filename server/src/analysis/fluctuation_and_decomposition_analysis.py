@@ -8,8 +8,8 @@ from matplotlib import gridspec
 from numpy.fft import fft
 from statsmodels.tsa.seasonal import STL
 
-from ..utils.get_data_util import get_all_locations
-from ..utils.utils import map_locations
+from utils.get_data_util import get_all_locations
+from utils.utils import map_locations
 
 
 def plot_raw_humidity():

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, Response
 
-from ...analysis import (
+from analysis import (
 	fluctuation_and_decomposition_analysis,
 	humidity_delta_sun_vs_shade,
 	location_analysis,

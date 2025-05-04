@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from ..utils import get_data_util
+from utils import get_data_util
 
 
 def compute_monthly_avgs(df):

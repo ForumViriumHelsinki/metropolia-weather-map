@@ -1,15 +1,22 @@
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent))
+
 import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.routes.analysis import analysis_router
-from src.api.routes.graph_routes import graph_router
-from src.api.routes.sensor_tags import sensor_tag_router
-from src.api.routes.sensors import sensor_router
-from src.api.routes.tags import tag_router
-from src.cache import DATA_CACHE
+from api.routes.analysis import analysis_router
+from api.routes.graph_routes import graph_router
+from api.routes.sensor_tags import sensor_tag_router
+from api.routes.sensors import sensor_router
+from api.routes.tags import tag_router
+from cache import DATA_CACHE
+
+# from utils.get_data_util import get_by_location
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -18,10 +25,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 	yield
-
-
-def newFunc():
-	return "asd"
 
 
 app = FastAPI(lifespan=lifespan)
@@ -51,6 +54,7 @@ async def log_request_info(request: Request, call_next):
 @app.get("/api/test")
 def test():
 	print(DATA_CACHE.head())
+	# get_by_location()
 	return {"Hello"}
 
 

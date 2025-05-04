@@ -5,6 +5,7 @@ from sqlmodel import select
 
 from src.api.database import get_session
 from src.api.models import Sensor
+from src.cache import DATA_CACHE
 
 
 def get_by_location(
@@ -14,8 +15,6 @@ def get_by_location(
 	daytime: bool = False,
 	nighttime: bool = False,
 ):
-	print(DATA_CACHE)
-
 	match location:
 		case "Vallila":
 			return get_vallila(get_2024, get_2025, daytime, nighttime)

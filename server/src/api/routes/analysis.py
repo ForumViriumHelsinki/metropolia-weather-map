@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from fastapi import APIRouter, HTTPException
 from starlette.responses import StreamingResponse
 
-from src.analysis.scripts.temperature_by_tag import temperature_by_tag
+from analysis.scripts.temperature_by_tag import temperature_by_tag
 
 analysis_router = APIRouter()
 
