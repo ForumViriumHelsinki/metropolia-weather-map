@@ -8,8 +8,6 @@ export interface TagGraphParams {
   location?: Locations | null;
   startDate?: string | null;
   endDate?: string | null;
-  // daytime?: boolean;
-  // nighttime?: boolean;
   timeOfDay?: string;
 }
 
@@ -25,14 +23,17 @@ const toSnakeCase = (str: string): string =>
 export const getTagGraphService = async (
   params: TagGraphParams,
 ): Promise<Blob> => {
+  console.log(params);
   try {
     const searchParams = new URLSearchParams();
     for (const [key, val] of Object.entries(params)) {
+      console.log(key, val);
       if (!val) continue;
 
       searchParams.set(toSnakeCase(key), val);
     }
 
+    console.log(searchParams.toString());
     const res = await apiFetch(
       `/analysis/temperature?${searchParams.toString()}`,
     );
