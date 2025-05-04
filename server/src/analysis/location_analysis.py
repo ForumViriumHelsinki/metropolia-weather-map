@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 import io
 
 from src.utils.get_data_util import get_all_locations
-from src.utils.save_graph import save_graph
 
 # --------------------------
 # TEMP FUNCTIONS
@@ -32,13 +32,12 @@ def plot_daily_temperature_range():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_daily_median_temperature():
@@ -63,21 +62,19 @@ def plot_daily_median_temperature():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
-
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 def plot_day_night_temperature_difference():
     print("[INFO] Plotting day-night temperature difference (monthly)...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["date"] = df["time"].dt.date
-    df["daypart"] = df["hour"].apply(lambda h: "night" if h < 6 or h >= 22 else "day")
+    df = add_daypart_column(df)
 
     grouped = df.groupby(["location", "date", "daypart"])["temperature"].median().unstack()
     grouped["day_night_diff"] = grouped["day"] - grouped["night"]
@@ -98,23 +95,22 @@ def plot_day_night_temperature_difference():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_monthly_night_temperature():
     print("[INFO] Plotting monthly night-time median temperature...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
-    df["is_night"] = df["hour"].between(0, 5) | df["hour"].between(22, 23)
+    df = add_daypart_column(df)
 
-    night_df = df[df["is_night"]]
+    night_df = df[df["daypart"] == "night"]
     night_df = night_df.groupby(["location", "month"])["temperature"].median().reset_index()
     night_df["month_str"] = night_df["month"].astype(str)
 
@@ -136,23 +132,22 @@ def plot_monthly_night_temperature():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_monthly_night_min_temperature():
     print("[INFO] Plotting monthly night-time minimum temperatures...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
-    df["is_night"] = df["hour"].between(0, 5) | df["hour"].between(22, 23)
+    df = add_daypart_column(df)
 
-    night_df = df[df["is_night"]]
+    night_df = df[df["daypart"] == "night"]
     night_min_df = night_df.groupby(["location", "month"])["temperature"].min().reset_index()
     night_min_df["month_str"] = night_min_df["month"].astype(str)
 
@@ -178,23 +173,22 @@ def plot_monthly_night_min_temperature():
     print("\n[SUMMARY] Average monthly minimum night-time temperature (°C):")
     print(summary.sort_values(ascending=False))
     print(f"\n[INFO] Warmest night minimums on average: {summary.idxmax()}")
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
     print("[INFO] Plotting monthly night-time temperature differences (compared to Laajasalo)...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
-    df["is_night"] = df["hour"].between(0, 5) | df["hour"].between(22, 23)
+    df = add_daypart_column(df)
 
-    night_df = df[df["is_night"]]
+    night_df = df[df["daypart"] == "night"]
     grouped = night_df.groupby(["location", "month"])["temperature"].median().reset_index()
     grouped["month_str"] = grouped["month"].astype(str)
 
@@ -220,13 +214,12 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 # --------------------------
@@ -254,13 +247,12 @@ def plot_daily_median_humidity():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_daily_humidity_range():
@@ -285,21 +277,19 @@ def plot_daily_humidity_range():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_day_night_humidity_difference():
     print("[INFO] Plotting day-night humidity difference (monthly)...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
-    df["date"] = df["time"].dt.date
-    df["daypart"] = df["hour"].apply(lambda h: "night" if h < 6 or h >= 22 else "day")
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
+    df = add_daypart_column(df)
 
     grouped = df.groupby(["location", "date", "daypart"])["humidity"].median().unstack()
     grouped["day_night_diff"] = grouped["day"] - grouped["night"]
@@ -307,8 +297,8 @@ def plot_day_night_humidity_difference():
     grouped["month"] = pd.to_datetime(grouped["date"]).dt.to_period("M")
 
     monthly_diff = grouped.groupby(["month", "location"])["day_night_diff"].mean().unstack()
-
     avg_diff = monthly_diff.mean(axis=0).round(2)
+
     print("\n[SUMMARY] Average monthly day-night humidity difference (%):")
     print(avg_diff.sort_values(ascending=False))
 
@@ -320,23 +310,22 @@ def plot_day_night_humidity_difference():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
 
 
 def plot_monthly_night_humidity():
     print("[INFO] Plotting monthly night-time median humidity...")
     df = get_all_locations()
-    df["hour"] = df["time"].dt.hour
+    df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
-    df["is_night"] = df["hour"].between(0, 5) | df["hour"].between(22, 23)
+    df = add_daypart_column(df)
 
-    night_df = df[df["is_night"]]
+    night_df = df[df["daypart"] == "night"]
     night_df = night_df.groupby(["location", "month"])["humidity"].median().reset_index()
     night_df["month_str"] = night_df["month"].astype(str)
 
@@ -358,35 +347,74 @@ def plot_monthly_night_humidity():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-    #plt.show()
+    plt.show()
+    #buf = io.BytesIO()
+    #plt.savefig(buf, format='png')
+    #plt.close()
+    #buf.seek(0)
+    #return buf
+ 
     
+# --------------------------
+# DAYLIGHT HELPER FUNCTIONS
+# --------------------------
+
+def load_daylight_data():
+    base_dir = os.path.dirname(__file__)
+    daylight_24_path = os.path.join(base_dir, "daylight.csv")
+    daylight_25_path = os.path.join(base_dir, "daylight25.csv")
+
+    datetime_format = "%Y-%m-%dT%H:%M:%S.%f%z"
+
+    daylight_24 = pd.read_csv(daylight_24_path)
+    daylight_25 = pd.read_csv(daylight_25_path)
+
+    for df in [daylight_24, daylight_25]:
+        df["sunrise"] = pd.to_datetime(df["sunrise"], format=datetime_format)
+        df["sunset"] = pd.to_datetime(df["sunset"], format=datetime_format)
+        df["date"] = df["sunrise"].dt.date
+
+    daylight_df = pd.concat([daylight_24, daylight_25], ignore_index=True)
+    return daylight_df
+
+
+def add_daypart_column(df):
+    daylight = load_daylight_data()
+
+    df["time"] = df["time"].dt.tz_convert(None)
+    daylight["sunrise"] = daylight["sunrise"].dt.tz_convert(None)
+    daylight["sunset"] = daylight["sunset"].dt.tz_convert(None)
+
+    df["date"] = df["time"].dt.date
+
+    df = df.merge(daylight[["date", "sunrise", "sunset"]], on="date", how="left")
+
+    df["daypart"] = (
+        (df["time"] >= df["sunrise"]) & (df["time"] <= df["sunset"])
+    ).map({True: "day", False: "night"})
+
+    return df
+
 
 # --------------------------
 # MAIN
 # --------------------------
 
 def main():
-    df = get_all_locations()
 
     # Temperature
-    plot_daily_temperature_range(df)
-    plot_daily_median_temperature(df)
-    plot_day_night_temperature_difference(df)
-    plot_monthly_night_temperature(df)
-    plot_monthly_night_min_temperature(df)
-    plot_monthly_night_temperature_difference(df)
+    plot_daily_temperature_range()
+    plot_daily_median_temperature()
+    plot_day_night_temperature_difference()
+    plot_monthly_night_temperature()
+    plot_monthly_night_min_temperature()
+    plot_monthly_night_temperature_difference()
 
     # Humidity
-    plot_daily_median_humidity(df)
-    plot_daily_humidity_range(df)
-    plot_day_night_humidity_difference(df)
-    plot_monthly_night_humidity(df)
+    plot_daily_median_humidity()
+    plot_daily_humidity_range()
+    plot_day_night_humidity_difference()
+    plot_monthly_night_humidity()
 
 if __name__ == "__main__":
     main()
