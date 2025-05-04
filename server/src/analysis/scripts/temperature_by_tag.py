@@ -67,6 +67,8 @@ def temperature_by_tag(
     df2 = filter_df_by_tag(df2, tag2)
     avg2 = daily_avg_temp(df2)
 
+    print(f"Max value of avg_diff: {(avg1 - avg2).max()}")
+
     match graph_type:
         case "plot":
             return plot_daily_temp_avg(
