@@ -1,0 +1,42 @@
+@startuml Server
+!define RECTANGLE_COLOR #ADD8E6
+
+package "Weather Map Server" {
+    rectangle "API Layer" as api_layer RECTANGLE_COLOR {
+        [Routes: Sensors]
+        [Routes: Sensor Tags]
+        [Routes: Tags]
+        [Routes: Analysis]
+        [Routes: Graphs]
+    }
+
+    rectangle "Utilities" as utilities RECTANGLE_COLOR {
+        [get_data_util.py]
+        [filter_tag.py]
+    }
+
+    rectangle "Database" as database RECTANGLE_COLOR {
+        [Models: Sensor]
+        [Models: Tag]
+        [Models: SensorTag]
+        [SQL Scripts]
+    }
+
+    rectangle "Cache" as cache RECTANGLE_COLOR {
+        [DATA_CACHE]
+    }
+
+    rectangle "Analysis" as analysis RECTANGLE_COLOR {
+        [test.py]
+        [temperature_delta_sun_vs_shade.py]
+    }
+}
+
+api_layer --> utilities : Uses
+utilities --> database : Queries
+utilities --> cache : Reads/Writes
+analysis --> utilities : Fetches Data
+analysis --> cache : Reads
+database --> cache : Populates
+
+@enduml
