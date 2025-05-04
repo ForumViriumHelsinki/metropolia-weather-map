@@ -4,10 +4,18 @@
 
 All parts of the project can be started with docker compose. Compose starts the Client, server and database.
 
+First time running docker you need to first run:
+```bash
+docker-compose build
+```
+Once it's been ran once, you can start the application with:
 ```bash
 docker-compose up
 ```
-
+Populate the database with:
+```bash
+py .\server\src\api\sql\populate_db.py
+```
 ## Starting components separately
 
 ### Client
