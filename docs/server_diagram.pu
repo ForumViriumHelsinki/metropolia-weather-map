@@ -1,0 +1,42 @@
+@startuml analysis sequence
+
+participant "Server" as Server
+participant "Data API" as API
+
+
+alt optimize data fetching
+    Server -> Server: check location
+    alt Vallila
+        Server -> API: fetch /opendata/makelankatu/
+        API -> Server: return Vallila data
+    else Koivukylä or Laajasalo
+        Server -> API: fetch /opendata/r4c/
+        API -> Server: return Koivukylä or Laajasalo data
+        Server -> Server: filter chosen location
+    end
+else no location
+    Server -> API: fetch /opendata/makelankatu/
+    API -> Server: return Vallila data
+    Server -> API: fetch /opendata/r4c/
+    API -> Server: return Koivukylä and Laajasalo data
+    Server -> Server: combine datasets
+end
+
+alt daytime
+    Server -> Server: filter data from sunrise to sunset
+else nighttime
+    Server -> Server: filter data from sunset to sunrise
+end
+
+Server -> Server: filter data with tags
+Server -> Server: run analysis on filtered dataset
+
+alt generate graph
+    Server -> Server: generate plot graph
+else
+    Server -> Server: generate bar graph
+end
+
+
+
+@enduml

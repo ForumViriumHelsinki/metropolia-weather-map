@@ -5,7 +5,6 @@ from sqlmodel import select
 
 from src.api.database import get_session
 from src.api.models import Sensor
-from src.cache import DATA_CACHE
 
 
 def get_by_location(
@@ -23,10 +22,6 @@ def get_by_location(
         case "Laajasalo":
             return get_laajasalo(get_2024, get_2025, daytime, nighttime)
         case _:
-            print("Cache hit")
-            if DATA_CACHE is not None:
-                return DATA_CACHE
-
             return get_all_locations(get_2024, get_2025, daytime, nighttime)
 
     return None
@@ -46,22 +41,26 @@ def get_vallila(
     daytime: bool = False,
     nightime: bool = False,
 ):
+    df24 = None
+    df25 = None
+
     if get_2024:
-        return read_and_clean_parquet(
+        df24 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
         )
 
     if get_2025:
-        return read_and_clean_parquet(
+        df25 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
         )
 
-    df24 = read_and_clean_parquet(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
-    )
-    df25 = read_and_clean_parquet(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
-    )
+    if not get_2024 and not get_2025:
+        df24 = read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
+        )
+        df25 = read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
+        )
 
     df = pd.concat([df24, df25])
     df["location"] = "Vallila"
@@ -222,7 +221,7 @@ def filter_date_range(df, start_date, end_date):
 def filter_daytime_data(df, nightime: bool = None):
     # daylight csv location
     csv_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "..", "data", "daylight.csv"
+        os.path.dirname(__file__), "..", "analysis", "daylight.csv"
     )
 
     # Sunrise and sunset data

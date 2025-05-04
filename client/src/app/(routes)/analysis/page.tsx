@@ -5,10 +5,13 @@ import {
   TagGraphParams,
 } from "@/app/services/tags/getTagGraphService";
 import { GraphTypes, Locations } from "@/types";
+import { apiFetch } from "@/utils/apiFetch";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Tag } from "../tags/page";
 
 const Analysis = () => {
+  const [tags, setTags] = useState<Tag[]>([]);
   const [message, setMessage] = useState<string>("");
   const [graphUrl, setGraphUrl] = useState<string | null>(null);
   const [graphParams, setGraphParams] = useState<TagGraphParams>({
@@ -17,6 +20,15 @@ const Analysis = () => {
     graph_type: GraphTypes.plot,
   });
   const [imageLoaded, setImageLoaded] = useState<boolean>(false); // New state for image loading
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      const res = await apiFetch("/tags");
+      const tags: Tag[] = await res.json();
+      setTags(tags);
+    };
+    fetchTags();
+  }, []);
 
   const getGraph = async () => {
     console.log("getGraph()");
@@ -47,24 +59,26 @@ const Analysis = () => {
 
         <form className="box-basic col-span-3 row-span-6 flex flex-col">
           <label>Tag1</label>
-          <input
-            type="text"
-            value={graphParams.tag1}
+          <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag1: e.currentTarget.value })
             }
-            placeholder="Tag"
-          />
+          >
+            {tags.map((t) => (
+              <option key={t.id}>{t.id}</option>
+            ))}
+          </select>
 
           <label>Tag2</label>
-          <input
-            type="text"
-            value={graphParams.tag2}
+          <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag2: e.currentTarget.value })
             }
-            placeholder="Tag to compare"
-          />
+          >
+            {tags.map((t) => (
+              <option key={t.id}>{t.id}</option>
+            ))}
+          </select>
 
           <label>Location</label>
           <select
