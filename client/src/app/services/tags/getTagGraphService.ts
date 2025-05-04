@@ -6,11 +6,21 @@ export interface TagGraphParams {
   tag2: string;
   graph_type: GraphTypes;
   location?: Locations | null;
-  start_date?: string | null;
-  end_date?: string | null;
-  daytime?: boolean;
-  nighttime?: boolean;
+  startDate?: string | null;
+  endDate?: string | null;
+  // daytime?: boolean;
+  // nighttime?: boolean;
+  timeOfDay?: string;
 }
+
+export enum TimeOfDay {
+  wholeDay = "whole day",
+  daytime = "daytime",
+  nighttime = "nighttime",
+}
+
+const toSnakeCase = (str: string): string =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
 export const getTagGraphService = async (
   params: TagGraphParams,
@@ -20,7 +30,7 @@ export const getTagGraphService = async (
     for (const [key, val] of Object.entries(params)) {
       if (!val) continue;
 
-      searchParams.set(key, val);
+      searchParams.set(toSnakeCase(key), val);
     }
 
     const res = await apiFetch(

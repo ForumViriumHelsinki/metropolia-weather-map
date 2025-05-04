@@ -1,0 +1,10 @@
+line-length = 80
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[lint]
+select = ["PL", "I", "F", "N", "RET"]
+ignore = ["N806", "PLR0913", "PLW0603"]

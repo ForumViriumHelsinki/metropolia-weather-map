@@ -1,10 +1,11 @@
 import os
-from datetime import date
 
 import pandas as pd
 from sqlmodel import select
+
 from src.api.database import get_session
 from src.api.models import Sensor
+from src.cache import DATA_CACHE
 
 
 def get_by_location(
@@ -14,7 +15,6 @@ def get_by_location(
     daytime: bool = False,
     nighttime: bool = False,
 ):
-
     match location:
         case "Vallila":
             return get_vallila(get_2024, get_2025, daytime, nighttime)
@@ -23,9 +23,20 @@ def get_by_location(
         case "Laajasalo":
             return get_laajasalo(get_2024, get_2025, daytime, nighttime)
         case _:
+            print("Cache hit")
+            if DATA_CACHE is not None:
+                return DATA_CACHE
+
             return get_all_locations(get_2024, get_2025, daytime, nighttime)
 
-    return
+    return None
+
+
+def read_and_clean_parquet(url):
+    df = pd.read_parquet(url)
+    df = df.rename_axis("time").reset_index()
+    df["time"] = pd.to_datetime(df["time"])
+    return df
 
 
 # Fetch and filter makelankatu data
@@ -35,19 +46,22 @@ def get_vallila(
     daytime: bool = False,
     nightime: bool = False,
 ):
-    df24 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.csv.gz",
-        parse_dates=["time"],
-    )
     if get_2024:
-        return df24
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
+        )
 
-    df25 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.csv.gz",
-        parse_dates=["time"],
-    )
     if get_2025:
-        return df25
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
+        )
+
+    df24 = read_and_clean_parquet(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
+    )
+    df25 = read_and_clean_parquet(
+        "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
+    )
 
     df = pd.concat([df24, df25])
     df["location"] = "Vallila"
@@ -75,9 +89,7 @@ def get_laajasalo(
     else:
         df = get_rest()
 
-    # get Laajasalo sensors
     df["location"] = "Laajasalo"
-    df = df.loc[df["location"] == "Laajasalo"]
     df = filter_install_date(df, "Laajasalo")
 
     if daytime:
@@ -149,7 +161,9 @@ def filter_install_date(df, location):
     # Get ids and install dates
     for db in get_session():
         res = db.exec(
-            select(Sensor.id, Sensor.install_date).where(Sensor.location == location)
+            select(Sensor.id, Sensor.install_date).where(
+                Sensor.location == location
+            )
         ).all()
 
     dfs = []
@@ -158,29 +172,33 @@ def filter_install_date(df, location):
         filtered_df = df[(df["dev-id"] == sensor_id) & mask]
         dfs.append(filtered_df)
 
-    df = pd.concat(dfs)
-    return df
+    return pd.concat(dfs)
 
 
 def get_rest(
     get_2024: bool = False,
     get_2025: bool = False,
 ):
-    df24 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.csv.gz", parse_dates=["time"]
-    )
+    def fetch_2024():
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.parquet"
+        )
+
+    def fetch_2025():
+        return read_and_clean_parquet(
+            "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.parquet"
+        )
+
     if get_2024:
-        return df24
+        return fetch_2024()
 
-    df25 = pd.read_csv(
-        "https://bri3.fvh.io/opendata/r4c/r4c_all-2025.csv.gz", parse_dates=["time"]
-    )
     if get_2025:
-        return df25
+        return fetch_2025()
 
-    df = pd.concat([df24, df25])
+    df24 = fetch_2024()
+    df25 = fetch_2025()
 
-    return df
+    return pd.concat([df24, df25])
 
 
 def filter_date_range(df, start_date, end_date):
@@ -228,9 +246,7 @@ def filter_daytime_data(df, nightime: bool = None):
         daylight_df = df[mask]
 
     daylight_df = daylight_df.drop("sunrise", axis=1)
-    daylight_df = daylight_df.drop("sunset", axis=1)
-
-    return daylight_df
+    return daylight_df.drop("sunset", axis=1)
 
 
 def get_ids_by_location(location: str):
