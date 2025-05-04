@@ -130,7 +130,7 @@ def plot_seasonal_decomposition():
 
 	fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
 	result.trend.plot(ax=axes[0], title="Trendi")
-	result.seasonal.plot(ax=axes[1], title="Kausisuus")
+	result.seasonal.plot(ax=axes[1], title="kausiluonteisuus")
 	result.resid.plot(ax=axes[2], title="Jäännös")
 	plt.show()
 	buf = io.BytesIO()
