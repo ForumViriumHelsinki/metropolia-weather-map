@@ -7,6 +7,7 @@ import {
 import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Tag } from "../tags/page";
 
@@ -49,16 +50,25 @@ const Analysis = () => {
 
   return (
     <div>
+      <div className="mb-2 flex justify-between">
+        <h2 className="text-4xl font-semibold">Tägi analysoija</h2>
+        <Link
+          href={"/tags"}
+          className="text-4xl font-semibold"
+        >
+          Hallitse tägejä
+        </Link>
+      </div>
       <div className="flex flex-col-reverse gap-4 sm:grid sm:grid-cols-4 sm:grid-rows-6">
         <button
           className="btn-primary row-start-6 row-end-6"
           onClick={getGraph}
         >
-          Get graph
+          Luo kaavio
         </button>
 
         <form className="box-basic col-span-3 row-span-6 flex flex-col">
-          <label>Tag1</label>
+          <label>Tag 1</label>
           <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag1: e.currentTarget.value })
@@ -69,7 +79,7 @@ const Analysis = () => {
             ))}
           </select>
 
-          <label>Tag2</label>
+          <label>Tag 2</label>
           <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag2: e.currentTarget.value })
@@ -80,7 +90,7 @@ const Analysis = () => {
             ))}
           </select>
 
-          <label>Location</label>
+          <label>Alue</label>
           <select
             onChange={(e) =>
               setGraphParams({
@@ -99,7 +109,7 @@ const Analysis = () => {
               </option>
             ))}
           </select>
-          <label>Graph type</label>
+          <label>Kaaviotyyppi</label>
           <select
             onChange={(e) =>
               setGraphParams({
@@ -113,7 +123,7 @@ const Analysis = () => {
             ))}
           </select>
 
-          <label>Start date</label>
+          <label>Aloituspäivä</label>
           <input
             type={graphParams.graph_type === "plot" ? "date" : "month"}
             onChange={(e) =>
@@ -124,7 +134,7 @@ const Analysis = () => {
             }
           />
 
-          <label>End date</label>
+          <label>Lopetuspäivä</label>
           <input
             type={graphParams.graph_type === "plot" ? "date" : "month"}
             onChange={(e) =>
@@ -135,7 +145,7 @@ const Analysis = () => {
             }
           />
 
-          <label>Time of day</label>
+          <label>Päivänaika</label>
           <select
             onChange={(e) =>
               setGraphParams({

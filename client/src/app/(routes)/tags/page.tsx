@@ -5,8 +5,8 @@ import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import AddSensor from "./AddSensor";
 import TagAdding from "./TagAdding";
 
 // Fixes error 500
@@ -65,6 +65,7 @@ const Tags = () => {
   const handleTagRemoval = async () => {
     try {
       await removeTagService(selectedSensors, selectedTag);
+      setSelectedSensors([]);
 
       // Refetch sensors with tag to update map
       const updateRes = await apiFetch(`/sensors?tag=${selectedTag}`);
@@ -82,17 +83,22 @@ const Tags = () => {
 
   return (
     <div className="flex flex-col gap-2">
+      <Link
+        href={"/"}
+        className="text-4xl font-semibold"
+      >
+        Takaisin
+      </Link>
       <TagAdding
         tags={tags}
         setTags={setTags}
         selectedSensors={selectedSensors}
         setSelectedSensors={setSelectedSensors}
       />
-
       <div className="box-basic grid grid-cols-2">
         <div className="flex flex-col gap-3">
           <div>
-            <div>Filter map by tag</div>
+            <div>Näytä sensorit tägillä</div>
             <select onChange={(e) => setSelectedTag(e.currentTarget.value)}>
               <option>All</option>
               {tags.map((t) => (
@@ -105,19 +111,18 @@ const Tags = () => {
             className="btn-primary w-fit"
             onClick={handleTagRemoval}
           >
-            Remove tag
+            Poista tägi
           </button>
           <div>{message}</div>
         </div>
 
         <div>
-          <h2 className="text-2xl">Selected sensors</h2>
+          <h2 className="text-2xl">Valitut sensorit</h2>
           {selectedSensors.map((s) => (
             <div key={s.id}>{s.id}</div>
           ))}
         </div>
       </div>
-
       <div className="border-off-white aspect-4/2 w-full rounded-lg border">
         <TagMap
           sensors={selectedTag === "All" ? allSensors : sensorsWithTag}
@@ -125,8 +130,7 @@ const Tags = () => {
           handleSelectedSensors={handleSelectedSensors}
         />
       </div>
-
-      <AddSensor />
+      {/* <AddSensor /> */}
     </div>
   );
 };

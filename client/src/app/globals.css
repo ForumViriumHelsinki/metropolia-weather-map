@@ -28,9 +28,9 @@
   --sun: var(--color-sun);
   --shade: var(--color-shade);
 
-  h2 {
+  /* h2 {
     @apply font-heavy;
-  }
+  } */
 
   h3 {
     @apply font-heavy text-xl;
