@@ -54,9 +54,12 @@ export default async function Home() {
         position="top-center"
         reverseOrder={false}
       />
+        {/* Header */}
+        <h1 className="mx-auto w-fit rounded-2xl bg-blue-100 px-6 py-4 text-5xl font-bold text-blue-900 shadow-md">
+            Pääkaupunkiseudun sensorit
+        </h1>
       {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
-        <h1 className="mb-2 text-5xl 2xl:pt-9">Ilmastokartta</h1>
         <div className="2xl:w-fill aspect-2/3 w-full border-2 sm:aspect-2/1 2xl:aspect-2/1">
           <MapWrapper />
         </div>
