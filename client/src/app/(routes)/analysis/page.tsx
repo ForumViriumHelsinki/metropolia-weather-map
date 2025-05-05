@@ -51,7 +51,7 @@ const Analysis = () => {
   return (
     <div>
       <div className="mb-2 flex justify-between">
-        <h2 className="text-4xl font-semibold">Tägi analysoija</h2>
+        <h2 className="text-4xl font-semibold">Analysointityökalu tägeille</h2>
         <Link
           href={"/tags"}
           className="text-4xl font-semibold"
@@ -68,7 +68,7 @@ const Analysis = () => {
         </button>
 
         <form className="box-basic col-span-3 row-span-6 flex flex-col">
-          <label>Tag 1</label>
+          <label>Tägi 1</label>
           <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag1: e.currentTarget.value })
@@ -79,7 +79,7 @@ const Analysis = () => {
             ))}
           </select>
 
-          <label>Tag 2</label>
+          <label>Tägi 2</label>
           <select
             onChange={(e) =>
               setGraphParams({ ...graphParams, tag2: e.currentTarget.value })
@@ -145,7 +145,7 @@ const Analysis = () => {
             }
           />
 
-          <label>Päivänaika</label>
+          <label>Vuorokaudenaika</label>
           <select
             onChange={(e) =>
               setGraphParams({
