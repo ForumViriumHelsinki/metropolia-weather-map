@@ -26,16 +26,16 @@ export default function GraphsLoader() {
     ],
     ["/plot/daily_temperature_range", "Päivittäinen lämpötilaero"],
     ["/plot/daily_median_temperature", "Päivittäinen keskilämpötila"],
-    ["/plot/monthly_night_temperature", "Kuukausittainen yö lämpötila"],
+    ["/plot/monthly_night_temperature", "Kuukausittainen yölämpötila"],
     ["/plot/monthly_night_min_temperature", "Kuukausittainen minimilämpötila"],
     [
       "/plot/monthly_night_temperature_difference",
-      "Kuukausittainen yö lämpötilaero",
+      "Kuukausittainen yölämpötilaero",
     ],
-    ["/plot/daily_median_humidity", "Päivittäinen keski kosteus"],
-    ["/plot/daily_humidity_range", "Päivittäinen kosteus ero"],
-    ["/plot/day_night_humidity_difference", "Päivä-yö kosteus ero"],
-    ["/plot/monthly_night_humidity", "Kuukausittainen yö kosteus"],
+    ["/plot/daily_median_humidity", "Päivittäinen kosteuden mediaani"],
+    ["/plot/daily_humidity_range", "Päivittäinen kosteusero"],
+    ["/plot/day_night_humidity_difference", "Yön ja päivän kosteusero"],
+    ["/plot/monthly_night_humidity", "Kuukausittainen yökosteus"],
   ];
 
   const LoadAllImages = async () => {
