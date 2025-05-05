@@ -65,6 +65,7 @@ const Tags = () => {
   const handleTagRemoval = async () => {
     try {
       await removeTagService(selectedSensors, selectedTag);
+      setSelectedSensors([]);
 
       // Refetch sensors with tag to update map
       const updateRes = await apiFetch(`/sensors?tag=${selectedTag}`);
@@ -92,7 +93,7 @@ const Tags = () => {
       <div className="box-basic grid grid-cols-2">
         <div className="flex flex-col gap-3">
           <div>
-            <div>Filter map by tag</div>
+            <div>Näytä sensorit tägillä</div>
             <select onChange={(e) => setSelectedTag(e.currentTarget.value)}>
               <option>All</option>
               {tags.map((t) => (
@@ -105,13 +106,13 @@ const Tags = () => {
             className="btn-primary w-fit"
             onClick={handleTagRemoval}
           >
-            Remove tag
+            Poista tägi
           </button>
           <div>{message}</div>
         </div>
 
         <div>
-          <h2 className="text-2xl">Selected sensors</h2>
+          <h2 className="text-2xl">Valitut sensorit</h2>
           {selectedSensors.map((s) => (
             <div key={s.id}>{s.id}</div>
           ))}

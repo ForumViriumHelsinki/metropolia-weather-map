@@ -44,6 +44,7 @@ const TagAdding = ({
     try {
       await addTagService(selectedSensors, selectedTag);
       setMessage("Tags added succesfully");
+      setSelectedSensors([]);
     } catch (error) {
       if (error instanceof Error) {
         setMessage(error.message);
@@ -55,10 +56,10 @@ const TagAdding = ({
   return (
     <div className="box-basic grid grid-cols-2">
       <div>
-        <h2 className="text-2xl">Add tag to sensors</h2>
+        <h2 className="text-2xl">Lisää tägi</h2>
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col">
-            <label className="text-xl font-bold">Select tag to add</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-xl font-bold">Lisättävä tägi</label>
             <select
               className="w-1/2"
               value={selectedTag}
@@ -74,24 +75,25 @@ const TagAdding = ({
               className="btn-primary w-1/2"
               onClick={handleTagAdding}
             >
-              Add tag to sensors
+              Lisää tägi sensoriin
             </button>
           </div>
 
           {/* Add tag to db */}
           <div>
             <form onSubmit={handleTagCreation}>
-              <div className="flex flex-col">
-                <label className="text-xl font-bold">Create new tag</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-xl font-bold">Luo uusi tägi</label>
                 <input
+                  className="w-1/2"
                   value={newTag}
                   onChange={(e) => setNewTag(e.currentTarget.value)}
                   type="text"
-                  placeholder="New tag"
+                  placeholder="Luotava tägi"
                 />
               </div>
 
-              <button className="btn-primary w-1/2">Add new tag</button>
+              <button className="btn-primary mt-2 w-1/2">Luo tägi</button>
             </form>
             <div>{message}</div>
           </div>
@@ -101,7 +103,7 @@ const TagAdding = ({
       {/* List of selected sensors */}
       <div className="flex flex-col justify-between">
         <div>
-          <h2 className="text-2xl">Selected sensors</h2>
+          <h2 className="text-2xl">Valitut sensorit</h2>
           <div>
             {selectedSensors.map((s) => (
               <option key={s.id}>{s.id}</option>
@@ -114,7 +116,7 @@ const TagAdding = ({
             onClick={() => setSelectedSensors([])}
             className="btn-primary w-1/2"
           >
-            Clear
+            Tyhjennä valinnat
           </button>
         </div>
       </div>
