@@ -5,8 +5,8 @@ import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { useMessageDisplay } from "@/utils/useMessageDisplay";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import AddSensor from "./AddSensor";
 import TagAdding from "./TagAdding";
 
 // Fixes error 500
@@ -83,13 +83,18 @@ const Tags = () => {
 
   return (
     <div className="flex flex-col gap-2">
+      <Link
+        href={"/"}
+        className="text-4xl font-semibold"
+      >
+        Takaisin
+      </Link>
       <TagAdding
         tags={tags}
         setTags={setTags}
         selectedSensors={selectedSensors}
         setSelectedSensors={setSelectedSensors}
       />
-
       <div className="box-basic grid grid-cols-2">
         <div className="flex flex-col gap-3">
           <div>
@@ -118,7 +123,6 @@ const Tags = () => {
           ))}
         </div>
       </div>
-
       <div className="border-off-white aspect-4/2 w-full rounded-lg border">
         <TagMap
           sensors={selectedTag === "All" ? allSensors : sensorsWithTag}
@@ -126,8 +130,7 @@ const Tags = () => {
           handleSelectedSensors={handleSelectedSensors}
         />
       </div>
-
-      <AddSensor />
+      {/* <AddSensor /> */}
     </div>
   );
 };

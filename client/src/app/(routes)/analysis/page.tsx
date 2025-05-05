@@ -7,6 +7,7 @@ import {
 import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Tag } from "../tags/page";
 
@@ -49,6 +50,15 @@ const Analysis = () => {
 
   return (
     <div>
+      <div className="mb-2 flex justify-between">
+        <h2 className="text-4xl font-semibold">Tägi analysoija</h2>
+        <Link
+          href={"/tags"}
+          className="text-4xl font-semibold"
+        >
+          Hallitse tägejä
+        </Link>
+      </div>
       <div className="flex flex-col-reverse gap-4 sm:grid sm:grid-cols-4 sm:grid-rows-6">
         <button
           className="btn-primary row-start-6 row-end-6"
