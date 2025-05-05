@@ -56,7 +56,7 @@ export default async function Home() {
       />
       {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
-        <h1 className="mb-2 text-5xl 2xl:pt-9">Mäkelänkatu</h1>
+        <h1 className="mb-2 text-5xl 2xl:pt-9">Ilmastokartta</h1>
         <div className="2xl:w-fill aspect-2/3 w-full border-2 sm:aspect-2/1 2xl:aspect-2/1">
           <MapWrapper />
         </div>
