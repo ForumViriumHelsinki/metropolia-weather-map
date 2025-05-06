@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
+from api.database import get_session
 from api.models import Tag
-from src.api.database import get_session
 
 tag_router = APIRouter()
 

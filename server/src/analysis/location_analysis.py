@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.utils.get_data_util import get_all_locations
+from utils.get_data_util import get_all_locations
 
 # --------------------------
 # TEMP FUNCTIONS

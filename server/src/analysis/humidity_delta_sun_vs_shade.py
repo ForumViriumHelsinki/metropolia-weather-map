@@ -3,8 +3,8 @@ import io
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.utils.get_data_util import get_vallila
 from utils.filters import filter_df_by_tag
+from utils.get_data_util import get_vallila
 
 """
 Sensors in sun and shade are currently hardcoded in the utils.py file.

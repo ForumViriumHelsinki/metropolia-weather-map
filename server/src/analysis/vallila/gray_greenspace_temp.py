@@ -1,11 +1,10 @@
-from src.utils.utils import save_graph
 from utils.filters import filter_location_with_tag
 from utils.plot_utils import (
     filter_daytime_data,
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
 )
-from utils.utils import daily_avg_temp
+from utils.utils import daily_avg_temp, save_graph
 
 
 def area_daily_temp_diff():

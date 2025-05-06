@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.utils.get_data_util import get_koivukyla, get_laajasalo, get_vallila
-from src.utils.utils import save_graph
-from utils.utils import daily_avg_temp
+from utils.get_data_util import get_koivukyla, get_laajasalo, get_vallila
+from utils.utils import daily_avg_temp, save_graph
 
 
 def location_temps():

@@ -1,6 +1,6 @@
 import os
 
-from src.utils.get_data_util import get_ids_by_location
+from utils.get_data_util import get_ids_by_location
 
 
 def map_locations():
