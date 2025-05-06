@@ -46,7 +46,18 @@ def filter_location_with_tag(
             select(SensorTag.sensor_id)
             .join(Sensor, Sensor.id == SensorTag.sensor_id)
             .where(SensorTag.tag_id == tag)
-            # .where(Sensor.location == location)
+        )
+        location_with_tag_ids = res.all()
+
+    return df[df["dev-id"].isin(location_with_tag_ids)]
+
+
+def tag_filter(df, tag):
+    for db in get_session():
+        res = db.exec(
+            select(SensorTag.sensor_id)
+            .join(Sensor, Sensor.id == SensorTag.sensor_id)
+            .where(SensorTag.tag_id == tag)
         )
         location_with_tag_ids = res.all()
 

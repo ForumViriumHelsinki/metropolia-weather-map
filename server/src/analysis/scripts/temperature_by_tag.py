@@ -1,8 +1,14 @@
 # ruff: noqa: PLR2004
 from datetime import date
 
-from utils.filters import filter_location_with_tag
-from utils.get_data_util import filter_date_range
+from utils.filters import tag_filter
+from utils.get_data_util import (
+    filter_date_range,
+    get_all_locations,
+    get_koivukyla,
+    get_laajasalo,
+    get_vallila,
+)
 from utils.plot_utils import (
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
@@ -25,25 +31,41 @@ def temperature_by_tag(
     if start_date and end_date and start_date > end_date:
         raise ValueError("Start date cannot be later than end date.")
 
-    year_flags = {
-        2024: start_date and end_date and start_date.year == 2024,
-        2025: start_date and end_date and start_date.year == 2025,
-    }
+    is_2024 = (
+        start_date
+        and end_date
+        and start_date.year == end_date.year
+        and start_date.year == 2024
+    )
 
-    def prepare_data(tag):
-        df = filter_location_with_tag(
-            location,
-            tag,
-            get_2024=year_flags[2024],
-            get_2025=year_flags[2025],
-            daytime=daytime,
-            nighttime=nighttime,
-        )
+    is_2025 = (
+        start_date
+        and end_date
+        and start_date.year == end_date.year
+        and start_date.year == 2025
+    )
+
+    print(is_2024, is_2025)
+
+    def prepare_data(df, tag):
+        df = tag_filter(df, tag)
         df = filter_date_range(df, start_date, end_date)
         return daily_avg_temp(df), df
 
-    avg1, df1 = prepare_data(tag1)
-    avg2, df2 = prepare_data(tag2)
+    match location:
+        case "Vallila":
+            df = get_vallila(is_2024, is_2025, daytime, nighttime)
+        case "Koivukyla":
+            df = get_koivukyla(is_2024, is_2025, daytime, nighttime)
+        case "Laajasalo":
+            df = get_laajasalo(is_2024, is_2025, daytime, nighttime)
+        case _:
+            df = get_all_locations(is_2024, is_2025, daytime, nighttime)
+
+    df = filter_date_range(df, start_date, end_date)
+
+    avg1, df1 = prepare_data(df, tag1)
+    avg2, df2 = prepare_data(df, tag2)
 
     print(f"Max value of avg_diff: {(avg1 - avg2).max()}")
 

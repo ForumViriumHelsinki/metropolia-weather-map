@@ -23,6 +23,8 @@ def get_temperature_graph(
     try:
         if start_date and end_date:
             start_date, end_date = parse_date(start_date, end_date)
+            if end_date < start_date:
+                raise ValueError("End date cannot be before start date")
 
         is_daytime = time_of_day == "daytime"
         is_nighttime = time_of_day == "nighttime"
