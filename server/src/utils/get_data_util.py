@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from sqlmodel import select
 
-from src.api.database import get_session
-from src.api.models import Sensor
+from api.database import get_session
+from api.models import Sensor
 
 
 # Fetch and filter makelankatu data

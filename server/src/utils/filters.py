@@ -1,7 +1,7 @@
 from sqlmodel import select
 
+from api.models import Sensor, SensorTag
 from src.api.database import get_session
-from src.api.models import Sensor, SensorTag
 from utils.get_data_util import (
     get_all_locations,
     get_koivukyla,
