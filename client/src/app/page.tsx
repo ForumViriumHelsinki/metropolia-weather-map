@@ -6,7 +6,7 @@ import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { Toaster } from "react-hot-toast";
-import Analysis from "./(routes)/analysis/page";
+import Analysis from "../sections/analysis";
 
 export type VallilaLatestData = {
   id: string;
@@ -54,10 +54,10 @@ export default async function Home() {
         position="top-center"
         reverseOrder={false}
       />
-        {/* Header */}
-        <h1 className="mx-auto w-fit rounded-2xl bg-blue-100 px-6 py-4 text-5xl font-bold text-blue-900 shadow-md">
-            Pääkaupunkiseudun sensorit
-        </h1>
+      {/* Header */}
+      <h1 className="mx-auto w-fit rounded-2xl bg-blue-100 px-6 py-4 text-5xl font-bold text-blue-900 shadow-md">
+        Pääkaupunkiseudun sensorit
+      </h1>
       {/* Map */}
       <div className="2xl:flex 2xl:gap-12">
         <div className="2xl:w-fill aspect-2/3 w-full border-2 sm:aspect-2/1 2xl:aspect-2/1">
