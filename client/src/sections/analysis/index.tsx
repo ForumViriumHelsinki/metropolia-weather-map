@@ -54,8 +54,8 @@ const Analysis = () => {
       setMessage("Graph created");
     } catch (error) {
       if (error instanceof Error) {
-        setMessage(`Error creating graph: ${error.message}`);
         console.error(error);
+        setMessage(`Virhe luodessa kaaviota: ${error.message}`);
       }
     }
   };

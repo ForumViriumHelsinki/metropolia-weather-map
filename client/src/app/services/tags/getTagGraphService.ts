@@ -41,7 +41,7 @@ export const getTagGraphService = async (
     if (!res.ok) {
       const errorData = await res.json();
       console.error(errorData);
-      throw new Error("Error creating data", errorData.detail);
+      throw new Error(errorData.detail);
     }
 
     const data = await res.blob();
