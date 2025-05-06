@@ -3,7 +3,7 @@ from datetime import date
 
 from src.utils.get_data_util import filter_date_range
 from src.utils.utils import save_graph
-from utils.filters import filter_df_by_tag, filter_location_with_tag
+from utils.filters import filter_location_with_tag
 from utils.plot_utils import (
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
@@ -16,79 +16,57 @@ def temperature_by_tag(
     tag2: str,
     graph_type: str,
     location: str = None,
-    start_date: str = date,
-    end_date: str = date,
+    start_date: date = None,
+    end_date: date = None,
     daytime: bool = False,
     nighttime: bool = False,
 ):
-    # Data does not exist before year 2024
     if start_date and start_date.year < 2024:
         raise ValueError("Start date must be in 2024 or later.")
-
     if start_date and end_date and start_date > end_date:
         raise ValueError("Start date cannot be later than end date.")
 
-    is_year_2024 = False
-    is_year_2025 = False
+    year_flags = {
+        2024: start_date and end_date and start_date.year == 2024,
+        2025: start_date and end_date and start_date.year == 2025,
+    }
 
-    if start_date and end_date and start_date.year == end_date.year:
-        if start_date.year == 2024:
-            is_year_2024 = True
+    def prepare_data(tag):
+        df = filter_location_with_tag(
+            location,
+            tag,
+            get_2024=year_flags[2024],
+            get_2025=year_flags[2025],
+            daytime=daytime,
+            nighttime=nighttime,
+        )
+        df = filter_date_range(df, start_date, end_date)
+        return daily_avg_temp(df), df
 
-        if start_date.year == 2025:
-            is_year_2025 = True
-
-    df1 = filter_location_with_tag(
-        location,
-        tag1,
-        get_2024=is_year_2024,
-        get_2025=is_year_2025,
-        daytime=daytime,
-        nighttime=nighttime,
-    )
-
-    df1 = filter_date_range(df1, start_date, end_date)
-
-    df2 = filter_location_with_tag(
-        location,
-        tag2,
-        get_2024=is_year_2024,
-        get_2025=is_year_2025,
-        daytime=daytime,
-        nighttime=nighttime,
-    )
-
-    df2 = filter_date_range(df2, start_date, end_date)
-
-    # Location of analysis Vallila | Laajasalo | Koivukylä | All
-    df1 = filter_df_by_tag(df1, tag1)
-    avg1 = daily_avg_temp(df1)
-
-    df2 = filter_df_by_tag(df2, tag2)
-    avg2 = daily_avg_temp(df2)
+    avg1, df1 = prepare_data(tag1)
+    avg2, df2 = prepare_data(tag2)
 
     print(f"Max value of avg_diff: {(avg1 - avg2).max()}")
 
-    match graph_type:
-        case "plot":
-            return plot_daily_temp_avg(
-                df1=avg1,
-                df2=avg2,
-                title=f"Päivittäinen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
-                df1_label=tag1,
-                df2_label=tag2,
-            )
+    if graph_type == "plot":
+        return plot_daily_temp_avg(
+            df1=avg1,
+            df2=avg2,
+            title=f"Päivittäinen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
+            df1_label=tag1,
+            df2_label=tag2,
+        )
 
-        case "bar":
-            return plot_monthly_temp_diff(
-                df1=df1,
-                df2=df2,
-                title=f"Kuukausittainen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
-                df1_label=tag1,
-                df2_label=tag2,
-            )
-        case _:
-            raise ValueError("Invalid or undefined graph type")
+    if graph_type == "bar":
+        return plot_monthly_temp_diff(
+            df1=df1,
+            df2=df2,
+            title=f"Kuukausittainen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
+            df1_label=tag1,
+            df2_label=tag2,
+        )
+
+    raise ValueError("Invalid or undefined graph type")
 
 
 if __name__ == "__main__":

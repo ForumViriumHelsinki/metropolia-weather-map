@@ -20,16 +20,13 @@ def get_temperature_graph(
     end_date: str = None,
     time_of_day: str = "whole day",
 ):
-    if graph_type == "plot" and start_date and end_date:
-        start_date, end_date = parse_date(start_date, end_date)
-
-    if graph_type == "bar" and start_date and end_date:
-        start_date, end_date = parse_date(start_date, end_date)
-
-    is_daytime = time_of_day == "daytime"
-    is_nighttime = time_of_day == "nighttime"
-
     try:
+        if start_date and end_date:
+            start_date, end_date = parse_date(start_date, end_date)
+
+        is_daytime = time_of_day == "daytime"
+        is_nighttime = time_of_day == "nighttime"
+
         graph = temperature_by_tag(
             tag1=tag1,
             tag2=tag2,
@@ -46,8 +43,13 @@ def get_temperature_graph(
         buf.seek(0)
 
         return StreamingResponse(buf, media_type="image/svg+xml")
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        print(e)
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred."
+        )
 
 
 def parse_date(start_date, end_date):
