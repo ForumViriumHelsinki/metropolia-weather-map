@@ -1,10 +1,13 @@
 "use client";
 
 import {
+  AnalysisType,
   getTagGraphService,
+  GraphTypes,
+  Locations,
   TagGraphParams,
+  TimeOfDay,
 } from "@/app/services/tags/getTagGraphService";
-import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { capitalize } from "@/utils/capitalize";
 import Image from "next/image";
@@ -16,11 +19,18 @@ const graphs = [
   { display: "Pylväs", value: "bar" },
   { display: "Viiva", value: "plot" },
 ];
+
 const timesOfDay = [
   { display: "Koko päivä", value: "whole day" },
   { display: "Päiväsaika", value: "daytime" },
   { display: "Yöaika", value: "nighttime" },
 ];
+
+const analysisTypes = [
+  { display: "Lämpötila", value: "temperature" },
+  { display: "Ilmankosteus", value: "humidity" },
+];
+
 const Analysis = () => {
   const [tags, setTags] = useState<Tag[]>([]);
   const [message, setMessage] = useState<string>("");
@@ -28,10 +38,10 @@ const Analysis = () => {
   const [graphParams, setGraphParams] = useState<TagGraphParams>({
     tag1: "",
     tag2: "",
-    graph_type: GraphTypes.plot,
-    timeOfDay: timesOfDay[0].value,
+    graph_type: GraphTypes.Plot,
+    timeOfDay: TimeOfDay.WholeDay,
   });
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false); // New state for image loading
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -80,6 +90,25 @@ const Analysis = () => {
         </button>
 
         <form className="box-basic col-span-3 row-span-6 flex flex-col">
+          <label>Analyysi</label>
+          <select
+            onChange={(e) =>
+              setGraphParams({
+                ...graphParams,
+                analysis_variable: e.currentTarget.value as AnalysisType,
+              })
+            }
+          >
+            {analysisTypes.map((t) => (
+              <option
+                key={t.value}
+                value={t.value}
+              >
+                {t.display}
+              </option>
+            ))}
+          </select>
+
           <label>Tägi 1</label>
           <select
             onChange={(e) =>
@@ -177,7 +206,7 @@ const Analysis = () => {
             onChange={(e) =>
               setGraphParams({
                 ...graphParams,
-                timeOfDay: e.currentTarget.value,
+                timeOfDay: e.currentTarget.value as TimeOfDay,
               })
             }
           >
