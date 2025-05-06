@@ -30,3 +30,9 @@ def save_graph(file_name, plt, folder=None):
 
     plt.savefig(svg_path)
     plt.savefig(png_path)
+
+
+def daily_avg_temp(df):
+    df = df.copy()
+    df.loc[:, "date"] = df["time"].dt.date
+    return df.groupby("date")["temperature"].mean()

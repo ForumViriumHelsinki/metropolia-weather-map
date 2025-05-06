@@ -1,12 +1,6 @@
 import matplotlib.pyplot as plt
 
 
-def daily_avg_temp(df):
-    df = df.copy()
-    df.loc[:, "date"] = df["time"].dt.date
-    return df.groupby("date")["temperature"].mean()
-
-
 def plot_daily_temp_avg(
     df1,
     df2,

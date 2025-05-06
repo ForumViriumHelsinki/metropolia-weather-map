@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.utils.get_data_util import get_koivukyla, get_laajasalo, get_vallila
 from src.utils.utils import save_graph
-from utils.plot_utils import daily_avg_temp
+from utils.utils import daily_avg_temp
 
 
 def location_temps():
