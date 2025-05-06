@@ -2,8 +2,12 @@ from sqlmodel import select
 
 from src.api.database import get_session
 from src.api.models import Sensor, SensorTag
-
-from .get_data_util import get_by_location
+from utils.get_data_util import (
+    get_all_locations,
+    get_koivukyla,
+    get_laajasalo,
+    get_vallila,
+)
 
 
 def filter_df_by_tag(df, tag):
@@ -26,7 +30,15 @@ def filter_location_with_tag(
     daytime=False,
     nighttime=False,
 ):
-    df = get_by_location(location, get_2024, get_2025, daytime, nighttime)
+    match location:
+        case "Vallila":
+            df = get_vallila(get_2024, get_2025, daytime, nighttime)
+        case "Koivukyla":
+            df = get_koivukyla(get_2024, get_2025, daytime, nighttime)
+        case "Laajasalo":
+            df = get_laajasalo(get_2024, get_2025, daytime, nighttime)
+        case _:
+            df = get_all_locations(get_2024, get_2025, daytime, nighttime)
 
     location_with_tag_ids = []
     for db in get_session():

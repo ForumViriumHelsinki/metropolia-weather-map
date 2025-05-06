@@ -7,33 +7,6 @@ from src.api.database import get_session
 from src.api.models import Sensor
 
 
-def get_by_location(
-    location: str = None,
-    get_2024: bool = False,
-    get_2025: bool = False,
-    daytime: bool = False,
-    nighttime: bool = False,
-):
-    match location:
-        case "Vallila":
-            return get_vallila(get_2024, get_2025, daytime, nighttime)
-        case "Koivukyla":
-            return get_koivukyla(get_2024, get_2025, daytime, nighttime)
-        case "Laajasalo":
-            return get_laajasalo(get_2024, get_2025, daytime, nighttime)
-        case _:
-            return get_all_locations(get_2024, get_2025, daytime, nighttime)
-
-    return None
-
-
-def read_and_clean_parquet(url):
-    df = pd.read_parquet(url)
-    df = df.rename_axis("time").reset_index()
-    df["time"] = pd.to_datetime(df["time"])
-    return df
-
-
 # Fetch and filter makelankatu data
 def get_vallila(
     get_2024: bool = False,
@@ -154,6 +127,13 @@ def get_all_locations(
         return filter_daytime_data(df_merged, nightime=True)
 
     return df_merged
+
+
+def read_and_clean_parquet(url):
+    df = pd.read_parquet(url)
+    df = df.rename_axis("time").reset_index()
+    df["time"] = pd.to_datetime(df["time"])
+    return df
 
 
 def filter_install_date(df, location):
