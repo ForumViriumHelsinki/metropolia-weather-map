@@ -11,9 +11,9 @@ from utils.get_data_util import (
 )
 from utils.plot_utils import (
     plot_daily_temp_avg,
-    plot_monthly_temp_diff,
+    plot_monthly_diff,
 )
-from utils.utils import daily_avg_temp, save_graph
+from utils.utils import save_graph
 
 
 def temperature_by_tag(
@@ -25,6 +25,7 @@ def temperature_by_tag(
     end_date: date = None,
     daytime: bool = False,
     nighttime: bool = False,
+    analysis_variable: str = "temperature",
 ):
     if start_date and start_date.year < 2024:
         raise ValueError("Start date must be in 2024 or later.")
@@ -45,12 +46,14 @@ def temperature_by_tag(
         and start_date.year == 2025
     )
 
-    print(is_2024, is_2025)
-
     def prepare_data(df, tag):
         df = tag_filter(df, tag)
         df = filter_date_range(df, start_date, end_date)
-        return daily_avg_temp(df), df
+
+        if graph_type == "plot":
+            return daily_avg(df, analysis_variable)
+
+        return monthly_avg_mean(df, analysis_variable)
 
     match location:
         case "Vallila":
@@ -64,30 +67,53 @@ def temperature_by_tag(
 
     df = filter_date_range(df, start_date, end_date)
 
-    avg1, df1 = prepare_data(df, tag1)
-    avg2, df2 = prepare_data(df, tag2)
+    var1 = prepare_data(df, tag1)
+    var2 = prepare_data(df, tag2)
 
-    print(f"Max value of avg_diff: {(avg1 - avg2).max()}")
+    print(f"Max value of avg_diff: {(var1 - var2).max()}")
+
+    title_detail = "lämpötila"
+    unit = "°C"
+
+    if analysis_variable == "humidity":
+        title_detail = "ilmankosteus"
+        unit = "%"
 
     if graph_type == "plot":
         return plot_daily_temp_avg(
-            df1=avg1,
-            df2=avg2,
-            title=f"Päivittäinen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
+            df1=var1,
+            df2=var2,
+            title=f"Päivittäinen {title_detail} vaihtelu {f'{location}ssa' if location else ''}",
+            diff_title=title_detail,
+            unit=unit,
             df1_label=tag1,
             df2_label=tag2,
         )
 
     if graph_type == "bar":
-        return plot_monthly_temp_diff(
-            df1=df1,
-            df2=df2,
-            title=f"Kuukausittainen lämpötila vaihtelu {f'{location}ssa' if location else ''}",
+        return plot_monthly_diff(
+            mean1=var1,
+            mean2=var2,
+            title=f"Kuukausittainen {title_detail} vaihtelu {f'{location}ssa' if location else ''}",
+            diff_title=title_detail,
+            unit=unit,
             df1_label=tag1,
             df2_label=tag2,
         )
 
     raise ValueError("Invalid or undefined graph type")
+
+
+def daily_avg(df, analysis_variable):
+    df = df.copy()
+    df.loc[:, "date"] = df["time"].dt.date
+    return df.groupby("date")[analysis_variable].mean()
+
+
+def monthly_avg_mean(df, analysis_variable):
+    df = df.copy()
+    df.loc[:, "month"] = df["time"].dt.month
+    return df.groupby("month")[analysis_variable].mean()
 
 
 if __name__ == "__main__":

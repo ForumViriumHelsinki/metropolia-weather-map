@@ -2,7 +2,7 @@ from utils.filters import filter_df_by_tag
 from utils.get_data_util import get_all_locations
 from utils.plot_utils import (
     plot_daily_temp_avg,
-    plot_monthly_temp_diff,
+    plot_monthly_diff,
 )
 from utils.utils import daily_avg_temp, save_graph
 
@@ -27,7 +27,7 @@ def main():
     save_graph("continental coastal temp diff", plt, "all_locations")
     plt.clf()
 
-    plt2 = plot_monthly_temp_diff(
+    plt2 = plot_monthly_diff(
         df_manner, df_meri, "Meri- ja mannerilmaseto lämpötilaero", (-1, 1)
     )
     save_graph("continental coastal monthly temp diff", plt2, "all_locations")

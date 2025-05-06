@@ -16,8 +16,8 @@ import { useEffect, useState } from "react";
 import { Tag } from "../../app/(routes)/tags/page";
 
 const graphs = [
-  { display: "Pylväs", value: "bar" },
   { display: "Viiva", value: "plot" },
+  { display: "Pylväs", value: "bar" },
 ];
 
 const timesOfDay = [
@@ -61,7 +61,7 @@ const Analysis = () => {
       setMessage("Numeroita pyöritetään");
       const blob = await getTagGraphService(graphParams);
       setGraphUrl(URL.createObjectURL(blob));
-      setMessage("Graph created");
+      setMessage("Kuvaaja luotu!");
     } catch (error) {
       if (error instanceof Error) {
         console.error(error);

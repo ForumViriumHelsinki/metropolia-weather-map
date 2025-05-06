@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from fastapi import APIRouter, HTTPException
 from starlette.responses import StreamingResponse
 
-from analysis.scripts.temperature_by_tag import temperature_by_tag
+from analysis.scripts.tag_analysis import temperature_by_tag
 
 analysis_router = APIRouter()
 
@@ -19,6 +19,7 @@ def get_temperature_graph(
     start_date: str = None,
     end_date: str = None,
     time_of_day: str = "whole day",
+    analysis_variable: str = "temperature",
 ):
     try:
         if start_date and end_date:
@@ -38,6 +39,7 @@ def get_temperature_graph(
             end_date=end_date,
             daytime=is_daytime,
             nighttime=is_nighttime,
+            analysis_variable=analysis_variable,
         )
 
         buf = io.BytesIO()

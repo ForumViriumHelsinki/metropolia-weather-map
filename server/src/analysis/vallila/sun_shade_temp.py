@@ -3,7 +3,7 @@ from utils.filters import filter_location_with_tag
 from utils.plot_utils import (
     filter_daytime_data,
     plot_daily_temp_avg,
-    plot_monthly_temp_diff,
+    plot_monthly_diff,
 )
 from utils.utils import daily_avg_temp
 
@@ -30,7 +30,7 @@ def avg_daily_temps_sun_shade():
     )
     save_graph("vallila_sun_shade_temp_diff", plt1, folder="vallila")
 
-    plt2 = plot_monthly_temp_diff(
+    plt2 = plot_monthly_diff(
         dfA,
         dfV,
         "Mäkelänkadun lämpötilaero auringossa ja varjossa",
