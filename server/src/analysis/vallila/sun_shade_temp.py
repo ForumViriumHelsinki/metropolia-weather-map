@@ -1,5 +1,5 @@
 from src.utils import save_graph
-from src.utils.filter_tag import filter_location_with_tag
+from utils.filters import filter_location_with_tag
 from utils.plot_utils import (
     filter_daytime_data,
     plot_daily_temp_avg,

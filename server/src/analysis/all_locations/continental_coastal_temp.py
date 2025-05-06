@@ -1,6 +1,6 @@
-from src.utils.filter_tag import filter_df_by_tag
 from src.utils.get_data_util import get_all_locations
 from src.utils.utils import save_graph
+from utils.filters import filter_df_by_tag
 from utils.plot_utils import (
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
