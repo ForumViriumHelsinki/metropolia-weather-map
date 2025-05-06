@@ -3,35 +3,8 @@ import os
 import pandas as pd
 from sqlmodel import select
 
-from src.api.database import get_session
-from src.api.models import Sensor
-
-
-def get_by_location(
-    location: str = None,
-    get_2024: bool = False,
-    get_2025: bool = False,
-    daytime: bool = False,
-    nighttime: bool = False,
-):
-    match location:
-        case "Vallila":
-            return get_vallila(get_2024, get_2025, daytime, nighttime)
-        case "Koivukyla":
-            return get_koivukyla(get_2024, get_2025, daytime, nighttime)
-        case "Laajasalo":
-            return get_laajasalo(get_2024, get_2025, daytime, nighttime)
-        case _:
-            return get_all_locations(get_2024, get_2025, daytime, nighttime)
-
-    return None
-
-
-def read_and_clean_parquet(url):
-    df = pd.read_parquet(url)
-    df = df.rename_axis("time").reset_index()
-    df["time"] = pd.to_datetime(df["time"])
-    return df
+from api.database import get_session
+from api.models import Sensor
 
 
 # Fetch and filter makelankatu data
@@ -45,16 +18,19 @@ def get_vallila(
     df25 = None
 
     if get_2024:
+        print("Vallila 2024")
         df24 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
         )
 
     if get_2025:
+        print("Vallila 2025")
         df25 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
         )
 
     if not get_2024 and not get_2025:
+        print("Vallila kaikki")
         df24 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
         )
@@ -82,14 +58,18 @@ def get_laajasalo(
     nightime: bool = False,
 ):
     if get_2024:
+        print("Laajasalo 2024")
         df = get_rest(get_2024=True)
     elif get_2025:
+        print("Laajasalo 2025")
         df = get_rest(get_2025=True)
     else:
+        print("Laajasalo kaikki")
         df = get_rest()
 
     df["location"] = "Laajasalo"
     df = filter_install_date(df, "Laajasalo")
+    print(df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -107,15 +87,19 @@ def get_koivukyla(
     nightime: bool = False,
 ):
     if get_2024:
+        print("Koivukylä 2024")
         df = get_rest(get_2024=True)
     elif get_2025:
+        print("Koivukylä 2025")
         df = get_rest(get_2025=True)
     else:
+        print("Koivukylä kaikki")
         df = get_rest()
 
     df["location"] = "Koivukyla"
     df = df.loc[df["location"] == "Koivukyla"]
     df = filter_install_date(df, "Koivukyla")
+    print(df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -133,17 +117,24 @@ def get_all_locations(
     nightime: bool = False,
 ):
     if get_2024:
+        print("All 2024")
         dfV = get_vallila(get_2024=True)
-        dfK = get_koivukyla(get_2024=True)
-        dfL = get_laajasalo(get_2024=True)
+        dfR = get_rest(get_2024=True)
+
     elif get_2025:
+        print("All 2025")
         dfV = get_vallila(get_2025=True)
-        dfK = get_koivukyla(get_2025=True)
-        dfL = get_laajasalo(get_2025=True)
+        dfR = get_rest(get_2025=True)
     else:
+        print("All year")
         dfV = get_vallila()
-        dfK = get_koivukyla()
-        dfL = get_laajasalo()
+        dfR = get_rest()
+
+    dfK = filter_install_date(dfR.copy(), "Koivukyla")
+    dfK["location"] = "Koivukyla"
+
+    dfL = filter_install_date(dfR.copy(), "Laajasalo")
+    dfL["location"] = "Laajasalo"
 
     df_merged = pd.concat([dfV, dfK, dfL])
 
@@ -154,6 +145,13 @@ def get_all_locations(
         return filter_daytime_data(df_merged, nightime=True)
 
     return df_merged
+
+
+def read_and_clean_parquet(url):
+    df = pd.read_parquet(url)
+    df = df.rename_axis("time").reset_index()
+    df["time"] = pd.to_datetime(df["time"])
+    return df
 
 
 def filter_install_date(df, location):
@@ -189,14 +187,17 @@ def get_rest(
         )
 
     if get_2024:
+        print("Rest 2024")
         return fetch_2024()
 
     if get_2025:
+        print("Rest 2025")
         return fetch_2025()
 
     df24 = fetch_2024()
     df25 = fetch_2025()
 
+    print("Rest all")
     return pd.concat([df24, df25])
 
 

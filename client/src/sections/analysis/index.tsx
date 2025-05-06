@@ -1,15 +1,35 @@
 "use client";
 
 import {
+  AnalysisType,
   getTagGraphService,
+  GraphTypes,
+  Locations,
   TagGraphParams,
+  TimeOfDay,
 } from "@/app/services/tags/getTagGraphService";
-import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
+import { capitalize } from "@/utils/capitalize";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Tag } from "../tags/page";
+import { Tag } from "../../app/(routes)/tags/page";
+
+const graphs = [
+  { display: "Viiva", value: "plot" },
+  { display: "Pylväs", value: "bar" },
+];
+
+const timesOfDay = [
+  { display: "Koko päivä", value: "whole day" },
+  { display: "Päiväsaika", value: "daytime" },
+  { display: "Yöaika", value: "nighttime" },
+];
+
+const analysisTypes = [
+  { display: "Lämpötila", value: "temperature" },
+  { display: "Ilmankosteus", value: "humidity" },
+];
 
 const Analysis = () => {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -18,32 +38,34 @@ const Analysis = () => {
   const [graphParams, setGraphParams] = useState<TagGraphParams>({
     tag1: "",
     tag2: "",
-    graph_type: GraphTypes.plot,
+    graph_type: GraphTypes.Plot,
+    timeOfDay: TimeOfDay.WholeDay,
   });
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false); // New state for image loading
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchTags = async () => {
       const res = await apiFetch("/tags");
       const tags: Tag[] = await res.json();
       setTags(tags);
+      setGraphParams({ ...graphParams, tag1: tags[0].id, tag2: tags[0].id });
     };
     fetchTags();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getGraph = async () => {
     console.log("getGraph()");
 
     try {
-      // setGraphUrl(null);
-      setMessage("Crunching numbers");
+      setMessage("Numeroita pyöritetään");
       const blob = await getTagGraphService(graphParams);
       setGraphUrl(URL.createObjectURL(blob));
-      setMessage("Graph created");
+      setMessage("Kuvaaja luotu!");
     } catch (error) {
       if (error instanceof Error) {
-        setMessage(`Error creating graph: ${error.message}`);
         console.error(error);
+        setMessage(`Virhe luodessa kaaviota: ${error.message}`);
       }
     }
   };
@@ -68,6 +90,25 @@ const Analysis = () => {
         </button>
 
         <form className="box-basic col-span-3 row-span-6 flex flex-col">
+          <label>Analyysi</label>
+          <select
+            onChange={(e) =>
+              setGraphParams({
+                ...graphParams,
+                analysis_variable: e.currentTarget.value as AnalysisType,
+              })
+            }
+          >
+            {analysisTypes.map((t) => (
+              <option
+                key={t.value}
+                value={t.value}
+              >
+                {t.display}
+              </option>
+            ))}
+          </select>
+
           <label>Tägi 1</label>
           <select
             onChange={(e) =>
@@ -75,7 +116,12 @@ const Analysis = () => {
             }
           >
             {tags.map((t) => (
-              <option key={t.id}>{t.id}</option>
+              <option
+                key={t.id}
+                value={t.id}
+              >
+                {capitalize(t.id)}
+              </option>
             ))}
           </select>
 
@@ -86,7 +132,12 @@ const Analysis = () => {
             }
           >
             {tags.map((t) => (
-              <option key={t.id}>{t.id}</option>
+              <option
+                key={t.id}
+                value={t.id}
+              >
+                {capitalize(t.id)}
+              </option>
             ))}
           </select>
 
@@ -118,8 +169,13 @@ const Analysis = () => {
               })
             }
           >
-            {Object.values(GraphTypes).map((gt) => (
-              <option key={gt}>{gt}</option>
+            {graphs.map((g) => (
+              <option
+                key={g.value}
+                value={g.value}
+              >
+                {g.display}
+              </option>
             ))}
           </select>
 
@@ -150,12 +206,17 @@ const Analysis = () => {
             onChange={(e) =>
               setGraphParams({
                 ...graphParams,
-                timeOfDay: e.currentTarget.value,
+                timeOfDay: e.currentTarget.value as TimeOfDay,
               })
             }
           >
-            {["whole day", "daytime", "nighttime"].map((t) => (
-              <option key={t}>{t}</option>
+            {timesOfDay.map((t) => (
+              <option
+                key={t.value}
+                value={t.value}
+              >
+                {t.display}
+              </option>
             ))}
           </select>
         </form>

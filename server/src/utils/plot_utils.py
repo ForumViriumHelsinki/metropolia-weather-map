@@ -1,16 +1,12 @@
 import matplotlib.pyplot as plt
 
 
-def daily_avg_temp(df):
-    df = df.copy()
-    df.loc[:, "date"] = df["time"].dt.date
-    return df.groupby("date")["temperature"].mean()
-
-
 def plot_daily_temp_avg(
     df1,
     df2,
     title,
+    diff_title,
+    unit,
     df1_label,
     df2_label,
     line1_color=None,
@@ -32,13 +28,13 @@ def plot_daily_temp_avg(
     avg_diff = df1 - df2
 
     avg_diff.plot(
-        kind="line", label="Lämpötilaero", color="red", figsize=(10, 5)
+        kind="line", label=f"{diff_title}ero", color="red", figsize=(10, 5)
     )
 
     plt.title(title)
     plt.axhline(y=0, color="black", linestyle="--", linewidth=1)
     plt.xlabel("Päivämäärä")
-    plt.ylabel("Lämpötila (°C)")
+    plt.ylabel(f"{diff_title} ({unit})")
     plt.legend()
     plt.grid(True)
     return plt
@@ -60,19 +56,12 @@ months = [
 ]
 
 
-def plot_monthly_temp_diff(df1, df2, title, df1_label, df2_label, ylim=None):
+def plot_monthly_diff(
+    mean1, mean2, title, diff_title, unit, df1_label, df2_label
+):
     plt.clf()
 
     plt.figure(figsize=(10, 5))
-
-    df1 = df1.copy()
-    df2 = df2.copy()
-
-    df1.loc[:, "month"] = df1["time"].dt.month
-    df2.loc[:, "month"] = df2["time"].dt.month
-
-    mean1 = df1.groupby("month")["temperature"].mean()
-    mean2 = df2.groupby("month")["temperature"].mean()
 
     # Get the union of months present in both datasets
     available_months = sorted(set(mean1.index).union(mean2.index))
@@ -105,7 +94,7 @@ def plot_monthly_temp_diff(df1, df2, title, df1_label, df2_label, ylim=None):
     plt.title(title)
     plt.legend()
     plt.xlabel("Kuukausi")
-    plt.ylabel("Lämpötila (°C)")
+    plt.ylabel(f"{diff_title}, ({unit})")
     plt.xticks(
         months_indices, [months[m - 1] for m in available_months], rotation=45
     )
