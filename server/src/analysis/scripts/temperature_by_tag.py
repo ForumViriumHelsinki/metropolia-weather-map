@@ -1,14 +1,14 @@
 # ruff: noqa: PLR2004
 from datetime import date
 
-from src.utils.analysis_utils import (
+from src.utils.filter_tag import filter_df_by_tag, filter_location_with_tag
+from src.utils.get_data_util import filter_date_range
+from src.utils.utils import save_graph
+from utils.plot_utils import (
     daily_avg_temp,
     plot_daily_temp_avg,
     plot_monthly_temp_diff,
 )
-from src.utils.filter_tag import filter_df_by_tag, filter_location_with_tag
-from src.utils.get_data_util import filter_date_range
-from src.utils.save_graph import save_graph
 
 
 def temperature_by_tag(
