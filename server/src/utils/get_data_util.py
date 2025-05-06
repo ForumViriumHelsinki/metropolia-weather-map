@@ -69,6 +69,7 @@ def get_laajasalo(
 
     df["location"] = "Laajasalo"
     df = filter_install_date(df, "Laajasalo")
+    print(df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -98,6 +99,7 @@ def get_koivukyla(
     df["location"] = "Koivukyla"
     df = df.loc[df["location"] == "Koivukyla"]
     df = filter_install_date(df, "Koivukyla")
+    print(df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -117,23 +119,24 @@ def get_all_locations(
     if get_2024:
         print("All 2024")
         dfV = get_vallila(get_2024=True)
-        # dfK = get_koivukyla(get_2024=True)
-        # dfL = get_laajasalo(get_2024=True)
         dfR = get_rest(get_2024=True)
+
     elif get_2025:
         print("All 2025")
         dfV = get_vallila(get_2025=True)
         dfR = get_rest(get_2025=True)
-        # dfK = get_koivukyla(get_2025=True)
-        # dfL = get_laajasalo(get_2025=True)
     else:
         print("All year")
         dfV = get_vallila()
         dfR = get_rest()
-        # dfK = get_koivukyla()
-        # dfL = get_laajasalo()
 
-    df_merged = pd.concat([dfV, dfR])
+    dfK = filter_install_date(dfR.copy(), "Koivukyla")
+    dfK["location"] = "Koivukyla"
+
+    dfL = filter_install_date(dfR.copy(), "Laajasalo")
+    dfL["location"] = "Laajasalo"
+
+    df_merged = pd.concat([dfV, dfK, dfL])
 
     if daytime:
         return filter_daytime_data(df_merged)
