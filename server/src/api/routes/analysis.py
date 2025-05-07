@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from fastapi import APIRouter, HTTPException
 from starlette.responses import StreamingResponse
 
-from analysis.scripts.temperature_by_tag import temperature_by_tag
+from analysis.scripts.tag_analysis import temperature_by_tag
 
 analysis_router = APIRouter()
 
@@ -19,17 +19,17 @@ def get_temperature_graph(
     start_date: str = None,
     end_date: str = None,
     time_of_day: str = "whole day",
+    analysis_variable: str = "temperature",
 ):
-    if graph_type == "plot" and start_date and end_date:
-        start_date, end_date = parse_date(start_date, end_date)
-
-    if graph_type == "bar" and start_date and end_date:
-        start_date, end_date = parse_date(start_date, end_date)
-
-    is_daytime = time_of_day == "daytime"
-    is_nighttime = time_of_day == "nighttime"
-
     try:
+        if start_date and end_date:
+            start_date, end_date = parse_date(start_date, end_date)
+            if end_date < start_date:
+                raise ValueError("End date cannot be before start date")
+
+        is_daytime = time_of_day == "daytime"
+        is_nighttime = time_of_day == "nighttime"
+
         graph = temperature_by_tag(
             tag1=tag1,
             tag2=tag2,
@@ -39,6 +39,7 @@ def get_temperature_graph(
             end_date=end_date,
             daytime=is_daytime,
             nighttime=is_nighttime,
+            analysis_variable=analysis_variable,
         )
 
         buf = io.BytesIO()
@@ -46,8 +47,13 @@ def get_temperature_graph(
         buf.seek(0)
 
         return StreamingResponse(buf, media_type="image/svg+xml")
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        print(e)
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred."
+        )
 
 
 def parse_date(start_date, end_date):

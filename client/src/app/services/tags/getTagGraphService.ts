@@ -1,4 +1,3 @@
-import { GraphTypes, Locations } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 
 export interface TagGraphParams {
@@ -8,13 +7,28 @@ export interface TagGraphParams {
   location?: Locations | null;
   startDate?: string | null;
   endDate?: string | null;
-  timeOfDay?: string;
+  timeOfDay?: TimeOfDay;
+  analysis_variable?: AnalysisType;
+}
+export enum GraphTypes {
+  Bar = "bar",
+  Plot = "plot",
+}
+export enum Locations {
+  vallilla = "Vallila",
+  laajasalo = "Laajasalo",
+  koivukyla = "Koivukyla",
 }
 
 export enum TimeOfDay {
-  wholeDay = "whole day",
-  daytime = "daytime",
-  nighttime = "nighttime",
+  WholeDay = "whole day",
+  Daytime = "daytime",
+  Nighttime = "nighttime",
+}
+
+export enum AnalysisType {
+  Temperature = "temperature",
+  Humidity = "humidity",
 }
 
 const toSnakeCase = (str: string): string =>
@@ -41,7 +55,7 @@ export const getTagGraphService = async (
     if (!res.ok) {
       const errorData = await res.json();
       console.error(errorData);
-      throw new Error("Error creating data", errorData.detail);
+      throw new Error(errorData.detail);
     }
 
     const data = await res.blob();
