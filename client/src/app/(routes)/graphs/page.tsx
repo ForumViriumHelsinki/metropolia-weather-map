@@ -29,6 +29,7 @@ export default function Home() {
     "/plot/monthly_night_humidity",
   ];
 
+  // Function to fetch all images from the API (currently not in use)
   const LoadAllImages = async () => {
     setLoading(true);
 
@@ -55,7 +56,7 @@ export default function Home() {
       setLoading(false);
     }
   };
-
+  // Function to fetch a single image from the API
   const LoadImage = async (endpoint) => {
     if (fetchedEndpoints.has(endpoint)) {
       console.log(`Already fetched: ${endpoint}`);
