@@ -1,31 +1,50 @@
+from typing import TYPE_CHECKING
+
 import matplotlib.pyplot as plt
+
+if TYPE_CHECKING:
+    import pandas
 
 
 def plot_daily_temp_avg(
-    df1,
-    df2,
-    title,
-    diff_title,
-    unit,
-    df1_label,
-    df2_label,
-    line1_color=None,
-    line2_color=None,
-):
-    plt.clf()
+    avg1: pandas.DataFrame,
+    avg2: pandas.DataFrame,
+    title: str,
+    diff_title: str,
+    unit: str,
+    plot1_label: str,
+    plot2_label: str,
+    line1_color="darkorange",
+    line2_color="royalblue",
+) -> plt:
+    """Generates a plot of given daily averages of temperature or humidity
 
-    df1.plot(
+    Args:
+        avg1 (pandas.DataFrame): Dataframe of average values
+        avg2 (pandas.DataFrame): Dataframe of average values
+        title (str): Title for generated graph
+        diff_title (str): Legend title for generated differene of average values {diff_title}ero
+        unit (str): Unit of the average values
+        plot1_label (str): Label for plot 1
+        plot2_label (str): Label for plot 2
+        line1_color (str, optional): Color for the generated plot line. Defaults to darkorange.
+        line2_color (str, optional): Color for the generated plot line. Defaults to royalblue.
+
+    Returns:
+        matplotlib.pyplot: Generated graph
+    """
+    avg1.plot(
         kind="line",
-        label=df1_label,
-        color=line1_color if line1_color else "darkorange",
+        label=plot1_label,
+        color=line1_color,
     )
-    df2.plot(
+    avg2.plot(
         kind="line",
-        label=df2_label,
-        color=line2_color if line2_color else "royalblue",
+        label=plot2_label,
+        color=line2_color,
     )
 
-    avg_diff = df1 - df2
+    avg_diff = avg1 - avg2
 
     avg_diff.plot(
         kind="line", label=f"{diff_title}ero", color="red", figsize=(10, 5)
@@ -57,8 +76,28 @@ months = [
 
 
 def plot_monthly_diff(
-    mean1, mean2, title, diff_title, unit, df1_label, df2_label
-):
+    mean1: pandas.DataFrame,
+    mean2: pandas.DataFrame,
+    title: str,
+    diff_title: str,
+    unit: str,
+    bar1_label: str,
+    bar2_label: str,
+) -> plt:
+    """Generates a plot graph of monthly average values of temperature or humidity
+
+    Args:
+        mean1 (pandas.DataFrame): Dataframe of mean values
+        mean2 (pandas.DataFrame): Dataframe of mean values
+        title (str): Title of generated graph
+        diff_title (str): Legend title for generated difference of mean values
+        unit (str): Unit of the mean values
+        bar1_label (str): Label for bar 1
+        bar2_label (str): Label for bar 2
+
+    Returns:
+        matplotlib.pyplot: Generated graph
+    """
     plt.clf()
 
     plt.figure(figsize=(10, 5))
@@ -77,7 +116,7 @@ def plot_monthly_diff(
         [x - bar_width / 2 for x in months_indices],
         mean1,
         width=bar_width,
-        label=df1_label,
+        label=bar1_label,
         color="orange",
         zorder=3,
     )
@@ -85,7 +124,7 @@ def plot_monthly_diff(
         [x + bar_width / 2 for x in months_indices],
         mean2,
         width=bar_width,
-        label=df2_label,
+        label=bar2_label,
         color="royalblue",
         zorder=3,
     )

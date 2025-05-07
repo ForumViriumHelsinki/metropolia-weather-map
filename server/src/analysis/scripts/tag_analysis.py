@@ -81,13 +81,13 @@ def temperature_by_tag(
 
     if graph_type == "plot":
         return plot_daily_temp_avg(
-            df1=var1,
-            df2=var2,
+            avg1=var1,
+            avg2=var2,
             title=f"Päivittäinen {title_detail} vaihtelu {f'{location}ssa' if location else ''}",
             diff_title=title_detail,
             unit=unit,
-            df1_label=tag1,
-            df2_label=tag2,
+            plot1_label=tag1,
+            plot2_label=tag2,
         )
 
     if graph_type == "bar":
@@ -97,8 +97,8 @@ def temperature_by_tag(
             title=f"Kuukausittainen {title_detail} vaihtelu {f'{location}ssa' if location else ''}",
             diff_title=title_detail,
             unit=unit,
-            df1_label=tag1,
-            df2_label=tag2,
+            bar1_label=tag1,
+            bar2_label=tag2,
         )
 
     raise ValueError("Invalid or undefined graph type")

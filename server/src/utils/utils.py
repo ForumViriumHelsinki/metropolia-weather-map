@@ -1,6 +1,10 @@
 import os
+from typing import TYPE_CHECKING
 
 from utils.get_data_util import get_ids_by_location
+
+if TYPE_CHECKING:
+    import pandas
 
 
 def map_locations():
@@ -18,7 +22,14 @@ def map_locations():
     }
 
 
-def save_graph(file_name, plt, folder=None):
+def save_graph(file_name: str, plt, folder: str = None):
+    """Saves generated plot in png and svg format
+
+    Args:
+        file_name (_type_): Name which the files will be saved as
+        plt (_type_): Plot to save
+        folder (_type_, optional): Folder which images will be saved into, if unspecified saves to root folder. Defaults to None.
+    """
     base_path = os.path.join(
         os.path.dirname(__file__), "..", "analysis", "graphs"
     )
@@ -32,7 +43,7 @@ def save_graph(file_name, plt, folder=None):
     plt.savefig(png_path)
 
 
-def daily_avg_temp(df):
+def daily_avg_temp(df: pandas.DataFrame) -> pandas.DataFrame:
     df = df.copy()
     df.loc[:, "date"] = df["time"].dt.date
     return df.groupby("date")["temperature"].mean()
