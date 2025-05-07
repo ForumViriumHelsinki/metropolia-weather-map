@@ -1,10 +1,17 @@
 import os
+from typing import TYPE_CHECKING
 
 import pandas as pd
 from sqlmodel import select
 
 from api.database import get_session
 from api.models import Sensor
+
+if TYPE_CHECKING:
+    from datetime import date
+
+    import pandas
+    from sqlalchemy import Sequence
 
 
 # Fetch and filter makelankatu data
@@ -13,7 +20,18 @@ def get_vallila(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-):
+) -> pandas.DataFrame:
+    """Fetch data of Mäkelänkatu sensors
+
+    Args:
+        get_2024 (bool, optional): Fetch only 2024 data. Defaults to False.
+        get_2025 (bool, optional): Fetch only 2025 data. Defaults to False.
+        daytime (bool, optional): Use only data between sunrise and sundown. Defaults to False.
+        nightime (bool, optional): Use only data between sundown and sunrise. Defaults to False.
+
+    Returns:
+        pandas.DataFrame: Dataframe of location data with specified filters
+    """
     df24 = None
     df25 = None
 
@@ -56,7 +74,18 @@ def get_laajasalo(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-):
+) -> pandas.DataFrame:
+    """Fetch data of Laajasalo sensors
+
+    Args:
+        get_2024 (bool, optional): Fetch only 2024 data. Defaults to False.
+        get_2025 (bool, optional): Fetch only 2025 data. Defaults to False.
+        daytime (bool, optional): Use only data between sunrise and sundown. Defaults to False.
+        nightime (bool, optional): Use only data between sundown and sunrise. Defaults to False.
+
+    Returns:
+        pandas.DataFrame: Dataframe of location data with specified filters
+    """
     if get_2024:
         print("Laajasalo 2024")
         df = get_rest(get_2024=True)
@@ -85,7 +114,18 @@ def get_koivukyla(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-):
+) -> pandas.DataFrame:
+    """Fetch data of Koivukylä sensors
+
+    Args:
+        get_2024 (bool, optional): Fetch only 2024 data. Defaults to False.
+        get_2025 (bool, optional): Fetch only 2025 data. Defaults to False.
+        daytime (bool, optional): Use only data between sunrise and sundown. Defaults to False.
+        nightime (bool, optional): Use only data between sundown and sunrise. Defaults to False.
+
+    Returns:
+        pandas.DataFrame: Dataframe of location data with specified filters
+    """
     if get_2024:
         print("Koivukylä 2024")
         df = get_rest(get_2024=True)
@@ -115,7 +155,18 @@ def get_all_locations(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-):
+) -> pandas.DataFrame:
+    """Fetch data of all sensors
+
+    Args:
+        get_2024 (bool, optional): Fetch only 2024 data. Defaults to False.
+        get_2025 (bool, optional): Fetch only 2025 data. Defaults to False.
+        daytime (bool, optional): Use only data between sunrise and sundown. Defaults to False.
+        nightime (bool, optional): Use only data between sundown and sunrise. Defaults to False.
+
+    Returns:
+        pandas.DataFrame: Dataframe of all locations data with specified filters
+    """
     if get_2024:
         print("All 2024")
         dfV = get_vallila(get_2024=True)
@@ -147,14 +198,34 @@ def get_all_locations(
     return df_merged
 
 
-def read_and_clean_parquet(url):
+def read_and_clean_parquet(url: str) -> pandas.DataFrame:
+    """Fetches parquet data and sets time column to datetime
+
+    Args:
+        url (str): URL of the parquet file
+
+    Returns:
+        pandas.DataFrame: Dataframe of parquet data
+    """
     df = pd.read_parquet(url)
     df = df.rename_axis("time").reset_index()
     df["time"] = pd.to_datetime(df["time"])
     return df
 
 
-def filter_install_date(df, location):
+def filter_install_date(
+    df: pandas.DataFrame, location: str
+) -> pandas.DataFrame:
+    """Filters sensors by location and removes invalid data before install date
+
+    Args:
+        df (pandas.DataFrame): Dataframe of fetched data from bri3
+        location (str): Location of wanted sensors
+
+    Returns:
+        pandas.DataFrame: Dataframe which includes only sensors
+        of the specified location with corrected install date
+    """
     # Get ids and install dates
     for db in get_session():
         res = db.exec(
@@ -164,6 +235,8 @@ def filter_install_date(df, location):
         ).all()
 
     dfs = []
+
+    # Mask out data before install dates
     for sensor_id, install_date in res:
         mask = df["time"] >= str(install_date)
         filtered_df = df[(df["dev-id"] == sensor_id) & mask]
@@ -175,7 +248,14 @@ def filter_install_date(df, location):
 def get_rest(
     get_2024: bool = False,
     get_2025: bool = False,
-):
+) -> pandas.DataFrame:
+    """Helper function to fetch Koivukylä and Laajasalo data
+
+    Args:
+        get_2024 (bool, optional): Fetch only 2024 data. Defaults to False.
+        get_2025 (bool, optional): Fetch only 2025 data. Defaults to False.
+    """
+
     def fetch_2024():
         return read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/r4c/r4c_all-2024.parquet"
@@ -201,7 +281,19 @@ def get_rest(
     return pd.concat([df24, df25])
 
 
-def filter_date_range(df, start_date, end_date):
+def filter_date_range(
+    df: pandas.DataFrame, start_date: date, end_date: date
+) -> pandas.DataFrame:
+    """Filters dataframe with the wanted date range
+
+    Args:
+        df (pandas.DataFrame): Dataframe to filter
+        start_date (datetime.date): Start date of the range
+        end_date (datetime.date): End date of the range
+
+    Returns:
+        pandas.DataFrame: Filtered DataFrame with the specified date range
+    """
     if start_date:
         start_date = pd.to_datetime(start_date).tz_localize("UTC")
     if end_date:
@@ -219,7 +311,18 @@ def filter_date_range(df, start_date, end_date):
     return df[mask]
 
 
-def filter_daytime_data(df, nightime: bool = None):
+def filter_daytime_data(
+    df: pandas.DataFrame, nightime: bool = None
+) -> pandas.DataFrame:
+    """Filters dataframe to only include data between sunrise and sundown or opposite
+
+    Args:
+        df (pandas.DataFrame): Dataframe to filter
+        nightime (bool, optional): Returns nighttime data if True. Defaults to None.
+
+    Returns:
+        pandas.DataFrame: Filtered DataFrame
+    """
     # daylight csv location
     csv_path = os.path.join(
         os.path.dirname(__file__), "..", "analysis", "daylight.csv"
@@ -239,7 +342,6 @@ def filter_daytime_data(df, nightime: bool = None):
     mask = (df["time"] >= df["sunrise"]) & (df["time"] <= df["sunset"])
 
     # Apply the mask to filter out timestamps after sunset
-
     if nightime:
         daylight_df = df[~mask]
     else:
@@ -249,7 +351,15 @@ def filter_daytime_data(df, nightime: bool = None):
     return daylight_df.drop("sunset", axis=1)
 
 
-def get_ids_by_location(location: str):
+def get_ids_by_location(location: str) -> Sequence[str] | list:
+    """Returns list of sensor ids in the specified location
+
+    Args:
+        location (str): Wanted location
+
+    Returns:
+        Sequence[str] | list: List of sensor ids in specified location
+    """
     sensor_ids = []
     for db in get_session():
         res = db.exec(select(Sensor.id).where(Sensor.location == location))
