@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING
 
@@ -10,7 +12,6 @@ from api.models import Sensor
 if TYPE_CHECKING:
     from datetime import date
 
-    import pandas
     from sqlalchemy import Sequence
 
 
@@ -20,7 +21,7 @@ def get_vallila(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-) -> pandas.DataFrame:
+) -> pd.DataFrame:
     """Fetch data of Mäkelänkatu sensors
 
     Args:
@@ -74,7 +75,7 @@ def get_laajasalo(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-) -> pandas.DataFrame:
+) -> pd.DataFrame:
     """Fetch data of Laajasalo sensors
 
     Args:
@@ -114,7 +115,7 @@ def get_koivukyla(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-) -> pandas.DataFrame:
+) -> pd.DataFrame:
     """Fetch data of Koivukylä sensors
 
     Args:
@@ -155,7 +156,7 @@ def get_all_locations(
     get_2025: bool = False,
     daytime: bool = False,
     nightime: bool = False,
-) -> pandas.DataFrame:
+) -> pd.DataFrame:
     """Fetch data of all sensors
 
     Args:
@@ -198,7 +199,7 @@ def get_all_locations(
     return df_merged
 
 
-def read_and_clean_parquet(url: str) -> pandas.DataFrame:
+def read_and_clean_parquet(url: str) -> pd.DataFrame:
     """Fetches parquet data and sets time column to datetime
 
     Args:
@@ -213,9 +214,7 @@ def read_and_clean_parquet(url: str) -> pandas.DataFrame:
     return df
 
 
-def filter_install_date(
-    df: pandas.DataFrame, location: str
-) -> pandas.DataFrame:
+def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
     """Filters sensors by location and removes invalid data before install date
 
     Args:
@@ -248,7 +247,7 @@ def filter_install_date(
 def get_rest(
     get_2024: bool = False,
     get_2025: bool = False,
-) -> pandas.DataFrame:
+) -> pd.DataFrame:
     """Helper function to fetch Koivukylä and Laajasalo data
 
     Args:
@@ -282,8 +281,8 @@ def get_rest(
 
 
 def filter_date_range(
-    df: pandas.DataFrame, start_date: date, end_date: date
-) -> pandas.DataFrame:
+    df: pd.DataFrame, start_date: date, end_date: date
+) -> pd.DataFrame:
     """Filters dataframe with the wanted date range
 
     Args:
@@ -312,8 +311,8 @@ def filter_date_range(
 
 
 def filter_daytime_data(
-    df: pandas.DataFrame, nightime: bool = None
-) -> pandas.DataFrame:
+    df: pd.DataFrame, nightime: bool = None
+) -> pd.DataFrame:
     """Filters dataframe to only include data between sunrise and sundown or opposite
 
     Args:
