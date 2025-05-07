@@ -1,13 +1,11 @@
-import asyncio
 import io
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
 from matplotlib import gridspec
 from numpy.fft import fft
 from statsmodels.tsa.seasonal import STL
-
 from utils.get_data_util import get_all_locations
 from utils.utils import map_locations
 
@@ -49,7 +47,8 @@ def plot_raw_humidity():
 
 	return buf
 
-
+## This function is used to plot the FFT analysis of the humidity data. User can specify an area to filter the data.
+## The function uses the Fast Fourier Transform to analyze the frequency components of the humidity data.
 def plot_fft_analysis(area=None):
 	df = get_all_locations()
 	map = map_locations()
@@ -106,7 +105,8 @@ def plot_fft_analysis(area=None):
 
 	return buf
 
-
+## This function is used to plot the seasonal decomposition of the humidity data using STL (Seasonal-Trend decomposition using LOESS).
+## The function decomposes the time series data into trend, seasonal, and residual components.
 def plot_seasonal_decomposition():
 	df = get_all_locations()
 	print("Columns at start of seasonal decomposition:", df.dtypes)
@@ -132,19 +132,8 @@ def plot_seasonal_decomposition():
 	result.trend.plot(ax=axes[0], title="Trendi")
 	result.seasonal.plot(ax=axes[1], title="Kausiluonteisuus")
 	result.resid.plot(ax=axes[2], title="Jäännös")
-	plt.show()
 	buf = io.BytesIO()
 	plt.savefig(buf, format="png")
 	plt.close()
 	buf.seek(0)
 	return buf
-
-
-def main():
-	plot_raw_humidity()
-	plot_fft_analysis()
-	plot_seasonal_decomposition()
-
-
-if __name__ == "__main__":
-	asyncio.run(main())
