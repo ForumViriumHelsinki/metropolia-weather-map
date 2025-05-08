@@ -6,7 +6,7 @@ import VallilaCard from "@/components/SensorCard/VallilaCard";
 import { Sensor } from "@/types";
 import { apiFetch } from "@/utils/apiFetch";
 import { Toaster } from "react-hot-toast";
-import Analysis from "../sections/analysis";
+import Analysis from "../sections/Analysis";
 
 export type VallilaLatestData = {
   id: string;

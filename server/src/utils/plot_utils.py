@@ -35,6 +35,8 @@ def plot_daily_temp_avg(
     Returns:
         matplotlib.pyplot: Generated graph
     """
+    plt.clf()
+
     avg1.plot(
         kind="line",
         label=plot1_label,

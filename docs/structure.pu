@@ -1,0 +1,11 @@
+@startuml ProjectStructure
+
+package "Weather Map" {
+  package "Server" {
+    [Analysis]
+    [API]
+    [Utils]
+  }
+}
+
+@enduml
