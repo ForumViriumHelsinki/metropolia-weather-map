@@ -59,7 +59,7 @@ Kaikki projektin osat voidaan käynnistää Docker Compose -työkalun avulla. Do
     ```bash
     docker compose up
     ```
-
+    Jos sovelluksen käynnistyksen yhteydessä python-server printtaa virheitä, sammuta sovellus näppäinyhdistelmällä "CTRL + C", ja käynnistä sovellus uudelleen. Tarvittaessa toista tämä prosessi kahdesti.
 Docker voidaan pysäyttää terminaalissa näppäinkomennolla `Ctrl + C`. Se ajetaan uudestaan komennolla `docker compose up`. Tämä vaaditaan ensimmäisen ajon jälkeen, jotta tietokannassa oleva data näkyy verkkosivulla.
 
 ## 3. Alusta tietokanta
