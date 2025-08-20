@@ -1,0 +1,208 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: weather-map-dev
+
+build:
+  local:
+    push: false          # Don't push to registry for local development
+    useDockerCLI: true    # Better compatibility with Orbstack
+    useBuildkit: true     # Faster builds
+    concurrency: 2        # Build client and server in parallel
+  artifacts:
+    - image: weather-map-client
+      context: ./client
+      docker:
+        dockerfile: ./Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.{js,jsx,ts,tsx,css,json}"
+            dest: /app/src
+            strip: "src/"
+          - src: "package.json"
+            dest: /app/package.json
+          - src: "*.config.*"
+            dest: /app/
+    - image: weather-map-server
+      context: ./server
+      docker:
+        dockerfile: ./Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.py"
+            dest: /usr/src/app/src
+            strip: "src/"
+          - src: "requirements.txt"
+            dest: /usr/src/app/requirements.txt
+
+manifests:
+  rawYaml:
+    - k8s/*.yaml
+
+deploy:
+  statusCheckDeadlineSeconds: 300
+  kubectl: {}
+
+portForward:
+  - resourceType: service
+    resourceName: nextjs-service
+    port: 3000
+    localPort: 3000
+    address: 127.0.0.1
+  - resourceType: service
+    resourceName: fastapi-service
+    port: 8000
+    localPort: 8000
+    address: 127.0.0.1
+  - resourceType: service
+    resourceName: postgres-service
+    port: 5432
+    localPort: 5432
+    address: 127.0.0.1
+
+profiles:
+  - name: dev
+    build:
+      local:
+        push: false
+        concurrency: 0  # No build limit for dev
+    patches:
+      - op: add
+        path: /build/artifacts/0/sync/manual/-
+        value:
+          src: "public/**/*"
+          dest: /app/public
+          strip: "public/"
+      - op: add
+        path: /build/artifacts/1/sync/manual/-
+        value:
+          src: "*.py"
+          dest: /usr/src/app/
+    deploy:
+      statusCheckDeadlineSeconds: 600
+
+  - name: debug
+    build:
+      local:
+        push: false
+    deploy:
+      logs:
+        prefix: pod
+      statusCheckDeadlineSeconds: 900
+    patches:
+      - op: replace
+        path: /manifests/rawYaml
+        value:
+          - k8s/*.yaml
+
+test:
+  - image: weather-map-server
+    structureTests:
+      - ./tests/structure/server-structure-test.yaml
+    custom:
+      - command: ./scripts/test-runner.sh health
+        timeoutSeconds: 60
+        dependencies:
+          paths:
+            - "src/**/*.py"
+            - "scripts/test-runner.sh"
+      - command: ./scripts/test-runner.sh database
+        timeoutSeconds: 30
+        dependencies:
+          paths:
+            - "src/**/*.py"
+            - "scripts/test-runner.sh"
+      - command: python -m pytest src/tests/ -v
+        timeoutSeconds: 120
+        dependencies:
+          paths:
+            - "src/**/*.py"
+            - "requirements.txt"
+  - image: weather-map-client
+    structureTests:
+      - ./tests/structure/client-structure-test.yaml
+    custom:
+      - command: npm test -- --watchAll=false --passWithNoTests
+        timeoutSeconds: 120
+        dependencies:
+          paths:
+            - "src/**/*.{js,jsx,ts,tsx}"
+            - "package.json"
+            - "package-lock.json"
+
+verify:
+  - name: nextjs-health
+    container:
+      name: nextjs-health-check
+      image: curlimages/curl:latest
+      command: ["/bin/sh"]
+      args: ["-c", "curl -f http://nextjs-service:3000/api/health && echo 'Next.js health check passed'"]
+  - name: fastapi-health
+    container:
+      name: fastapi-health-check
+      image: curlimages/curl:latest
+      command: ["/bin/sh"]
+      args: ["-c", "curl -f http://fastapi-service:8000/health && echo 'FastAPI health check passed'"]
+  - name: database-connectivity
+    container:
+      name: db-connectivity-check
+      image: postgres:15
+      command: ["/bin/sh"]
+      args: ["-c", "pg_isready -h postgres-service -p 5432 -U postgres && echo 'Database connectivity check passed'"]
+
+  - name: db-only
+    build:
+      artifacts: []
+    manifests:
+      rawYaml:
+        - k8s/namespace.yaml
+        - k8s/secrets/*.yaml
+        - k8s/configmaps/*.yaml
+        - k8s/storage/*.yaml
+        - k8s/database/*.yaml
+    portForward:
+      - resourceType: service
+        resourceName: postgres-service
+        port: 5432
+        localPort: 5432
+        address: 127.0.0.1
+
+  - name: quick-test
+    test:
+      - image: weather-map-server
+        custom:
+          - command: ./scripts/quick-health-check.sh
+            timeoutSeconds: 30
+      - image: weather-map-client
+        custom:
+          - command: npm run lint
+            timeoutSeconds: 60
+
+  - name: full-test
+    test:
+      - image: weather-map-server
+        custom:
+          - command: ./scripts/validate-skaffold-deployment.sh
+            timeoutSeconds: 300
+          - command: python -m pytest src/tests/ -v --cov=src
+            timeoutSeconds: 180
+      - image: weather-map-client
+        custom:
+          - command: npm test -- --watchAll=false --coverage
+            timeoutSeconds: 180
+          - command: npm run build
+            timeoutSeconds: 120
+
+  - name: benchmark-test
+    test:
+      - image: weather-map-server
+        custom:
+          - command: ./scripts/performance-benchmark.sh
+            timeoutSeconds: 600
+    verify:
+      - name: load-test
+        container:
+          name: load-tester
+          image: curlimages/curl:latest
+          command: ["/bin/sh"]
+          args: ["-c", "for i in $(seq 1 10); do curl -f http://nextjs-service:3000 && sleep 1; done && echo 'Load test completed'"]

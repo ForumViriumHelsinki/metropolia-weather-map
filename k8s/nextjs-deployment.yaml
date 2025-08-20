@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-client
+  namespace: weather-map
+  labels:
+    app: nextjs-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextjs-client
+  template:
+    metadata:
+      labels:
+        app: nextjs-client
+    spec:
+      containers:
+      - name: nextjs-client
+        image: weather-map/nextjs-client:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_PYTHON_API
+          valueFrom:
+            configMapKeyRef:
+              name: nextjs-config
+              key: NEXT_PUBLIC_PYTHON_API
+        - name: NEXT_PUBLIC_CLIENT_API
+          valueFrom:
+            configMapKeyRef:
+              name: nextjs-config
+              key: NEXT_PUBLIC_CLIENT_API
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5

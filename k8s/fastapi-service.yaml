@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  namespace: weather-map
+  labels:
+    app: fastapi-server
+spec:
+  selector:
+    app: fastapi-server
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP

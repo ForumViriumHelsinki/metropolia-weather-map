@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: weather-map
+  labels:
+    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/instance: dev
