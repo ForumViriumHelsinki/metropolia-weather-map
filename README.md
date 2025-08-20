@@ -67,3 +67,61 @@ Docker voidaan pysäyttää terminaalissa näppäinkomennolla `Ctrl + C`. Se aje
     ```bash
     docker compose up
     ```
+
+# Skaffold Development & Testing
+
+This project supports modern Kubernetes development using Skaffold with integrated testing capabilities.
+
+## Quick Start with Skaffold
+
+1. **Start development environment:**
+   ```bash
+   skaffold dev
+   ```
+
+2. **Run with testing enabled:**
+   ```bash
+   skaffold dev -p quick-test
+   ```
+
+3. **Run full test suite:**
+   ```bash
+   skaffold run -p full-test
+   ```
+
+## Testing
+
+The project uses Skaffold's native testing features instead of shell scripts:
+
+- **Custom Tests**: Automated testing during build/deploy cycles
+- **Container Structure Tests**: Validation of built container images
+- **Verify Tests**: Post-deployment health and connectivity checks
+- **Test Profiles**: Different test suites for dev/staging/production
+
+### Test Commands
+
+```bash
+# Run all tests
+skaffold test
+
+# Run with specific profiles
+skaffold test -p quick-test     # Quick health checks
+skaffold run -p full-test       # Comprehensive testing
+skaffold run -p benchmark-test  # Performance testing
+
+# Post-deployment verification
+skaffold verify
+
+# Individual test functions
+./scripts/test-runner.sh health
+./scripts/test-runner.sh database
+./scripts/test-runner.sh performance
+```
+
+### Test Profiles
+
+- **quick-test**: Fast health checks and linting for development
+- **full-test**: Comprehensive testing with coverage for CI/CD  
+- **benchmark-test**: Performance and load testing
+
+For detailed testing documentation, see [docs/skaffold/TESTING_GUIDE.md](docs/skaffold/TESTING_GUIDE.md).
