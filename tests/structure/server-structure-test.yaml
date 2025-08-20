@@ -1,0 +1,73 @@
+schemaVersion: '2.0.0'
+
+# Container structure tests for the FastAPI server image
+# These tests validate the container's structure, configuration, and runtime environment
+
+commandTests:
+  - name: "Python is installed and accessible"
+    command: "python"
+    args: ["--version"]
+    expectedOutput: ["Python 3.*"]
+
+  - name: "pip is available"
+    command: "pip"
+    args: ["--version"]
+    expectedOutput: ["pip.*"]
+
+  - name: "FastAPI dependencies are installed"
+    command: "python"
+    args: ["-c", "import fastapi, uvicorn; print('FastAPI and Uvicorn are available')"]
+    expectedOutput: ["FastAPI and Uvicorn are available"]
+
+  - name: "Application source code exists"
+    command: "ls"
+    args: ["/usr/src/app/src"]
+    exitCode: 0
+
+  - name: "Main application file exists"
+    command: "ls"
+    args: ["/usr/src/app/src/main.py"]
+    exitCode: 0
+
+  - name: "Requirements file exists"
+    command: "ls"
+    args: ["/usr/src/app/requirements.txt"]
+    exitCode: 0
+
+fileExistenceTests:
+  - name: 'Python executable'
+    path: '/usr/local/bin/python'
+    shouldExist: true
+
+  - name: 'Application main file'
+    path: '/usr/src/app/src/main.py'
+    shouldExist: true
+
+  - name: 'Requirements file'
+    path: '/usr/src/app/requirements.txt'
+    shouldExist: true
+
+  - name: 'API routes directory'
+    path: '/usr/src/app/src/api/routes'
+    shouldExist: true
+
+fileContentTests:
+  - name: 'Check if main.py contains FastAPI import'
+    path: '/usr/src/app/src/main.py'
+    expectedContents: ['from fastapi import FastAPI']
+
+  - name: 'Verify working directory is set correctly'
+    path: '/usr/src/app'
+    isExecutableBy: 'owner'
+
+metadataTest:
+  exposedPorts: ["8000"]
+  workdir: "/usr/src/app"
+  
+  labels:
+    - key: 'maintainer'
+      value: '.*'  # Should have some maintainer label
+
+licenseTests:
+  - debian: true
+    files: ["/usr/share/doc/*/copyright"]
