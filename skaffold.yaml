@@ -13,27 +13,15 @@ build:
     - image: weather-map-client
       context: ./client
       docker:
-        dockerfile: ./Dockerfile
+        dockerfile: Dockerfile
       sync:
-        manual:
-          - src: "src/**/*.{js,jsx,ts,tsx,css,json}"
-            dest: /app/src
-            strip: "src/"
-          - src: "package.json"
-            dest: /app/package.json
-          - src: "*.config.*"
-            dest: /app/
+        auto: true
     - image: weather-map-server
       context: ./server
       docker:
-        dockerfile: ./Dockerfile
+        dockerfile: Dockerfile
       sync:
-        manual:
-          - src: "src/**/*.py"
-            dest: /usr/src/app/src
-            strip: "src/"
-          - src: "requirements.txt"
-            dest: /usr/src/app/requirements.txt
+        auto: true
 
 manifests:
   rawYaml:
@@ -41,21 +29,25 @@ manifests:
 
 deploy:
   statusCheckDeadlineSeconds: 300
-  kubectl: {}
+  kubectl:
+    defaultNamespace: metropolia-weather-map
 
 portForward:
   - resourceType: service
     resourceName: nextjs-service
+    namespace: metropolia-weather-map
     port: 3000
     localPort: 3000
     address: 127.0.0.1
   - resourceType: service
     resourceName: fastapi-service
+    namespace: metropolia-weather-map
     port: 8000
     localPort: 8000
     address: 127.0.0.1
   - resourceType: service
     resourceName: postgres-service
+    namespace: metropolia-weather-map
     port: 5432
     localPort: 5432
     address: 127.0.0.1
@@ -66,18 +58,6 @@ profiles:
       local:
         push: false
         concurrency: 0  # No build limit for dev
-    patches:
-      - op: add
-        path: /build/artifacts/0/sync/manual/-
-        value:
-          src: "public/**/*"
-          dest: /app/public
-          strip: "public/"
-      - op: add
-        path: /build/artifacts/1/sync/manual/-
-        value:
-          src: "*.py"
-          dest: /usr/src/app/
     deploy:
       statusCheckDeadlineSeconds: 600
 
@@ -94,61 +74,6 @@ profiles:
         path: /manifests/rawYaml
         value:
           - k8s/*.yaml
-
-test:
-  - image: weather-map-server
-    structureTests:
-      - ./tests/structure/server-structure-test.yaml
-    custom:
-      - command: ./scripts/test-runner.sh health
-        timeoutSeconds: 60
-        dependencies:
-          paths:
-            - "src/**/*.py"
-            - "scripts/test-runner.sh"
-      - command: ./scripts/test-runner.sh database
-        timeoutSeconds: 30
-        dependencies:
-          paths:
-            - "src/**/*.py"
-            - "scripts/test-runner.sh"
-      - command: python -m pytest src/tests/ -v
-        timeoutSeconds: 120
-        dependencies:
-          paths:
-            - "src/**/*.py"
-            - "requirements.txt"
-  - image: weather-map-client
-    structureTests:
-      - ./tests/structure/client-structure-test.yaml
-    custom:
-      - command: npm test -- --watchAll=false --passWithNoTests
-        timeoutSeconds: 120
-        dependencies:
-          paths:
-            - "src/**/*.{js,jsx,ts,tsx}"
-            - "package.json"
-            - "package-lock.json"
-
-verify:
-  - name: nextjs-health
-    container:
-      name: nextjs-health-check
-      image: curlimages/curl:latest
-      command: ["/bin/sh"]
-      args: ["-c", "curl -f http://nextjs-service:3000/api/health && echo 'Next.js health check passed'"]
-  - name: fastapi-health
-    container:
-      name: fastapi-health-check
-      image: curlimages/curl:latest
-      command: ["/bin/sh"]
-      args: ["-c", "curl -f http://fastapi-service:8000/health && echo 'FastAPI health check passed'"]
-  - name: database-connectivity
-    container:
-      name: db-connectivity-check
-      image: postgres:15
-      command: ["/bin/sh"]
-      args: ["-c", "pg_isready -h postgres-service -p 5432 -U postgres && echo 'Database connectivity check passed'"]
 
   - name: db-only
     build:
@@ -206,3 +131,41 @@ verify:
           image: curlimages/curl:latest
           command: ["/bin/sh"]
           args: ["-c", "for i in $(seq 1 10); do curl -f http://nextjs-service:3000 && sleep 1; done && echo 'Load test completed'"]
+
+test:
+  - image: weather-map-server
+    structureTests:
+      - ./tests/structure/server-structure-test.yaml
+    custom:
+      - command: ./scripts/test-runner.sh health
+        timeoutSeconds: 60
+      - command: ./scripts/test-runner.sh database
+        timeoutSeconds: 30
+      - command: python -m pytest src/tests/ -v
+        timeoutSeconds: 120
+  - image: weather-map-client
+    structureTests:
+      - ./tests/structure/client-structure-test.yaml
+    custom:
+      - command: npm test -- --watchAll=false --passWithNoTests
+        timeoutSeconds: 120
+
+verify:
+  - name: nextjs-health
+    container:
+      name: nextjs-health-check
+      image: curlimages/curl:latest
+      command: ["/bin/sh"]
+      args: ["-c", "curl -f http://nextjs-service:3000/api/health && echo 'Next.js health check passed'"]
+  - name: fastapi-health
+    container:
+      name: fastapi-health-check
+      image: curlimages/curl:latest
+      command: ["/bin/sh"]
+      args: ["-c", "curl -f http://fastapi-service:8000/health && echo 'FastAPI health check passed'"]
+  - name: database-connectivity
+    container:
+      name: db-connectivity-check
+      image: postgres:15
+      command: ["/bin/sh"]
+      args: ["-c", "pg_isready -h postgres-service -p 5432 -U postgres && echo 'Database connectivity check passed'"]
