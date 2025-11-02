@@ -205,13 +205,13 @@ kubectl cluster-info
 # Check namespace
 kubectl get ns weather-map
 # Check pod status
-kubectl get pods -n weather-map
+kubectl get pods -n metropolia-weather-map
 ```
 
 **4. File Sync Not Working**
 - Ensure files are within sync paths defined in skaffold.yaml
 - Check file permissions (should be readable by non-root user)
-- Verify containers are running: `kubectl get pods -n weather-map`
+- Verify containers are running: `kubectl get pods -n metropolia-weather-map`
 
 ### Logs and Debugging
 
@@ -220,15 +220,15 @@ kubectl get pods -n weather-map
 skaffold dev --tail
 
 # View specific service logs
-kubectl logs -n weather-map deployment/nextjs
-kubectl logs -n weather-map deployment/fastapi
-kubectl logs -n weather-map deployment/postgres
+kubectl logs -n metropolia-weather-map deployment/nextjs
+kubectl logs -n metropolia-weather-map deployment/fastapi
+kubectl logs -n metropolia-weather-map deployment/postgres
 
 # Debug mode with verbose output
 skaffold dev -v debug
 
 # Check resource status
-kubectl get all -n weather-map
+kubectl get all -n metropolia-weather-map
 ```
 
 ## Security Features

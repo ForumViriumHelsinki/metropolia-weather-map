@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fastapi-server
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
     app: fastapi-server
 spec:

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nextjs-client
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
     app: nextjs-client
 spec:

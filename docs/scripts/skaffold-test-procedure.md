@@ -79,15 +79,15 @@ skaffold test -p full-test
 kubectl get namespace weather-map
 
 # Verify all deployments are ready
-kubectl get deployments -n weather-map
+kubectl get deployments -n metropolia-weather-map
 
 # Check pod status
-kubectl get pods -n weather-map -o wide
+kubectl get pods -n metropolia-weather-map -o wide
 
 # Monitor deployment progress
-kubectl rollout status deployment/postgres -n weather-map
-kubectl rollout status deployment/fastapi -n weather-map
-kubectl rollout status deployment/nextjs -n weather-map
+kubectl rollout status deployment/postgres -n metropolia-weather-map
+kubectl rollout status deployment/fastapi -n metropolia-weather-map
+kubectl rollout status deployment/nextjs -n metropolia-weather-map
 ```
 
 **Success Criteria**:
@@ -108,10 +108,10 @@ kubectl rollout status deployment/nextjs -n weather-map
 **Manual Verification**:
 ```bash
 # Check service creation
-kubectl get services -n weather-map
+kubectl get services -n metropolia-weather-map
 
 # Test internal connectivity using a debug pod
-kubectl run debug-pod --image=curlimages/curl:latest --rm -it --restart=Never -n weather-map -- sh
+kubectl run debug-pod --image=curlimages/curl:latest --rm -it --restart=Never -n metropolia-weather-map -- sh
 
 # Inside the debug pod:
 # Test PostgreSQL connectivity
@@ -178,7 +178,7 @@ curl http://localhost:3000/api/health | jq
 **Manual Verification**:
 ```bash
 # Check port forwarding status
-kubectl get services -n weather-map
+kubectl get services -n metropolia-weather-map
 
 # Test each port
 curl http://localhost:3000  # Next.js frontend
@@ -207,7 +207,7 @@ open http://localhost:3000  # Should show the weather map application
 **Manual Verification**:
 ```bash
 # Connect to database and create test data
-kubectl exec -it $(kubectl get pods -n weather-map -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n weather-map -- psql -U postgres -d weatherdb
+kubectl exec -it $(kubectl get pods -n metropolia-weather-map -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n metropolia-weather-map -- psql -U postgres -d weatherdb
 
 -- Inside PostgreSQL:
 CREATE TABLE test_persistence (id SERIAL, data TEXT, created_at TIMESTAMP DEFAULT NOW());
@@ -216,13 +216,13 @@ SELECT * FROM test_persistence;
 \q
 
 # Restart PostgreSQL pod
-kubectl delete pod -n weather-map -l app=postgres
+kubectl delete pod -n metropolia-weather-map -l app=postgres
 
 # Wait for new pod to be ready
-kubectl wait --for=condition=ready pod -n weather-map -l app=postgres --timeout=300s
+kubectl wait --for=condition=ready pod -n metropolia-weather-map -l app=postgres --timeout=300s
 
 # Verify data persistence
-kubectl exec -it $(kubectl get pods -n weather-map -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n weather-map -- psql -U postgres -d weatherdb -c "SELECT * FROM test_persistence;"
+kubectl exec -it $(kubectl get pods -n metropolia-weather-map -l app=postgres -o jsonpath='{.items[0].metadata.name}') -n metropolia-weather-map -- psql -U postgres -d weatherdb -c "SELECT * FROM test_persistence;"
 ```
 
 **Success Criteria**:
@@ -243,14 +243,14 @@ kubectl exec -it $(kubectl get pods -n weather-map -l app=postgres -o jsonpath='
 **Manual Verification**:
 ```bash
 # Check resource usage (requires metrics-server)
-kubectl top pods -n weather-map
+kubectl top pods -n metropolia-weather-map
 kubectl top nodes
 
 # Check resource requests and limits
-kubectl describe pods -n weather-map
+kubectl describe pods -n metropolia-weather-map
 
 # Monitor for a period
-watch kubectl get pods -n weather-map
+watch kubectl get pods -n metropolia-weather-map
 ```
 
 **Success Criteria**:
@@ -303,13 +303,13 @@ watch kubectl get pods -n weather-map
 
 **Diagnosis**:
 ```bash
-kubectl describe pod <pod-name> -n weather-map
-kubectl get events -n weather-map
+kubectl describe pod <pod-name> -n metropolia-weather-map
+kubectl get events -n metropolia-weather-map
 ```
 
 **Solutions**:
 - Check resource availability: `kubectl describe nodes`
-- Verify persistent volume claims: `kubectl get pvc -n weather-map`
+- Verify persistent volume claims: `kubectl get pvc -n metropolia-weather-map`
 - Check image pull issues: `docker images | grep weather-map`
 
 #### 2. Service Connectivity Issues
@@ -318,13 +318,13 @@ kubectl get events -n weather-map
 
 **Diagnosis**:
 ```bash
-kubectl get endpoints -n weather-map
-kubectl get services -n weather-map -o wide
+kubectl get endpoints -n metropolia-weather-map
+kubectl get services -n metropolia-weather-map -o wide
 ```
 
 **Solutions**:
 - Verify service selectors match pod labels
-- Check network policies: `kubectl get networkpolicies -n weather-map`
+- Check network policies: `kubectl get networkpolicies -n metropolia-weather-map`
 - Test DNS resolution from inside pods
 
 #### 3. Health Check Failures
@@ -333,13 +333,13 @@ kubectl get services -n weather-map -o wide
 
 **Diagnosis**:
 ```bash
-kubectl logs <pod-name> -n weather-map
+kubectl logs <pod-name> -n metropolia-weather-map
 curl -v http://localhost:8000/health
 ```
 
 **Solutions**:
 - Check application startup logs
-- Verify environment variables: `kubectl get configmap -n weather-map -o yaml`
+- Verify environment variables: `kubectl get configmap -n metropolia-weather-map -o yaml`
 - Test endpoints directly from pods
 
 #### 4. Port Forwarding Issues
@@ -348,7 +348,7 @@ curl -v http://localhost:8000/health
 
 **Diagnosis**:
 ```bash
-kubectl get services -n weather-map
+kubectl get services -n metropolia-weather-map
 lsof -i :3000,8000,5432
 ```
 
@@ -363,8 +363,8 @@ lsof -i :3000,8000,5432
 
 **Diagnosis**:
 ```bash
-kubectl logs <postgres-pod> -n weather-map
-kubectl exec -it <postgres-pod> -n weather-map -- pg_isready
+kubectl logs <postgres-pod> -n metropolia-weather-map
+kubectl exec -it <postgres-pod> -n metropolia-weather-map -- pg_isready
 ```
 
 **Solutions**:

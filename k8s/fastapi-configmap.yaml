@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fastapi-config
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
     app: fastapi-server
 data:

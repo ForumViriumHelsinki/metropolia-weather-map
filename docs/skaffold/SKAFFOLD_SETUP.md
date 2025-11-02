@@ -160,18 +160,18 @@ The PostgreSQL service automatically initializes with:
 
 ```bash
 # Check pod status
-kubectl get pods -n weather-map
+kubectl get pods -n metropolia-weather-map
 
 # View pod logs
-kubectl logs -f deployment/nextjs-client -n weather-map
-kubectl logs -f deployment/fastapi-server -n weather-map
-kubectl logs -f deployment/postgres -n weather-map
+kubectl logs -f deployment/nextjs-client -n metropolia-weather-map
+kubectl logs -f deployment/fastapi-server -n metropolia-weather-map
+kubectl logs -f deployment/postgres -n metropolia-weather-map
 
 # Describe pod issues
-kubectl describe pod <pod-name> -n weather-map
+kubectl describe pod <pod-name> -n metropolia-weather-map
 
 # Access pod shell
-kubectl exec -it deployment/fastapi-server -n weather-map -- /bin/bash
+kubectl exec -it deployment/fastapi-server -n metropolia-weather-map -- /bin/bash
 ```
 
 ### Clean Restart

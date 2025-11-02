@@ -2,9 +2,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
 spec:
   accessModes:
@@ -17,9 +17,9 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
 type: Opaque
 data:
@@ -31,20 +31,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: weather-map
+      app.kubernetes.io/name: metropolia-weather-map
       app.kubernetes.io/component: database
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: weather-map
+        app.kubernetes.io/name: metropolia-weather-map
         app.kubernetes.io/component: database
     spec:
       securityContext:
@@ -101,13 +101,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
 spec:
   selector:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
   ports:
   - port: 5432

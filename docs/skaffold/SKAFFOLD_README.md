@@ -98,13 +98,13 @@ skaffold deploy
 skaffold delete
 
 # Check deployment status
-kubectl get pods -n weather-map
-kubectl get services -n weather-map
+kubectl get pods -n metropolia-weather-map
+kubectl get services -n metropolia-weather-map
 
 # View logs
-kubectl logs -f -n weather-map deployment/nextjs-client
-kubectl logs -f -n weather-map deployment/fastapi-server
-kubectl logs -f -n weather-map deployment/postgres
+kubectl logs -f -n metropolia-weather-map deployment/nextjs-client
+kubectl logs -f -n metropolia-weather-map deployment/fastapi-server
+kubectl logs -f -n metropolia-weather-map deployment/postgres
 ```
 
 ## 📊 Health Checks
@@ -142,16 +142,16 @@ All services include health checks:
 
 ```bash
 # Check pod status
-kubectl get pods -n weather-map
+kubectl get pods -n metropolia-weather-map
 
 # Get detailed pod information
-kubectl describe pod -n weather-map <pod-name>
+kubectl describe pod -n metropolia-weather-map <pod-name>
 
 # View logs
-kubectl logs -n weather-map <pod-name>
+kubectl logs -n metropolia-weather-map <pod-name>
 
 # Access pod shell
-kubectl exec -it -n weather-map <pod-name> -- /bin/sh
+kubectl exec -it -n metropolia-weather-map <pod-name> -- /bin/sh
 ```
 
 ## 🔄 Migration from Docker Compose

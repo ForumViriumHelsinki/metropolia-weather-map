@@ -2,9 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-init
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: database
 data:
   init.sql: |

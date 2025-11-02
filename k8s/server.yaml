@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fastapi-server
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: weather-map
+      app.kubernetes.io/name: metropolia-weather-map
       app.kubernetes.io/component: server
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: weather-map
+        app.kubernetes.io/name: metropolia-weather-map
         app.kubernetes.io/component: server
     spec:
       securityContext:
@@ -73,13 +73,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: fastapi-service
-  namespace: weather-map
+  namespace: metropolia-weather-map
   labels:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: server
 spec:
   selector:
-    app.kubernetes.io/name: weather-map
+    app.kubernetes.io/name: metropolia-weather-map
     app.kubernetes.io/component: server
   ports:
   - port: 8000
