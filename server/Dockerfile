@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# Create non-root user with home directory
 RUN addgroup --system --gid 1001 python && \
-    adduser --system --uid 1001 --gid 1001 python
+    adduser --system --uid 1001 --gid 1001 --home /home/python python
 
 WORKDIR /app
 

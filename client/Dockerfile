@@ -25,8 +25,8 @@ USER nextjs
 # Copy package files
 COPY --chown=nextjs:nodejs package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies (allow lockfile updates in development)
+RUN pnpm install --no-frozen-lockfile
 
 # Copy source code
 COPY --chown=nextjs:nodejs . .
