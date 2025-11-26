@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set environment variables
 ENV PNPM_HOME="/pnpm"
@@ -11,8 +11,8 @@ RUN apk add --no-cache libc6-compat && \
     addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001 -G nodejs
 
-# Enable pnpm
-RUN corepack enable
+# Enable pnpm with correct version from package.json
+RUN corepack enable && corepack prepare --activate
 
 WORKDIR /app
 
