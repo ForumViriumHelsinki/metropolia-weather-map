@@ -1,0 +1,13 @@
+{
+  "separate-pull-requests": true,
+  "packages": {
+    "client": {
+      "release-type": "node",
+      "component": "weather-map-client"
+    },
+    "server": {
+      "release-type": "python",
+      "component": "weather-map-server"
+    }
+  }
+}

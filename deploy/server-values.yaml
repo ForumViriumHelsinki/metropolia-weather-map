@@ -1,0 +1,112 @@
+image:
+  repository: ghcr.io/forumviriumhelsinki/weather-map-server
+  tag: "0.1.0"
+imagePullSecrets:
+- name: ghcr-login-secret
+replicaCount: 1
+serviceAccount:
+  create: true
+  name: weather-map-server
+  annotations:
+    iam.gke.io/gcp-service-account: weather-map@fvh-project-containers-etc.iam.gserviceaccount.com
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+service:
+  type: ClusterIP
+  port: 8000
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+# Cloud SQL Proxy sidecar
+initContainers:
+- name: cloud-sql-proxy
+  image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.16.0
+  restartPolicy: Always
+  args:
+  - "--structured-logs"
+  - "--port=5432"
+  - "--auto-iam-authn"
+  - "fvh-project-containers-etc:europe-north1:fvh-postgres"
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+      - ALL
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+  - host: weather-map-api.dataportal.fi
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - weather-map-api.dataportal.fi
+    secretName: weather-map-server-tls # pragma: allowlist secret
+env:
+  DB_HOST:
+    value: "127.0.0.1"
+  DB_PORT:
+    value: "5432"
+  DB_NAME:
+    value: "weatherdb"
+  DB_USER:
+    value: "weather-map@fvh-project-containers-etc.iam"
+externalSecret:
+  enabled: true
+  name: weather-map-secrets
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: gcp-store
+  target:
+    name: weather-map-secrets
+    creationPolicy: Owner
+  data:
+  - secretKey: DB_PASS # pragma: allowlist secret
+    remoteRef:
+      key: weather-map-database-password
+keda:
+  enabled: true
+  minReplicaCount: 0
+  maxReplicaCount: 2
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+  - type: cron
+    metadata:
+      timezone: Europe/Helsinki
+      start: 0 7 * * 1-5
+      end: 0 18 * * 1-5
+      desiredReplicas: "1"

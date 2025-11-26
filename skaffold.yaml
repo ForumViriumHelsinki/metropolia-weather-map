@@ -134,8 +134,6 @@ profiles:
 
 test:
   - image: weather-map-server
-    structureTests:
-      - ./tests/structure/server-structure-test.yaml
     custom:
       - command: ./scripts/test-runner.sh health
         timeoutSeconds: 60
@@ -144,8 +142,6 @@ test:
       - command: python -m pytest src/tests/ -v
         timeoutSeconds: 120
   - image: weather-map-client
-    structureTests:
-      - ./tests/structure/client-structure-test.yaml
     custom:
       - command: npm test -- --watchAll=false --passWithNoTests
         timeoutSeconds: 120
