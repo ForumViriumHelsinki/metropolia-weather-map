@@ -1,0 +1,88 @@
+schemaVersion: '2.0.0'
+
+# Container structure tests for the Next.js client image
+# These tests validate the container's structure, configuration, and runtime environment
+
+commandTests:
+  - name: "Node.js is installed and accessible"
+    command: "node"
+    args: ["--version"]
+    expectedOutput: ["v.*"]
+
+  - name: "npm is available"
+    command: "npm"
+    args: ["--version"]
+    expectedOutput: [".*"]
+
+  - name: "Application package.json exists"
+    command: "ls"
+    args: ["/app/package.json"]
+    exitCode: 0
+
+  - name: "Next.js is installed"
+    command: "npm"
+    args: ["list", "next", "--depth=0"]
+    exitCode: 0
+
+  - name: "Application source code exists"
+    command: "ls"
+    args: ["/app/src"]
+    exitCode: 0
+
+  - name: "Public assets directory exists"
+    command: "ls"
+    args: ["/app/public"]
+    exitCode: 0
+
+  - name: "Next.js config exists"
+    command: "ls"
+    args: ["/app/next.config.ts"]
+    exitCode: 0
+
+fileExistenceTests:
+  - name: 'Node.js executable'
+    path: '/usr/local/bin/node'
+    shouldExist: true
+
+  - name: 'Application package.json'
+    path: '/app/package.json'
+    shouldExist: true
+
+  - name: 'Next.js configuration'
+    path: '/app/next.config.ts'
+    shouldExist: true
+
+  - name: 'Application source directory'
+    path: '/app/src'
+    shouldExist: true
+    isDirectory: true
+
+  - name: 'Public assets directory'
+    path: '/app/public'
+    shouldExist: true
+    isDirectory: true
+
+  - name: 'Node modules directory'
+    path: '/app/node_modules'
+    shouldExist: true
+    isDirectory: true
+
+fileContentTests:
+  - name: 'Check if package.json contains Next.js dependency'
+    path: '/app/package.json'
+    expectedContents: ['next']
+
+  - name: 'Verify package.json contains start script'
+    path: '/app/package.json'
+    expectedContents: ['"start"']
+
+metadataTest:
+  exposedPorts: ["3000"]
+  workdir: "/app"
+  
+  env:
+    - key: 'NODE_ENV'
+      value: 'production'
+
+licenseTests:
+  - debian: false  # Node.js base images typically use Alpine or minimal images

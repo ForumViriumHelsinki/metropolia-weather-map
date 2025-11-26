@@ -9,7 +9,8 @@
     "start-db": "docker-compose up",
     "enter-db": "docker exec -it weatherdb psql -U postgres",
     "start-api": "uvicorn api.main:app --reload",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo 'Info: No tests configured yet. To add tests, install Jest or Vitest.' && true"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

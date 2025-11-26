@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextjs-config
+  namespace: metropolia-weather-map
+  labels:
+    app: nextjs-client
+data:
+  NEXT_PUBLIC_PYTHON_API: http://fastapi-service:8000
+  NEXT_PUBLIC_CLIENT_API: http://localhost:8000

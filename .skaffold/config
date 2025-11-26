@@ -1,0 +1,16 @@
+# Skaffold global configuration
+global:
+  collect-metrics: false
+  update-check: true
+
+kubeContext: orbstack
+
+# Local development settings
+local:
+  # Use docker daemon from Orbstack
+  useBuildkit: true
+  # Push to local registry
+  push: false
+
+# Default repo for images
+default-repo: weather-map

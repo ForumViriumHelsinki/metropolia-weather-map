@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs-service
+  namespace: metropolia-weather-map
+  labels:
+    app: nextjs-client
+spec:
+  selector:
+    app: nextjs-client
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP

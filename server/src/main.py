@@ -62,6 +62,11 @@ def update_hello():
     return {"message": "Global variable updated"}
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "fastapi-server"}
+
+
 app.include_router(sensor_router)
 app.include_router(sensor_tag_router)
 app.include_router(tag_router)

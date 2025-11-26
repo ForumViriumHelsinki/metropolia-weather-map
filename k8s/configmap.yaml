@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+  namespace: metropolia-weather-map
+  labels:
+    app.kubernetes.io/name: metropolia-weather-map
+    app.kubernetes.io/component: database
+data:
+  init.sql: |
+    CREATE DATABASE weatherdb;
+    
+    \c weatherdb
+    CREATE SCHEMA IF NOT EXISTS weather;
+    
+    SET search_path TO weather;
+    
+    CREATE TABLE IF NOT EXISTS weather.sensors(
+        id text PRIMARY KEY,
+        lat float,
+        lon float,
+        location text,
+        install_date date,
+        csv_link text
+    );
+    
+    CREATE TABLE IF NOT EXISTS weather.tags(
+        id text PRIMARY KEY
+    );
+    
+    CREATE TABLE IF NOT EXISTS weather.sensor_tags(
+        sensor_id text REFERENCES weather.sensors(id),
+        tag_id text REFERENCES weather.tags(id),
+        PRIMARY KEY (sensor_id, tag_id)
+    );
