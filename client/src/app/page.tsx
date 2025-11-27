@@ -8,6 +8,9 @@ import { apiFetch } from "@/utils/apiFetch";
 import { Toaster } from "react-hot-toast";
 import Analysis from "../sections/Analysis";
 
+// Force dynamic rendering since this page fetches data from the API
+export const dynamic = 'force-dynamic';
+
 export type VallilaLatestData = {
   id: string;
   properties: {
