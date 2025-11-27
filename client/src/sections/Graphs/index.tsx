@@ -5,7 +5,6 @@ import { useState } from "react";
 export default function Home() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
   const endpoints = [
     "/plot/raw_humidity",
@@ -29,27 +28,19 @@ export default function Home() {
     "/plot/monthly_night_humidity",
   ];
 
-  // Function to fetch all images from the API (currently not in use)
+  // Function to fetch all images from the API
   const LoadAllImages = async () => {
     setLoading(true);
 
     try {
-      const endpointsToFetch = endpoints.filter(
-        (endpoint) => !fetchedEndpoints.has(endpoint),
-      );
-      const fetches = endpointsToFetch.map((endpoint) =>
+      const fetches = endpoints.map((endpoint) =>
         apiFetch(endpoint).then((res) => res.blob()),
       );
       const blobs = await Promise.all(fetches);
 
       const imageObjectUrls = blobs.map((blob) => URL.createObjectURL(blob));
 
-      setImages((prevImages) => [...prevImages, ...imageObjectUrls]);
-      setFetchedEndpoints((prev) => {
-        const updated = new Set(prev);
-        endpointsToFetch.forEach((endpoint) => updated.add(endpoint));
-        return updated;
-      });
+      setImages(imageObjectUrls);
     } catch (error) {
       console.error("Error fetching images:", error);
     } finally {
@@ -58,11 +49,6 @@ export default function Home() {
   };
   // Function to fetch a single image from the API
   const LoadImage = async (endpoint) => {
-    if (fetchedEndpoints.has(endpoint)) {
-      console.log(`Already fetched: ${endpoint}`);
-      return; // Don't fetch again
-    }
-
     setLoading(true);
 
     try {
@@ -71,11 +57,6 @@ export default function Home() {
       const imageObjectUrl = URL.createObjectURL(blob);
 
       setImages((prevImages) => [...prevImages, imageObjectUrl]);
-      setFetchedEndpoints((prev) => {
-        const updated = new Set(prev);
-        updated.add(endpoint);
-        return updated;
-      });
     } catch (error) {
       console.error("Error fetching image:", error);
     } finally {
