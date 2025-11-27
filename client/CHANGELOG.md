@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.1...weather-map-client-v0.2.2) (2025-11-27)
+
+
+### Bug Fixes
+
+* **client:** add TypeScript type annotations to Graphs component ([244fa6d](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/244fa6de030c861669c5932ec741f0c9720b6414))
+* **client:** force dynamic rendering for pages with API calls ([043c35e](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/043c35e931e0852fc268e0ff2e4af3cc36f81574))
+* **client:** remove unused fetchedEndpoints from Graphs section ([167c625](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/167c62593c5a28b55b6d928090e87c651c7da571))
+* **client:** remove unused LoadAllImages function and fetchedEndpoints state ([7ca34ce](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/7ca34ce179618ef2745037fd7cbbbef75dfec458))
+
 ## [0.2.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.0...weather-map-client-v0.2.1) (2025-11-27)
 
 
