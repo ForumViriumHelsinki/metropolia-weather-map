@@ -3,7 +3,7 @@ import { apiFetch } from "@/utils/apiFetch";
 import { useState } from "react";
 
 export default function Home() {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const endpoints = [
@@ -48,7 +48,7 @@ export default function Home() {
     }
   };
   // Function to fetch a single image from the API
-  const LoadImage = async (endpoint) => {
+  const LoadImage = async (endpoint: string) => {
     setLoading(true);
 
     try {
