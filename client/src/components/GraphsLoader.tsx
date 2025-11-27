@@ -8,7 +8,6 @@ export default function GraphsLoader() {
     { url: string; endpoint: string; visible: boolean }[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [fetchedEndpoints, setFetchedEndpoints] = useState(new Set()); // Track fetched endpoints!
 
   const endpoints = [
     ["/plot/raw_humidity", "Raaka kosteusdata"],
@@ -37,38 +36,6 @@ export default function GraphsLoader() {
     ["/plot/day_night_humidity_difference", "Yön ja päivän kosteusero"],
     ["/plot/monthly_night_humidity", "Kuukausittainen yökosteus"],
   ];
-
-  const LoadAllImages = async () => {
-    setLoading(true);
-
-    try {
-      const endpointsToFetch = endpoints.filter(
-        (endpoint) => !fetchedEndpoints.has(endpoint),
-      );
-      const fetches = endpointsToFetch.map((endpoint) =>
-        apiFetch(endpoint[0])
-          .then((res) => res.blob())
-          .then((blob) => ({
-            url: URL.createObjectURL(blob),
-            endpoint: endpoint[0],
-            visible: true,
-          })),
-      );
-      
-      const imageObjects = await Promise.all(fetches);
-      setImages((prevImages) => [...prevImages, ...imageObjects]);
-     
-      setFetchedEndpoints((prev) => {
-        const updated = new Set(prev);
-        endpointsToFetch.forEach((endpoint) => updated.add(endpoint[0]));
-        return updated;
-      });
-    } catch (error) {
-      console.error("Error fetching images:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const LoadImage = async (endpoint: string) => {
     const existing = images.find((img) => img.endpoint === endpoint);
@@ -99,13 +66,6 @@ export default function GraphsLoader() {
         visible: true,
       };
       setImages((prevImages) => [...prevImages, imageObject]);
-
-      
-      setFetchedEndpoints((prev) => {
-        const updated = new Set(prev);
-        updated.add(endpoint);
-        return updated;
-      });
     } catch (error) {
       console.error("Error fetching image:", error);
     } finally {
