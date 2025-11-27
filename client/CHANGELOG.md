@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.0...weather-map-client-v0.2.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* **deps:** regenerate pnpm-lock.yaml to match package.json ([#6](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/6)) ([a058358](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/a058358f5c675c059913c0bce15d34dc5f7156ca))
+
 ## [0.2.0](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.1.0...weather-map-client-v0.2.0) (2025-11-26)
 
 
