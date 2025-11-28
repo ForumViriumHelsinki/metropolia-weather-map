@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/forumviriumhelsinki/weather-map-client
-  tag: "0.2.2"
+  tag: "0.2.3"
 imagePullSecrets:
 - name: ghcr-login-secret
 replicaCount: 1
