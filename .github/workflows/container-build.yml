@@ -63,6 +63,9 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: mode=max
           sbom: true
+          build-args: |
+            NEXT_PUBLIC_PYTHON_API=${{ secrets.NEXT_PUBLIC_PYTHON_API }}
+            NEXT_PUBLIC_CLIENT_API=${{ secrets.NEXT_PUBLIC_CLIENT_API }}
 
   build-server:
     runs-on: ubuntu-latest
