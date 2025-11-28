@@ -19,6 +19,7 @@ resources:
 service:
   type: ClusterIP
   port: 8000
+  targetPort: 8000
 livenessProbe:
   httpGet:
     path: /health
