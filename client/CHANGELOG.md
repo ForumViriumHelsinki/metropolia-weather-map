@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.2...weather-map-client-v0.2.3) (2025-11-28)
+
+
+### Bug Fixes
+
+* **client:** use build args for Next.js public env vars ([d512974](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/d5129747f579196ec3bb83d66250902814b9e650))
+
 ## [0.2.2](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.1...weather-map-client-v0.2.2) (2025-11-27)
 
 
