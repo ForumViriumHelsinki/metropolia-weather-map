@@ -1,5 +1,6 @@
 import os
 
+from sqlalchemy import text
 from sqlmodel import Session, SQLModel, create_engine
 
 DB_NAME = os.environ.get("DB_NAME", "weatherdb")
@@ -11,6 +12,11 @@ DB_PASS = os.environ.get("DB_PASS", "pass")
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(DATABASE_URL)
+
+# Create the weather schema if it doesn't exist (required for tables)
+with engine.connect() as conn:
+    conn.execute(text("CREATE SCHEMA IF NOT EXISTS weather"))
+    conn.commit()
 
 SQLModel.metadata.create_all(engine)
 
