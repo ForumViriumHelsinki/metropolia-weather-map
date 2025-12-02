@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.0...weather-map-server-v0.3.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* **server:** create weather schema on startup ([#14](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/14)) ([2a992d3](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/2a992d341db2566ccfeaf691ed7bde86a0fe57e6))
+
 ## [0.3.0](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.2.0...weather-map-server-v0.3.0) (2025-11-28)
 
 
