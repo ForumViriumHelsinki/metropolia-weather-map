@@ -100,6 +100,34 @@ externalSecret:
   - secretKey: DB_PASS # pragma: allowlist secret
     remoteRef:
       key: weather-map-database-password
+# Database migrations (Helm hook - runs before deployment)
+migrations:
+  enabled: true
+  image:
+    repository: ghcr.io/forumviriumhelsinki/weather-map-db
+    tag: "main"
+  command: ['dbmate']
+  args: ['up']
+  env:
+    - name: DATABASE_URL
+      value: 'postgresql://weather-map%40fvh-project-containers-etc.iam@127.0.0.1:5432/weatherdb?sslmode=disable'
+    - name: DBMATE_MIGRATIONS_DIR
+      value: /migrations
+    - name: DBMATE_NO_DUMP_SCHEMA
+      value: 'true'
+  waitForDatabase:
+    enabled: true
+    host: 127.0.0.1
+    port: 5432
+    user: 'weather-map@fvh-project-containers-etc.iam'
+    timeout: 300
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 keda:
   enabled: true
   minReplicaCount: 0
