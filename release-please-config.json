@@ -8,6 +8,10 @@
     "server": {
       "release-type": "python",
       "component": "weather-map-server"
+    },
+    "db": {
+      "release-type": "simple",
+      "component": "weather-map-db"
     }
   }
 }

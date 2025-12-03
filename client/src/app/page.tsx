@@ -29,8 +29,16 @@ export interface LatestData {
 }
 
 export default async function Home() {
-  const res = await apiFetch("/sensors");
-  const sensors: Sensor[] = await res.json();
+  let sensors: Sensor[] = [];
+  try {
+    const res = await apiFetch("/sensors");
+    if (res.ok) {
+      const data = await res.json();
+      sensors = Array.isArray(data) ? data : [];
+    }
+  } catch (error) {
+    console.error("Failed to fetch sensors:", error);
+  }
 
   // Get latest data
   let latestData: VallilaLatestData[] = [];
