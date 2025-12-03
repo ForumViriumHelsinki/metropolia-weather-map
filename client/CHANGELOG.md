@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.3...weather-map-client-v0.3.0) (2025-12-03)
+
+
+### Features
+
+* **db:** add dbmate migrations for production database ([#19](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/19)) ([ab477df](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/ab477df71d99ce79144dc29d9355123e983e90ea))
+
+
+### Bug Fixes
+
+* **client:** add defensive error handling for sensors API ([#18](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/18)) ([05e2653](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/05e26537d061f76784ec18c9c614e5a6d5929f56))
+
 ## [0.2.3](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.2...weather-map-client-v0.2.3) (2025-11-28)
 
 
