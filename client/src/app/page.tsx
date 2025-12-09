@@ -49,7 +49,7 @@ export default async function Home() {
 
     if (resLatest.status === 200) {
       const data = await resLatest.json();
-      latestData = data.features;
+      latestData = Array.isArray(data?.features) ? data.features : [];
     }
   } catch (error) {
     if (error instanceof Error) console.log(error.message);

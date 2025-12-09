@@ -16,7 +16,7 @@ const Map = () => {
 
       if (res.status === 200) {
         const data = await res.json();
-        setSensors(data);
+        setSensors(Array.isArray(data) ? data : []);
       }
     };
     getSensors();
