@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.3.0...weather-map-client-v0.3.1) (2025-12-09)
+
+
+### Bug Fixes
+
+* **client:** add defensive array checks to prevent filter errors ([#23](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/23)) ([80692c8](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/80692c86f39f7bb86cc19cb6890fccdc9f53586b))
+
 ## [0.3.0](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.2.3...weather-map-client-v0.3.0) (2025-12-03)
 
 
