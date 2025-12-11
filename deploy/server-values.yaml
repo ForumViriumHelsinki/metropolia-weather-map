@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/forumviriumhelsinki/weather-map-server
-  tag: "0.3.1"
+  tag: "0.3.2"
 imagePullSecrets:
 - name: ghcr-login-secret
 replicaCount: 1
@@ -125,12 +125,12 @@ migrations:
   command: ['dbmate']
   args: ['up']
   env:
-    - name: DATABASE_URL
-      value: 'postgresql://weather-map%40fvh-project-containers-etc.iam@127.0.0.1:5432/weatherdb?sslmode=disable'
-    - name: DBMATE_MIGRATIONS_DIR
-      value: /migrations
-    - name: DBMATE_NO_DUMP_SCHEMA
-      value: 'true'
+  - name: DATABASE_URL
+    value: 'postgresql://weather-map%40fvh-project-containers-etc.iam@127.0.0.1:5432/weatherdb?sslmode=disable'
+  - name: DBMATE_MIGRATIONS_DIR
+    value: /migrations
+  - name: DBMATE_NO_DUMP_SCHEMA
+    value: 'true'
   waitForDatabase:
     enabled: true
     host: 127.0.0.1
