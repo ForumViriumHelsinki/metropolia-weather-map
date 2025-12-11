@@ -130,7 +130,7 @@ migrations:
   enabled: true
   image:
     repository: ghcr.io/forumviriumhelsinki/weather-map-db
-    tag: "main"
+    tag: "0.2.0"
   command: ['dbmate']
   args: ['up']
   env:
