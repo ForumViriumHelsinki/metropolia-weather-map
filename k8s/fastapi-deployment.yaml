@@ -46,6 +46,11 @@ spec:
             secretKeyRef:
               name: fastapi-secret
               key: DB_PASS
+        - name: MPLCONFIGDIR
+          valueFrom:
+            configMapKeyRef:
+              name: fastapi-config
+              key: MPLCONFIGDIR
         resources:
           requests:
             memory: "256Mi"
