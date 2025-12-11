@@ -16,6 +16,16 @@ resources:
   requests:
     cpu: 100m
     memory: 256Mi
+# Security context for main container and migration job containers
+# Required by Kyverno policies: disallow-privilege-escalation, require-ro-rootfs
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
 service:
   type: ClusterIP
   port: 8000
