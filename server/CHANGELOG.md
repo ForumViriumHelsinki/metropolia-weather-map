@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.1...weather-map-server-v0.3.2) (2025-12-11)
+
+
+### Bug Fixes
+
+* **server:** set MPLCONFIGDIR to resolve matplotlib config error ([f645256](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/f6452560e364dbcf3aef875c7c737f0e57308fb8))
+
 ## [0.3.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.0...weather-map-server-v0.3.1) (2025-12-02)
 
 
