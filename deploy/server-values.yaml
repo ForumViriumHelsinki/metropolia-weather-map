@@ -101,6 +101,15 @@ env:
         key: DB_PASS
   CORS_ORIGINS:
     value: "https://weather-map.dataportal.fi,http://localhost:3000"
+  MPLCONFIGDIR:
+    value: "/tmp/matplotlib"
+# Writable tmp directory for matplotlib cache (required with readOnlyRootFilesystem)
+volumes:
+- name: tmp
+  emptyDir: {}
+volumeMounts:
+- name: tmp
+  mountPath: /tmp
 externalSecret:
   enabled: true
   name: weather-map-secrets
