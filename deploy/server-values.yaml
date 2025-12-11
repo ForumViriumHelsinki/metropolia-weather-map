@@ -84,11 +84,17 @@ env:
     value: "weatherdb"
   DB_USER:
     value: "weather-map@fvh-project-containers-etc.iam"
+  DB_PASS:
+    valueFrom:
+      secretKeyRef:
+        name: weather-map-secrets
+        key: DB_PASS
   CORS_ORIGINS:
     value: "https://weather-map.dataportal.fi,http://localhost:3000"
 externalSecret:
   enabled: true
   name: weather-map-secrets
+  namespace: weather-map
   refreshInterval: 1h
   secretStoreRef:
     kind: ClusterSecretStore
