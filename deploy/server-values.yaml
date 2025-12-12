@@ -146,6 +146,7 @@ migrations:
     enabled: true
     host: "127.0.0.1"
     port: 5432
+    user: "weather-map@fvh-project-containers-etc.iam"
     timeout: 60
   resources:
     limits:
