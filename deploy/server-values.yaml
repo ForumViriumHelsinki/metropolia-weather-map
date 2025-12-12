@@ -140,12 +140,10 @@ migrations:
     value: /migrations
   - name: DBMATE_NO_DUMP_SCHEMA
     value: 'true'
+  # waitForDatabase disabled - native sidecar (restartPolicy: Always) ensures
+  # cloud-sql-proxy is running before migration container starts
   waitForDatabase:
-    enabled: true
-    host: 127.0.0.1
-    port: 5432
-    user: 'weather-map@fvh-project-containers-etc.iam'
-    timeout: 300
+    enabled: false
   resources:
     limits:
       cpu: 500m
