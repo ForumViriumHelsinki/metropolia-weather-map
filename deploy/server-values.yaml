@@ -76,6 +76,13 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Enable CORS at nginx level to ensure headers are present even for error responses
+    # (e.g., when KEDA scales to 0, nginx returns 503 without backend CORS headers)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://weather-map.dataportal.fi"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
   hosts:
   - host: weather-map-api.dataportal.fi
     paths:
