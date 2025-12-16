@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import logging
 import os
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import pandas as pd
@@ -13,6 +15,8 @@ if TYPE_CHECKING:
     from datetime import date
 
     from sqlalchemy import Sequence
+
+logger = logging.getLogger(__name__)
 
 
 # Fetch and filter makelankatu data
@@ -37,19 +41,19 @@ def get_vallila(
     df25 = None
 
     if get_2024:
-        print("Vallila 2024")
+        logger.debug("Loading Vallila 2024")
         df24 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
         )
 
     if get_2025:
-        print("Vallila 2025")
+        logger.debug("Loading Vallila 2025")
         df25 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2025.parquet"
         )
 
     if not get_2024 and not get_2025:
-        print("Vallila kaikki")
+        logger.debug("Loading Vallila all years")
         df24 = read_and_clean_parquet(
             "https://bri3.fvh.io/opendata/makelankatu/makelankatu-2024.parquet"
         )
@@ -88,18 +92,18 @@ def get_laajasalo(
         pandas.DataFrame: Dataframe of location data with specified filters
     """
     if get_2024:
-        print("Laajasalo 2024")
+        logger.debug("Loading Laajasalo 2024")
         df = get_rest(get_2024=True)
     elif get_2025:
-        print("Laajasalo 2025")
+        logger.debug("Loading Laajasalo 2025")
         df = get_rest(get_2025=True)
     else:
-        print("Laajasalo kaikki")
+        logger.debug("Loading Laajasalo all years")
         df = get_rest()
 
     df["location"] = "Laajasalo"
     df = filter_install_date(df, "Laajasalo")
-    print(df["dev-id"].unique())
+    logger.debug("Laajasalo sensors: %s", df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -128,19 +132,19 @@ def get_koivukyla(
         pandas.DataFrame: Dataframe of location data with specified filters
     """
     if get_2024:
-        print("Koivukylä 2024")
+        logger.debug("Loading Koivukylä 2024")
         df = get_rest(get_2024=True)
     elif get_2025:
-        print("Koivukylä 2025")
+        logger.debug("Loading Koivukylä 2025")
         df = get_rest(get_2025=True)
     else:
-        print("Koivukylä kaikki")
+        logger.debug("Loading Koivukylä all years")
         df = get_rest()
 
     df["location"] = "Koivukyla"
     df = df.loc[df["location"] == "Koivukyla"]
     df = filter_install_date(df, "Koivukyla")
-    print(df["dev-id"].unique())
+    logger.debug("Koivukylä sensors: %s", df["dev-id"].unique())
 
     if daytime:
         return filter_daytime_data(df)
@@ -169,24 +173,29 @@ def get_all_locations(
         pandas.DataFrame: Dataframe of all locations data with specified filters
     """
     if get_2024:
-        print("All 2024")
+        logger.info("Loading all 2024 data")
         dfV = get_vallila(get_2024=True)
         dfR = get_rest(get_2024=True)
 
     elif get_2025:
-        print("All 2025")
+        logger.info("Loading all 2025 data")
         dfV = get_vallila(get_2025=True)
         dfR = get_rest(get_2025=True)
     else:
-        print("All year")
+        logger.info("Loading all year data")
         dfV = get_vallila()
         dfR = get_rest()
 
-    dfK = filter_install_date(dfR.copy(), "Koivukyla")
+    # filter_install_date already creates new DataFrames via pd.concat,
+    # so no need for .copy() before filtering - this saves ~200MB memory
+    dfK = filter_install_date(dfR, "Koivukyla")
     dfK["location"] = "Koivukyla"
 
-    dfL = filter_install_date(dfR.copy(), "Laajasalo")
+    dfL = filter_install_date(dfR, "Laajasalo")
     dfL["location"] = "Laajasalo"
+
+    # Delete dfR to free memory before concat
+    del dfR
 
     df_merged = pd.concat([dfV, dfK, dfL])
 
@@ -199,6 +208,17 @@ def get_all_locations(
     return df_merged
 
 
+@lru_cache(maxsize=4)
+def _fetch_parquet_cached(url: str) -> pd.DataFrame:
+    """Fetch and cache parquet data from URL.
+
+    Uses LRU cache to avoid re-downloading the same files.
+    Cache size of 4 covers all parquet files used by the app.
+    """
+    logger.info("Fetching parquet from %s", url)
+    return pd.read_parquet(url)
+
+
 def read_and_clean_parquet(url: str) -> pd.DataFrame:
     """Fetches parquet data and sets time column to datetime
 
@@ -208,10 +228,17 @@ def read_and_clean_parquet(url: str) -> pd.DataFrame:
     Returns:
         pandas.DataFrame: Dataframe of parquet data
     """
-    df = pd.read_parquet(url)
+    # Use cached fetch to avoid re-downloading
+    df = _fetch_parquet_cached(url).copy()
     df = df.rename_axis("time").reset_index()
     df["time"] = pd.to_datetime(df["time"])
     return df
+
+
+def clear_parquet_cache() -> None:
+    """Clear the parquet file cache. Useful for testing or memory management."""
+    _fetch_parquet_cached.cache_clear()
+    logger.info("Parquet cache cleared")
 
 
 def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
@@ -266,17 +293,17 @@ def get_rest(
         )
 
     if get_2024:
-        print("Rest 2024")
+        logger.debug("Loading R4C 2024")
         return fetch_2024()
 
     if get_2025:
-        print("Rest 2025")
+        logger.debug("Loading R4C 2025")
         return fetch_2025()
 
     df24 = fetch_2024()
     df25 = fetch_2025()
 
-    print("Rest all")
+    logger.debug("Loading R4C all years")
     return pd.concat([df24, df25])
 
 
