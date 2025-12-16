@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.3...weather-map-server-v0.3.4) (2025-12-16)
+
+
+### Performance Improvements
+
+* **server:** optimize memory usage for plot generation ([#44](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/44)) ([eff7745](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/eff7745a740cd2b8a58e3bae9b299cdce0686c65))
+
 ## [0.3.3](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.2...weather-map-server-v0.3.3) (2025-12-15)
 
 
