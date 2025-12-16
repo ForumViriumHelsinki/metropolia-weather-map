@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv
+venv
+env
+.env
+.env.*
+*.egg-info
+.eggs
+dist
+build
+*.egg
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.tox
+.nox
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*
+compose.y*ml
+
+# Kubernetes/Skaffold
+k8s
+skaffold.yaml
+charts
+
+# Temporary
+tmp
+temp
+*.tmp
+*.log
+*.bak
+
+# Secrets
+secrets.dev.yaml
+values.dev.yaml

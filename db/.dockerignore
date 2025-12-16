@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Docker
+Dockerfile*
+docker-compose*
+compose.y*ml
+
+# Documentation
+*.md
+
+# Temporary
+tmp
+temp
+*.tmp
+*.log
+*.bak
+
+# Secrets
+secrets.dev.yaml
+values.dev.yaml
