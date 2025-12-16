@@ -268,8 +268,10 @@ def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
         return df.iloc[0:0]  # Return empty DataFrame with same columns
 
     # Create a mapping of sensor_id -> install_date for vectorized lookup
+    # Localize to UTC to match parquet data timestamps
     sensor_dates = {
-        sensor_id: pd.Timestamp(install_date) for sensor_id, install_date in res
+        sensor_id: pd.Timestamp(install_date).tz_localize("UTC")
+        for sensor_id, install_date in res
     }
     sensor_ids = set(sensor_dates.keys())
 
