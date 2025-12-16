@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.6](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.5...weather-map-server-v0.3.6) (2025-12-16)
+
+
+### Bug Fixes
+
+* **server:** handle timezone-aware comparison in filter_install_date ([#50](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/50)) ([fa5cfe7](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/fa5cfe7e49c80dc8daec507e7acc6c4d2ec9581b))
+
 ## [0.3.5](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.4...weather-map-server-v0.3.5) (2025-12-16)
 
 
