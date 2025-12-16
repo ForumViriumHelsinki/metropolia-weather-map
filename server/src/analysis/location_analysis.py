@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import gc
 import io
 import logging
 import os
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
@@ -38,20 +40,21 @@ def plot_daily_temperature_range(df: pd.DataFrame | None = None) -> io.BytesIO:
         name="temperature_range"
     )
 
+    # Free original df memory after aggregation
+    del df, grouped
+    gc.collect()
+
     summary = (
         daily_range.groupby("location")["temperature_range"]
         .agg(["mean", "std"])
         .round(2)
     )
-    print(
-        "\n[SUMMARY] Average daily temperature range (°C) with standard deviation:"
-    )
-    print(summary)
-    print(
-        f"\n[INFO] Most dynamic daily temperatures: {summary['mean'].idxmax()}"
+    logger.debug(
+        "Average daily temperature range (°C) with standard deviation: %s",
+        summary.to_dict(),
     )
 
-    plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(10, 5))
     for loc in daily_range["location"].unique():
         subset = daily_range[daily_range["location"] == loc]
         plt.plot(subset["date"], subset["temperature_range"], label=loc)
@@ -64,8 +67,13 @@ def plot_daily_temperature_range(df: pd.DataFrame | None = None) -> io.BytesIO:
     plt.tight_layout()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
-    plt.close()
+    plt.close(fig)
     buf.seek(0)
+
+    # Free memory after plot generation
+    del daily_range
+    gc.collect()
+
     return buf
 
 
@@ -86,18 +94,21 @@ def plot_daily_median_temperature(df: pd.DataFrame | None = None) -> io.BytesIO:
         df.groupby(["location", "date"])["temperature"].median().reset_index()
     )
 
+    # Free original df memory after aggregation
+    del df
+    gc.collect()
+
     summary = (
         daily_median.groupby("location")["temperature"]
         .agg(["mean", "std"])
         .round(2)
     )
-    print(
-        "\n[SUMMARY] Average daily median temperature (°C) with standard deviation:"
+    logger.debug(
+        "Average daily median temperature (°C) with standard deviation: %s",
+        summary.to_dict(),
     )
-    print(summary)
-    print(f"\n[INFO] Warmest area on average: {summary['mean'].idxmax()}")
 
-    plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(10, 5))
     for loc in daily_median["location"].unique():
         subset = daily_median[daily_median["location"] == loc]
         plt.plot(subset["date"], subset["temperature"], label=loc)
@@ -110,8 +121,13 @@ def plot_daily_median_temperature(df: pd.DataFrame | None = None) -> io.BytesIO:
     plt.tight_layout()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
-    plt.close()
+    plt.close(fig)
     buf.seek(0)
+
+    # Free memory after plot generation
+    del daily_median
+    gc.collect()
+
     return buf
 
 
@@ -172,8 +188,17 @@ def plot_day_night_temperature_difference(
 def plot_monthly_night_temperature(
     df: pd.DataFrame | None = None,
 ) -> io.BytesIO:
-    print("[INFO] Plotting monthly night-time median temperature...")
-    df = get_all_locations()
+    """Plot monthly night-time median temperature by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting monthly night-time median temperature...")
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
     df = add_daypart_column(df)
@@ -208,7 +233,6 @@ def plot_monthly_night_temperature(
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -216,9 +240,20 @@ def plot_monthly_night_temperature(
     return buf
 
 
-def plot_monthly_night_min_temperature():
-    print("[INFO] Plotting monthly night-time minimum temperatures...")
-    df = get_all_locations()
+def plot_monthly_night_min_temperature(
+    df: pd.DataFrame | None = None,
+) -> io.BytesIO:
+    """Plot monthly night-time minimum temperature by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting monthly night-time minimum temperatures...")
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
     df = add_daypart_column(df)
@@ -256,7 +291,6 @@ def plot_monthly_night_min_temperature():
     print("\n[SUMMARY] Average monthly minimum night-time temperature (°C):")
     print(summary.sort_values(ascending=False))
     print(f"\n[INFO] Warmest night minimums on average: {summary.idxmax()}")
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -264,11 +298,25 @@ def plot_monthly_night_min_temperature():
     return buf
 
 
-def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
-    print(
-        "[INFO] Plotting monthly night-time temperature differences (compared to Laajasalo)..."
+def plot_monthly_night_temperature_difference(
+    reference_location: str = "Laajasalo",
+    df: pd.DataFrame | None = None,
+) -> io.BytesIO | None:
+    """Plot monthly night-time temperature difference compared to reference location.
+
+    Args:
+        reference_location: Location to compare against. Defaults to "Laajasalo".
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image, or None if insufficient data.
+    """
+    logger.info(
+        "Plotting monthly night-time temperature differences (compared to %s)...",
+        reference_location,
     )
-    df = get_all_locations()
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
     df = add_daypart_column(df)
@@ -316,7 +364,6 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -329,9 +376,18 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
 # --------------------------
 
 
-def plot_daily_median_humidity():
-    print("[INFO] Plotting daily median humidity...")
-    df = get_all_locations()
+def plot_daily_median_humidity(df: pd.DataFrame | None = None) -> io.BytesIO:
+    """Plot daily median humidity by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting daily median humidity...")
+    if df is None:
+        df = get_all_locations()
     df["date"] = df["time"].dt.date
     daily_median = (
         df.groupby(["location", "date"])["humidity"].median().reset_index()
@@ -358,7 +414,6 @@ def plot_daily_median_humidity():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -366,9 +421,18 @@ def plot_daily_median_humidity():
     return buf
 
 
-def plot_daily_humidity_range():
-    print("[INFO] Plotting daily humidity range...")
-    df = get_all_locations()
+def plot_daily_humidity_range(df: pd.DataFrame | None = None) -> io.BytesIO:
+    """Plot daily humidity range by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting daily humidity range...")
+    if df is None:
+        df = get_all_locations()
     df["date"] = df["time"].dt.date
     grouped = df.groupby(["location", "date"])["humidity"]
     daily_range = (grouped.max() - grouped.min()).reset_index(
@@ -396,7 +460,6 @@ def plot_daily_humidity_range():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -404,9 +467,20 @@ def plot_daily_humidity_range():
     return buf
 
 
-def plot_day_night_humidity_difference():
-    print("[INFO] Plotting day-night humidity difference (monthly)...")
-    df = get_all_locations()
+def plot_day_night_humidity_difference(
+    df: pd.DataFrame | None = None,
+) -> io.BytesIO:
+    """Plot day-night humidity difference by month.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting day-night humidity difference (monthly)...")
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df = add_daypart_column(df)
 
@@ -437,7 +511,6 @@ def plot_day_night_humidity_difference():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -445,9 +518,18 @@ def plot_day_night_humidity_difference():
     return buf
 
 
-def plot_monthly_night_humidity():
-    print("[INFO] Plotting monthly night-time median humidity...")
-    df = get_all_locations()
+def plot_monthly_night_humidity(df: pd.DataFrame | None = None) -> io.BytesIO:
+    """Plot monthly night-time median humidity by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting monthly night-time median humidity...")
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["month"] = df["time"].dt.tz_convert(None).dt.to_period("M")
     df = add_daypart_column(df)
@@ -484,7 +566,6 @@ def plot_monthly_night_humidity():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -497,7 +578,14 @@ def plot_monthly_night_humidity():
 # --------------------------
 
 
-def load_daylight_data():
+@lru_cache(maxsize=1)
+def load_daylight_data() -> pd.DataFrame:
+    """Load and cache daylight data (sunrise/sunset times).
+
+    Uses LRU cache to avoid re-parsing CSV files on every call.
+    Cache is cleared when clear_daylight_cache() is called.
+    """
+    logger.debug("Loading daylight data from CSV files")
     base_dir = os.path.dirname(__file__)
     daylight_24_path = os.path.join(base_dir, "daylight.csv")
     daylight_25_path = os.path.join(base_dir, "daylight25.csv")
@@ -512,8 +600,13 @@ def load_daylight_data():
         df["sunset"] = pd.to_datetime(df["sunset"], format=datetime_format)
         df["date"] = df["sunrise"].dt.date
 
-    daylight_df = pd.concat([daylight_24, daylight_25], ignore_index=True)
-    return daylight_df
+    return pd.concat([daylight_24, daylight_25], ignore_index=True)
+
+
+def clear_daylight_cache() -> None:
+    """Clear the daylight data cache. Useful for testing or memory management."""
+    load_daylight_data.cache_clear()
+    logger.info("Daylight cache cleared")
 
 
 def add_daypart_column(df):

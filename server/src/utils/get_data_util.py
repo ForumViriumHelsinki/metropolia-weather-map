@@ -242,7 +242,10 @@ def clear_parquet_cache() -> None:
 
 
 def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
-    """Filters sensors by location and removes invalid data before install date
+    """Filters sensors by location and removes invalid data before install date.
+
+    Uses vectorized operations instead of sensor-by-sensor filtering for
+    better memory efficiency and performance.
 
     Args:
         df (pandas.DataFrame): Dataframe of fetched data from bri3
@@ -252,7 +255,7 @@ def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
         pandas.DataFrame: Dataframe which includes only sensors
         of the specified location with corrected install date
     """
-    # Get ids and install dates
+    # Get ids and install dates from database
     for db in get_session():
         res = db.exec(
             select(Sensor.id, Sensor.install_date).where(
@@ -260,15 +263,30 @@ def filter_install_date(df: pd.DataFrame, location: str) -> pd.DataFrame:
             )
         ).all()
 
-    dfs = []
+    if not res:
+        logger.warning("No sensors found for location: %s", location)
+        return df.iloc[0:0]  # Return empty DataFrame with same columns
 
-    # Mask out data before install dates
-    for sensor_id, install_date in res:
-        mask = df["time"] >= str(install_date)
-        filtered_df = df[(df["dev-id"] == sensor_id) & mask]
-        dfs.append(filtered_df)
+    # Create a mapping of sensor_id -> install_date for vectorized lookup
+    sensor_dates = {
+        sensor_id: pd.Timestamp(install_date) for sensor_id, install_date in res
+    }
+    sensor_ids = set(sensor_dates.keys())
 
-    return pd.concat(dfs)
+    # Filter to only sensors in this location (single boolean mask)
+    location_mask = df["dev-id"].isin(sensor_ids)
+    df_location = df[location_mask]
+
+    if df_location.empty:
+        logger.warning("No data found for sensors in location: %s", location)
+        return df_location
+
+    # Map each row's sensor_id to its install_date, then compare with time
+    # This is a vectorized operation - much faster than looping
+    install_dates = df_location["dev-id"].map(sensor_dates)
+    valid_mask = df_location["time"] >= install_dates
+
+    return df_location[valid_mask]
 
 
 def get_rest(
