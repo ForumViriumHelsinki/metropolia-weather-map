@@ -1,19 +1,37 @@
+from __future__ import annotations
+
 import io
+import logging
 import os
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
 from utils.get_data_util import get_all_locations
 
+if TYPE_CHECKING:
+    pass
+
+logger = logging.getLogger(__name__)
+
 # --------------------------
 # TEMP FUNCTIONS
 # --------------------------
 
 
-def plot_daily_temperature_range():
-    print("[INFO] Plotting daily temperature range...")
-    df = get_all_locations()
+def plot_daily_temperature_range(df: pd.DataFrame | None = None) -> io.BytesIO:
+    """Plot daily temperature range by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting daily temperature range...")
+    if df is None:
+        df = get_all_locations()
     df["date"] = df["time"].dt.date
     grouped = df.groupby(["location", "date"])["temperature"]
     daily_range = (grouped.max() - grouped.min()).reset_index(
@@ -44,7 +62,6 @@ def plot_daily_temperature_range():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -52,9 +69,18 @@ def plot_daily_temperature_range():
     return buf
 
 
-def plot_daily_median_temperature():
-    print("[INFO] Plotting daily median temperature...")
-    df = get_all_locations()
+def plot_daily_median_temperature(df: pd.DataFrame | None = None) -> io.BytesIO:
+    """Plot daily median temperature by location.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting daily median temperature...")
+    if df is None:
+        df = get_all_locations()
     df["date"] = df["time"].dt.date
     daily_median = (
         df.groupby(["location", "date"])["temperature"].median().reset_index()
@@ -82,7 +108,6 @@ def plot_daily_median_temperature():
     plt.grid(axis="y")
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -90,9 +115,20 @@ def plot_daily_median_temperature():
     return buf
 
 
-def plot_day_night_temperature_difference():
-    print("[INFO] Plotting day-night temperature difference (monthly)...")
-    df = get_all_locations()
+def plot_day_night_temperature_difference(
+    df: pd.DataFrame | None = None,
+) -> io.BytesIO:
+    """Plot day-night temperature difference by month.
+
+    Args:
+        df: Optional pre-loaded DataFrame. If None, loads data via get_all_locations().
+
+    Returns:
+        BytesIO buffer containing the PNG image.
+    """
+    logger.info("Plotting day-night temperature difference...")
+    if df is None:
+        df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
     df["date"] = df["time"].dt.date
     df = add_daypart_column(df)
@@ -126,7 +162,6 @@ def plot_day_night_temperature_difference():
     plt.xticks(rotation=0)
     plt.legend()
     plt.tight_layout()
-    plt.show()
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     plt.close()
@@ -134,7 +169,9 @@ def plot_day_night_temperature_difference():
     return buf
 
 
-def plot_monthly_night_temperature():
+def plot_monthly_night_temperature(
+    df: pd.DataFrame | None = None,
+) -> io.BytesIO:
     print("[INFO] Plotting monthly night-time median temperature...")
     df = get_all_locations()
     df = df[df["time"].dt.to_period("M") != pd.Period("2025-05", freq="M")]
@@ -273,7 +310,7 @@ def plot_monthly_night_temperature_difference(reference_location="Laajasalo"):
         )
 
     plt.axhline(0, color="gray", linestyle="--", linewidth=1)
-    plt.title(f"Kuukausittainen yölämpötilaero verrattuna Laajasaloon")
+    plt.title("Kuukausittainen yölämpötilaero verrattuna Laajasaloon")
     plt.xlabel("Kuukausi")
     plt.ylabel("Lämpötilaero (°C)")
     plt.grid(axis="y")
