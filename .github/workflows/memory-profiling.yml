@@ -1,0 +1,166 @@
+name: Memory Profiling
+
+on:
+  pull_request:
+    paths:
+      - 'server/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'server/**'
+  workflow_dispatch:
+    inputs:
+      full_profile:
+        description: 'Run full memory profiling with detailed report'
+        type: boolean
+        default: false
+  schedule:
+    # Nightly at 2 AM UTC for trend tracking
+    - cron: '0 2 * * *'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  memory-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgis/postgis:15-3.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pass
+          POSTGRES_DB: weatherdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: server/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Run memory limit tests (PR gate)
+        if: github.event_name == 'pull_request'
+        env:
+          CI: true
+          DB_HOST: localhost
+          DB_NAME: weatherdb
+          DB_USER: postgres
+          DB_PASS: pass
+        run: |
+          cd server/src
+          python -m pytest tests/test_memory_usage.py \
+            -m "slow" \
+            -v \
+            --tb=short \
+            -k "TestPlotMemoryLimits or TestDataLoadingMemory" \
+            --memray \
+            2>&1 | tee ../memory_test_results.txt
+
+      - name: Run full memory profiling (nightly/manual)
+        if: github.event_name == 'schedule' || github.event.inputs.full_profile == 'true' || github.event_name == 'push'
+        env:
+          CI: true
+          DB_HOST: localhost
+          DB_NAME: weatherdb
+          DB_USER: postgres
+          DB_PASS: pass
+        run: |
+          cd server/src
+          python -m pytest tests/test_memory_usage.py \
+            -m "slow" \
+            -v \
+            --memray \
+            --memray-bin-path=../memray_output \
+            2>&1 | tee ../memory_test_results.txt
+
+      - name: Generate memory report
+        if: always()
+        run: |
+          cd server/src
+          python tests/test_memory_usage.py 2>&1 | tee ../memory_profile_report.txt || true
+
+      - name: Upload memory profiling artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-profiling-results-${{ github.sha }}
+          path: |
+            server/memory_test_results.txt
+            server/memory_profile_report.txt
+            server/memray_output/
+          retention-days: 30
+
+      - name: Comment PR with memory results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let results = '';
+            let report = '';
+
+            try {
+              results = fs.readFileSync('server/memory_test_results.txt', 'utf8');
+            } catch (e) {
+              results = 'No test results available';
+            }
+
+            try {
+              report = fs.readFileSync('server/memory_profile_report.txt', 'utf8');
+            } catch (e) {
+              report = 'No profiling report available';
+            }
+
+            // Extract pass/fail summary
+            const passed = (results.match(/PASSED/g) || []).length;
+            const failed = (results.match(/FAILED/g) || []).length;
+            const status = failed > 0 ? '❌' : '✅';
+
+            const body = `## ${status} Memory Profiling Results
+
+            **Summary:** ${passed} passed, ${failed} failed
+
+            <details>
+            <summary>Memory Profile Report</summary>
+
+            \`\`\`
+            ${report.slice(0, 3000)}
+            \`\`\`
+            </details>
+
+            <details>
+            <summary>Test Output</summary>
+
+            \`\`\`
+            ${results.slice(0, 5000)}
+            \`\`\`
+            </details>
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

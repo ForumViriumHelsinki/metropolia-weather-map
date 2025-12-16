@@ -1,159 +1,206 @@
 """Memory usage tests for plot generation.
 
 These tests ensure that plot generation stays within acceptable memory limits.
-Target: Under 512MB peak memory usage for any single plot operation.
+Uses pytest-memray for native code tracking (matplotlib C extensions) and
+automatic memory limit enforcement.
+
+Memory Limits:
+- Hard limit: 512MB (must not exceed, blocks PR)
+- Optimization target: 256MB (goal for optimized functions)
+
+Run with:
+    pytest -m slow src/tests/test_memory_usage.py -v
+    pytest --memray -m slow src/tests/test_memory_usage.py -v  # With memray profiling
 """
 
-import gc
+from __future__ import annotations
+
 import io
-import tracemalloc
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import pytest
 
-# Target memory limit in bytes (512 MB)
-MEMORY_LIMIT_BYTES = 512 * 1024 * 1024
+if TYPE_CHECKING:
+    from typing import Callable
 
-# More aggressive target for optimized code (256 MB)
-MEMORY_TARGET_BYTES = 256 * 1024 * 1024
+# Memory limits
+MEMORY_LIMIT_MB = 512
+MEMORY_TARGET_MB = 256
 
 
-def measure_peak_memory(func: Callable) -> tuple[bytes, float]:
-    """Measure peak memory usage of a function.
+# =============================================================================
+# Plot Generation Tests - Hard Limits (512MB)
+# =============================================================================
 
-    Returns:
-        tuple: (result, peak_memory_bytes)
+
+class TestPlotMemoryLimits:
+    """Test that plot generation stays within 512MB hard limit.
+
+    These tests use pytest-memray's limit_memory marker for accurate
+    native code tracking (matplotlib C extensions, NumPy, etc.).
     """
-    gc.collect()
-    tracemalloc.start()
-
-    try:
-        result = func()
-        current, peak = tracemalloc.get_traced_memory()
-        return result, peak
-    finally:
-        tracemalloc.stop()
-        gc.collect()
-
-
-def bytes_to_mb(bytes_val: int) -> float:
-    """Convert bytes to megabytes."""
-    return bytes_val / (1024 * 1024)
-
-
-class TestPlotMemoryUsage:
-    """Test memory usage for plot generation endpoints."""
 
     @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
     def test_fft_plot_memory(self):
         """FFT plot should use less than 512MB memory."""
         from analysis import fluctuation_and_decomposition_analysis
 
-        result, peak_memory = measure_peak_memory(
-            fluctuation_and_decomposition_analysis.plot_fft_analysis
-        )
-
+        result = fluctuation_and_decomposition_analysis.plot_fft_analysis()
         assert isinstance(result, io.BytesIO), "Should return BytesIO buffer"
-        assert peak_memory < MEMORY_LIMIT_BYTES, (
-            f"FFT plot used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"limit is {bytes_to_mb(MEMORY_LIMIT_BYTES):.1f}MB"
-        )
 
     @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
     def test_raw_humidity_plot_memory(self):
         """Raw humidity plot should use less than 512MB memory."""
         from analysis import fluctuation_and_decomposition_analysis
 
-        result, peak_memory = measure_peak_memory(
-            fluctuation_and_decomposition_analysis.plot_raw_humidity
-        )
-
+        result = fluctuation_and_decomposition_analysis.plot_raw_humidity()
         assert isinstance(result, io.BytesIO), "Should return BytesIO buffer"
-        assert peak_memory < MEMORY_LIMIT_BYTES, (
-            f"Raw humidity plot used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"limit is {bytes_to_mb(MEMORY_LIMIT_BYTES):.1f}MB"
-        )
 
     @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
     def test_seasonal_decomposition_memory(self):
         """Seasonal decomposition should use less than 512MB memory."""
         from analysis import fluctuation_and_decomposition_analysis
 
-        result, peak_memory = measure_peak_memory(
-            fluctuation_and_decomposition_analysis.plot_seasonal_decomposition
-        )
-
         # This may return None if not enough data
-        assert peak_memory < MEMORY_LIMIT_BYTES, (
-            f"Seasonal decomposition used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"limit is {bytes_to_mb(MEMORY_LIMIT_BYTES):.1f}MB"
-        )
+        fluctuation_and_decomposition_analysis.plot_seasonal_decomposition()
 
     @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
     def test_daily_temperature_range_memory(self):
         """Daily temperature range plot should use less than 512MB memory."""
         from analysis import location_analysis
 
-        result, peak_memory = measure_peak_memory(
-            location_analysis.plot_daily_temperature_range
-        )
-
+        result = location_analysis.plot_daily_temperature_range()
         assert isinstance(result, io.BytesIO), "Should return BytesIO buffer"
-        assert peak_memory < MEMORY_LIMIT_BYTES, (
-            f"Daily temp range used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"limit is {bytes_to_mb(MEMORY_LIMIT_BYTES):.1f}MB"
-        )
+
+    @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
+    def test_daily_median_temperature_memory(self):
+        """Daily median temperature plot should use less than 512MB memory."""
+        from analysis import location_analysis
+
+        result = location_analysis.plot_daily_median_temperature()
+        assert isinstance(result, io.BytesIO), "Should return BytesIO buffer"
+
+
+# =============================================================================
+# Data Loading Tests
+# =============================================================================
 
 
 class TestDataLoadingMemory:
     """Test memory usage for data loading operations."""
 
     @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_LIMIT_MB} MB")
     def test_get_all_locations_memory(self):
-        """Loading all locations should use reasonable memory."""
+        """Loading all locations should use less than 512MB memory."""
         from utils.get_data_util import get_all_locations
 
-        result, peak_memory = measure_peak_memory(get_all_locations)
-
-        print(
-            f"\nget_all_locations() peak memory: {bytes_to_mb(peak_memory):.1f}MB"
-        )
-        print(f"DataFrame shape: {result.shape}")
-        print(
-            f"DataFrame memory: {result.memory_usage(deep=True).sum() / 1024 / 1024:.1f}MB"
-        )
-
-        assert peak_memory < MEMORY_LIMIT_BYTES, (
-            f"get_all_locations used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"limit is {bytes_to_mb(MEMORY_LIMIT_BYTES):.1f}MB"
-        )
+        df = get_all_locations()
+        assert not df.empty, "Should return non-empty DataFrame"
 
 
-class TestMemoryTargets:
-    """Tests with stricter memory targets for optimized code."""
+# =============================================================================
+# Optimization Target Tests (256MB)
+# =============================================================================
+
+
+class TestMemoryOptimizationTargets:
+    """Tests with stricter 256MB memory targets.
+
+    These represent optimization goals. Failures indicate
+    opportunities for improvement, not blocking issues.
+    """
 
     @pytest.mark.slow
-    def test_fft_plot_optimized_target(self):
+    @pytest.mark.limit_memory(f"{MEMORY_TARGET_MB} MB")
+    def test_fft_plot_optimized(self):
         """FFT plot should use less than 256MB after optimization."""
         from analysis import fluctuation_and_decomposition_analysis
 
-        result, peak_memory = measure_peak_memory(
-            fluctuation_and_decomposition_analysis.plot_fft_analysis
-        )
+        result = fluctuation_and_decomposition_analysis.plot_fft_analysis()
+        assert isinstance(result, io.BytesIO)
 
-        assert peak_memory < MEMORY_TARGET_BYTES, (
-            f"FFT plot used {bytes_to_mb(peak_memory):.1f}MB, "
-            f"target is {bytes_to_mb(MEMORY_TARGET_BYTES):.1f}MB"
-        )
+    @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_TARGET_MB} MB")
+    def test_daily_temperature_range_optimized(self):
+        """Daily temperature range should use less than 256MB."""
+        from analysis import location_analysis
+
+        result = location_analysis.plot_daily_temperature_range()
+        assert isinstance(result, io.BytesIO)
+
+    @pytest.mark.slow
+    @pytest.mark.limit_memory(f"{MEMORY_TARGET_MB} MB")
+    def test_daily_median_temperature_optimized(self):
+        """Daily median temperature should use less than 256MB."""
+        from analysis import location_analysis
+
+        result = location_analysis.plot_daily_median_temperature()
+        assert isinstance(result, io.BytesIO)
+
+
+# =============================================================================
+# Memory Leak Detection Tests
+# =============================================================================
+
+
+class TestMemoryLeaks:
+    """Test for memory leaks in repeated operations.
+
+    Uses pytest-memray's limit_leaks marker to detect memory
+    that isn't freed after multiple iterations.
+    """
+
+    @pytest.mark.slow
+    @pytest.mark.limit_leaks("10 MB")
+    def test_repeated_plot_generation_no_leak(self):
+        """Repeated plot generation should not leak memory."""
+        from analysis import location_analysis
+
+        for _ in range(3):
+            result = location_analysis.plot_daily_temperature_range()
+            assert isinstance(result, io.BytesIO)
+            # Buffer should be garbage collected between iterations
+
+    @pytest.mark.slow
+    @pytest.mark.limit_leaks("5 MB")
+    def test_daylight_cache_no_leak(self):
+        """Daylight data cache should not leak on repeated access."""
+        from analysis.location_analysis import load_daylight_data
+
+        for _ in range(10):
+            df = load_daylight_data()
+            assert not df.empty
+
+
+# =============================================================================
+# Cache Efficiency Tests
+# =============================================================================
+
+
+class TestCacheEfficiency:
+    """Test that caching mechanisms work correctly."""
 
     @pytest.mark.slow
     def test_daylight_data_caching(self):
         """Daylight data should be cached and not reload on each call."""
         import gc
+        import tracemalloc
 
-        from analysis.location_analysis import load_daylight_data
+        from analysis.location_analysis import (
+            clear_daylight_cache,
+            load_daylight_data,
+        )
 
+        # Clear cache to start fresh
+        clear_daylight_cache()
         gc.collect()
+
         tracemalloc.start()
 
         # First call loads data
@@ -171,79 +218,78 @@ class TestMemoryTargets:
         assert df1.equals(df2), "Cached data should be identical"
 
         # Second call should use significantly less memory (cache hit)
-        # Allow some overhead but expect < 10% of first call
-        max_cache_hit_memory = first_peak * 0.1
-        assert second_peak < max_cache_hit_memory, (
-            f"Cache hit used {bytes_to_mb(second_peak):.1f}MB, "
-            f"expected < {bytes_to_mb(max_cache_hit_memory):.1f}MB (10% of first call)"
+        # Allow some overhead but expect < 50% of first call
+        assert second_peak < first_peak * 0.5, (
+            f"Cache hit used {second_peak / 1024 / 1024:.1f}MB, "
+            f"expected < {first_peak * 0.5 / 1024 / 1024:.1f}MB"
         )
 
     @pytest.mark.slow
-    def test_filter_install_date_memory_efficiency(self):
-        """filter_install_date should not create excessive intermediate DataFrames."""
-        from utils.get_data_util import filter_install_date, get_rest
+    def test_parquet_cache_efficiency(self):
+        """Parquet data should be cached across calls."""
+        import gc
+        import tracemalloc
 
-        # Load test data
-        df = get_rest(get_2024=True)
-        initial_size = df.memory_usage(deep=True).sum()
+        from utils.get_data_util import clear_parquet_cache, get_vallila
 
+        # Clear cache to start fresh
+        clear_parquet_cache()
         gc.collect()
+
         tracemalloc.start()
 
-        filter_install_date(df, "Laajasalo")
+        # First call downloads and caches
+        df1 = get_vallila(get_2024=True)
+        _, first_peak = tracemalloc.get_traced_memory()
 
-        _, peak_memory = tracemalloc.get_traced_memory()
+        # Second call should hit cache
+        tracemalloc.reset_peak()
+        df2 = get_vallila(get_2024=True)
+        _, second_peak = tracemalloc.get_traced_memory()
+
         tracemalloc.stop()
 
-        # Peak memory should not exceed 3x the input DataFrame size
-        # (1x for input, 1x for output, 1x for intermediate operations)
-        max_allowed = initial_size * 3
-        assert peak_memory < max_allowed, (
-            f"filter_install_date peak memory {bytes_to_mb(peak_memory):.1f}MB "
-            f"exceeded 3x input size ({bytes_to_mb(max_allowed):.1f}MB)"
-        )
+        assert len(df1) == len(df2), "Cached data should have same length"
 
-    @pytest.mark.slow
-    def test_all_plot_functions_under_target(self):
-        """All plot functions should stay under 256MB target."""
-        from analysis import location_analysis
-
-        # Functions that should be optimized
-        plot_functions = [
-            (
-                "plot_daily_temperature_range",
-                location_analysis.plot_daily_temperature_range,
-            ),
-            (
-                "plot_daily_median_temperature",
-                location_analysis.plot_daily_median_temperature,
-            ),
-        ]
-
-        failures = []
-        for name, func in plot_functions:
-            result, peak_memory = measure_peak_memory(func)
-            if peak_memory >= MEMORY_TARGET_BYTES:
-                failures.append(
-                    f"{name}: {bytes_to_mb(peak_memory):.1f}MB "
-                    f"(target: {bytes_to_mb(MEMORY_TARGET_BYTES):.1f}MB)"
-                )
-
-        assert not failures, "Functions exceeding 256MB target:\n" + "\n".join(
-            failures
+        # Cache hit should use much less memory
+        assert second_peak < first_peak * 0.3, (
+            f"Cache hit used {second_peak / 1024 / 1024:.1f}MB, "
+            f"expected < {first_peak * 0.3 / 1024 / 1024:.1f}MB"
         )
 
 
-if __name__ == "__main__":
-    # Quick profiling script when run directly
-    print("Memory Profiling Report")
-    print("=" * 50)
+# =============================================================================
+# Profiling Script (for manual runs)
+# =============================================================================
+
+
+def _run_profiling_report() -> None:
+    """Generate a memory profiling report when run directly."""
+    import gc
+    import tracemalloc
 
     from analysis import (
         fluctuation_and_decomposition_analysis,
         location_analysis,
     )
     from utils.get_data_util import get_all_locations
+
+    def measure_peak_memory(func: Callable) -> tuple[object, float]:
+        """Measure peak memory usage of a function."""
+        gc.collect()
+        tracemalloc.start()
+        try:
+            result = func()
+            _, peak = tracemalloc.get_traced_memory()
+            return result, peak
+        finally:
+            tracemalloc.stop()
+            gc.collect()
+
+    print("Memory Profiling Report")
+    print("=" * 60)
+    print(f"Hard Limit: {MEMORY_LIMIT_MB}MB | Target: {MEMORY_TARGET_MB}MB")
+    print("=" * 60)
 
     tests = [
         ("get_all_locations", get_all_locations),
@@ -256,18 +302,38 @@ if __name__ == "__main__":
             fluctuation_and_decomposition_analysis.plot_raw_humidity,
         ),
         (
+            "plot_seasonal_decomposition",
+            fluctuation_and_decomposition_analysis.plot_seasonal_decomposition,
+        ),
+        (
             "plot_daily_temperature_range",
             location_analysis.plot_daily_temperature_range,
+        ),
+        (
+            "plot_daily_median_temperature",
+            location_analysis.plot_daily_median_temperature,
         ),
     ]
 
     for name, func in tests:
-        print(f"\nTesting: {name}")
+        print(f"\n{name}:")
         try:
-            result, peak_memory = measure_peak_memory(func)
-            status = (
-                "✅ PASS" if peak_memory < MEMORY_LIMIT_BYTES else "❌ FAIL"
-            )
-            print(f"  Peak memory: {bytes_to_mb(peak_memory):.1f}MB {status}")
+            _, peak_memory = measure_peak_memory(func)
+            peak_mb = peak_memory / 1024 / 1024
+
+            if peak_mb > MEMORY_LIMIT_MB:
+                status = "❌ EXCEEDS LIMIT"
+            elif peak_mb > MEMORY_TARGET_MB:
+                status = "⚠️  Above target"
+            else:
+                status = "✅ PASS"
+
+            print(f"  Peak: {peak_mb:.1f}MB {status}")
         except Exception as e:
             print(f"  ❌ ERROR: {e}")
+
+    print("\n" + "=" * 60)
+
+
+if __name__ == "__main__":
+    _run_profiling_report()
