@@ -1,17 +1,28 @@
 # Production Dockerfile for FastAPI server
-FROM python:3.11-slim AS base
+# Multi-stage build for minimal image size
+
+# Build stage - install dependencies with build tools
+FROM python:3.13-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --target=/app/deps -r requirements.txt
+
+# Runtime stage - minimal image without build tools
+FROM python:3.13-slim AS runtime
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONPATH=/app/deps:/app \
     MPLCONFIGDIR=/tmp/matplotlib
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -19,9 +30,8 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 python && \
     adduser --system --uid 1001 --gid 1001 python
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-deps -r requirements.txt
+# Copy installed dependencies from builder
+COPY --from=builder /app/deps /app/deps
 
 # Copy source code
 COPY --chown=python:python . .
@@ -33,6 +43,6 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=3)" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)" || exit 1
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

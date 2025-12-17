@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
 # Set environment variables
 ENV PNPM_HOME="/pnpm"
@@ -11,19 +11,19 @@ RUN apk add --no-cache libc6-compat && \
     addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001 -G nodejs
 
-# Enable pnpm with correct version from package.json
-RUN corepack enable && corepack prepare --activate
-
 WORKDIR /app
 
+# Copy package files first (needed for corepack to detect pnpm version)
+COPY package.json pnpm-lock.yaml ./
+
+# Enable pnpm with correct version from package.json (must run as root)
+RUN corepack enable pnpm && corepack prepare --activate
+
 # Change ownership of the working directory
-RUN chown nextjs:nodejs /app
+RUN chown -R nextjs:nodejs /app
 
 # Switch to non-root user for dependency installation
 USER nextjs
-
-# Copy package files
-COPY --chown=nextjs:nodejs package.json pnpm-lock.yaml ./
 
 # Install dependencies (allow lockfile updates in development)
 RUN pnpm install --no-frozen-lockfile
