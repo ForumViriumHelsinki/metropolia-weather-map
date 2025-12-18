@@ -186,12 +186,13 @@ def get_all_locations(
         dfV = get_vallila()
         dfR = get_rest()
 
-    # filter_install_date already creates new DataFrames via pd.concat,
-    # so no need for .copy() before filtering - this saves ~200MB memory
-    dfK = filter_install_date(dfR, "Koivukyla")
+    # filter_install_date returns boolean-indexed views, so we need .copy()
+    # to safely add the location column without SettingWithCopyWarning.
+    # Memory is freed when dfR is deleted before the final concat.
+    dfK = filter_install_date(dfR, "Koivukyla").copy()
     dfK["location"] = "Koivukyla"
 
-    dfL = filter_install_date(dfR, "Laajasalo")
+    dfL = filter_install_date(dfR, "Laajasalo").copy()
     dfL["location"] = "Laajasalo"
 
     # Delete dfR to free memory before concat
@@ -228,9 +229,9 @@ def read_and_clean_parquet(url: str) -> pd.DataFrame:
     Returns:
         pandas.DataFrame: Dataframe of parquet data
     """
-    # Use cached fetch to avoid re-downloading
-    df = _fetch_parquet_cached(url).copy()
-    df = df.rename_axis("time").reset_index()
+    # No .copy() needed - reset_index() returns a new DataFrame,
+    # so modifications here don't affect the cached data
+    df = _fetch_parquet_cached(url).rename_axis("time").reset_index()
     df["time"] = pd.to_datetime(df["time"])
     return df
 
