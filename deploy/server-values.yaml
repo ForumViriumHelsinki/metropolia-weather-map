@@ -75,6 +75,9 @@ ingress:
   enabled: false
 gateway:
   enabled: true
+# CORS for gateway-level error responses (e.g. 503 during KEDA scale-to-zero) is
+# handled by deploy/server-security-policy.yaml (Envoy Gateway SecurityPolicy).
+# FastAPI handles CORS for normal responses via CORS_ORIGINS env var below.
 env:
   DB_HOST:
     value: "127.0.0.1"
