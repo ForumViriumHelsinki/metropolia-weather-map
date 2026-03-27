@@ -34,19 +34,9 @@ readinessProbe:
   timeoutSeconds: 5
   failureThreshold: 3
 ingress:
+  enabled: false
+gateway:
   enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-  - host: weather-map.dataportal.fi
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - weather-map.dataportal.fi
-    secretName: weather-map-client-tls # pragma: allowlist secret
 env:
   NODE_ENV:
     value: "production"
