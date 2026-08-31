@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.7](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.6...weather-map-server-v0.3.7) (2026-06-15)
+
+
+### Performance Improvements
+
+* **server:** reduce memory footprint in parquet data loading ([#56](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/56)) ([42634ce](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/42634ceab72d3f1452f19328310faed02c055ed9))
+
 ## [0.3.6](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.5...weather-map-server-v0.3.6) (2025-12-16)
 
 
