@@ -37,6 +37,11 @@ ingress:
   enabled: false
 gateway:
   enabled: true
+  hosts:
+    - host: weather-map.dataportal.fi
+      paths:
+        - path: /
+          pathType: PathPrefix
 env:
   NODE_ENV:
     value: "production"
