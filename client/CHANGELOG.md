@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.3.1...weather-map-client-v0.3.2) (2026-10-16)
+
+
+### Bug Fixes
+
+* **client:** upgrade next to 15.2.9 for CVE-2025-66478 ([#68](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/68)) ([58ccfef](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/58ccfef857fe14d0762a4f1602fc387c437021bf))
+
 ## [0.3.1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-client-v0.3.0...weather-map-client-v0.3.1) (2025-12-09)
 
 
