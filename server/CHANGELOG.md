@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.4.0](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.7...weather-map-server-v0.4.0) (2026-10-16)
+
+
+### Features
+
+* add Skaffold orchestration and GitOps deployment infrastructure ([#1](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/1)) ([314bc33](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/314bc3330f0aefdce196e16840908d8e277f52e2))
+* **server:** make CORS origins configurable via environment variable ([#10](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/10)) ([19a148a](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/19a148afe3c3fc3deda504f19b400e13bfad4f64))
+
+
+### Bug Fixes
+
+* **server:** create weather schema on startup ([#14](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/14)) ([2a992d3](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/2a992d341db2566ccfeaf691ed7bde86a0fe57e6))
+* **server:** handle timezone-aware comparison in filter_install_date ([#50](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/50)) ([fa5cfe7](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/fa5cfe7e49c80dc8daec507e7acc6c4d2ec9581b))
+* **server:** run plot generation in thread pool to prevent event loop blocking ([#40](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/40)) ([1db5682](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/1db5682d589f837cebf292ffa48b26c42fcfe13a))
+* **server:** set MPLCONFIGDIR to resolve matplotlib config error ([f645256](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/f6452560e364dbcf3aef875c7c737f0e57308fb8))
+
+
+### Performance Improvements
+
+* **server:** further memory optimization for plot generation ([#47](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/47)) ([c617d1a](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/c617d1a5a4ee46107015cc54a19bcf121aa1b446))
+* **server:** optimize memory usage for plot generation ([#44](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/44)) ([eff7745](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/eff7745a740cd2b8a58e3bae9b299cdce0686c65))
+* **server:** reduce memory footprint in parquet data loading ([#56](https://github.com/ForumViriumHelsinki/metropolia-weather-map/issues/56)) ([42634ce](https://github.com/ForumViriumHelsinki/metropolia-weather-map/commit/42634ceab72d3f1452f19328310faed02c055ed9))
+
 ## [0.3.7](https://github.com/ForumViriumHelsinki/metropolia-weather-map/compare/weather-map-server-v0.3.6...weather-map-server-v0.3.7) (2026-06-15)
 
 
